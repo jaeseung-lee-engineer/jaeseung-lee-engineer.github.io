@@ -3,57 +3,268 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Website</title>
+  <title>Jaeseung Lee | Resume</title>
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      color: #222;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.45;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 24px auto;
+      background: #ffffff;
+      padding: 34px 42px 40px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      border-radius: 10px;
+    }
+
+    .topbar {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 18px;
+      margin-bottom: 22px;
     }
 
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      max-width: 500px;
-    }
-
-    h1 {
-      margin-bottom: 12px;
+    .name {
       font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: 0.3px;
     }
 
-    p {
-      margin-bottom: 20px;
-      line-height: 1.6;
+    .title {
+      font-size: 1.02rem;
+      color: #374151;
+      margin: 0;
     }
 
-    a {
-      display: inline-block;
+    .contact {
+      text-align: right;
+      font-size: 0.95rem;
+      color: #374151;
+    }
+
+    .contact a {
+      color: #1d4ed8;
       text-decoration: none;
-      background: #222;
-      color: white;
-      padding: 10px 18px;
-      border-radius: 8px;
     }
 
-    a:hover {
-      background: #444;
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #163e72;
+      margin: 0 0 12px;
+      padding-left: 10px;
+      border-left: 5px solid #163e72;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .entry {
+      margin-bottom: 18px;
+    }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .org {
+      font-size: 1.02rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .location, .date {
+      color: #374151;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .sub {
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .role-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-weight: 700;
+      margin-top: 8px;
+      margin-bottom: 6px;
+    }
+
+    ul {
+      margin: 6px 0 0 20px;
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .skills-list li,
+    .pub-list li {
+      margin-bottom: 10px;
+    }
+
+    .label {
+      font-weight: 700;
+    }
+
+    .links a {
+      color: #1d4ed8;
+      text-decoration: none;
+      margin-right: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        margin: 0;
+        border-radius: 0;
+        padding: 24px 20px 30px;
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+
+      .contact {
+        text-align: left;
+      }
+
+      .entry-header,
+      .role-row {
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .location, .date {
+        white-space: normal;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Hello, I'm Jaeseung</h1>
-    <p>Welcome to my GitHub Pages website.</p>
-    <a href="https://github.com/">Visit GitHub</a>
-  </div>
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <h1 class="name">Jaeseung Lee</h1>
+        <p class="title">Machine Learning Engineer | Digital Pathology | Biomedical Imaging</p>
+      </div>
+      <div class="contact">
+        <div>New York, NY</div>
+        <div>jaeseung [dot] lee124 [at] google [dot] com</div>
+        <div><a href="https://github.com/jaeseung-lee-engineer" target="_blank">GitHub</a> | <a href="https://www.linkedin.com/in/jaeseung-lee-49097318a/" target="_blank">LinkedIn</a></div>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2 class="section-title">Experience</h2>
+
+      <div class="entry">
+        <div class="entry-header">
+          <div class="org">Columbia University Irving Medical Center</div>
+          <div class="location">New York, NY</div>
+        </div>
+        <div class="sub">Department of Pathology and Cell Biology</div>
+
+        <div class="role-row">
+          <div>Staff Associate I</div>
+          <div class="date">Nov 2023 – Jun 2024</div>
+        </div>
+        <ul>
+          <li>Developed a GPU-accelerated analysis pipeline for spatial transcriptomics to quantify cell–cell interactions, achieving up to 1200× speedup; co-authored a publication and released the code on GitHub.</li>
+          <li>Built a deep learning framework for WSI analysis to classify Huntington’s disease vs control in a 66-case cohort, achieving 95% accuracy and generating attention heatmaps for interpretable feature localization.</li>
+        </ul>
+
+        <div class="role-row">
+          <div>Visiting Researcher</div>
+          <div class="date">Apr 2023 – Jun 2023</div>
+        </div>
+        <ul>
+          <li>Developed a WSI tissue segmentation pipeline using Reinhard normalization to reduce stain variation, achieving 97% accuracy in multi-class tissue classification.</li>
+          <li>Maintained genomic data processing workflows for RNA-seq and spatial transcriptomics, including FASTQ/BAM preprocessing, alignment, and quality control.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-header">
+          <div class="org">Korea University of Technology and Education</div>
+          <div class="location">South Korea</div>
+        </div>
+        <div class="sub">Department of Computer Engineering</div>
+
+        <div class="role-row">
+          <div>Research Assistant</div>
+          <div class="date">Mar 2021 – Dec 2022</div>
+        </div>
+        <ul>
+          <li>Developed an ML system to detect physiological responses to music using wearable sensor data and deployed models in a mobile application, achieving 81% prediction accuracy; co-authored a publication.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Skills</h2>
+      <ul class="skills-list">
+        <li><span class="label">Programming:</span> Python, C/C++, Bash, Linux</li>
+        <li><span class="label">Machine Learning:</span> PyTorch, TensorFlow, Scikit-learn</li>
+        <li><span class="label">Data Systems:</span> MongoDB, Neo4j, FastAPI</li>
+        <li><span class="label">Digital Pathology:</span> OpenSlide, QuPath, ImageJ/Fiji</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Publications</h2>
+      <ul class="pub-list">
+        <li>
+          Ma, M., Paryani, F., Jakubiak, K., Xia, S., Antoku, S., Kannan, A., <strong>Lee, J.</strong>, ... Sims, P. &amp; Al-Dalahmah, O.<br />
+          <em>The spatial landscape of glial pathology and T cell response in Parkinson’s disease substantia nigra.</em><br />
+          <em>Nature Communications</em>. 2025; 16:7146.
+          <span class="links"><a href="#">Paper</a><a href="#">GitHub</a></span>
+        </li>
+        <li>
+          Lee, E., Min, C., <strong>Lee, J.</strong>, Yu, J. and Kang, S.<br />
+          <em>Groovemeter: Enabling music engagement-aware apps by detecting reactions to daily music listening via Earable sensing.</em><br />
+          <em>Proc. 31st ACM Int. Conf. on Multimedia</em>. 2023.
+          <span class="links"><a href="#">Paper</a></span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Education</h2>
+      <div class="entry-header">
+        <div>
+          <div class="org">Korea University of Technology and Education</div>
+          <div class="sub">Bachelor of Science in Electrical Engineering</div>
+        </div>
+        <div>
+          <div class="location">South Korea</div>
+          <div class="date">Feb 2021</div>
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
