@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pathology Image Management System Review Portal | Jaeseung Lee</title>
+  <style>
+    :root {
+      --text: #111;
+      --muted: #4a4a4a;
+      --link: #1a56b3;
+      --border: #d9d9d9;
+      --bg: #ffffff;
+      --panel: #fafafa;
+      --accent: #eef5ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 36px 24px 64px;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .back-link:hover,
+    a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      font-size: 2.15rem;
+      line-height: 1.2;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .intro {
+      max-width: 860px;
+      margin-bottom: 22px;
+    }
+
+    .prototype-demo {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .prototype-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #f2f4f7;
+      font-size: 0.95rem;
+    }
+
+    .prototype-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border: 1px solid #c9d4e5;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 0.84rem;
+      margin-left: 8px;
+    }
+
+    .prototype-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 640px;
+    }
+
+    .prototype-sidebar {
+      border-right: 1px solid var(--border);
+      background: #fff;
+      padding: 16px;
+    }
+
+    .prototype-sidebar h3,
+    .prototype-main h3,
+    .prototype-main h4 {
+      margin-top: 0;
+    }
+
+    .case-search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font: inherit;
+      background: #fff;
+      color: #666;
+    }
+
+    .case-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .case-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 12px;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .case-card:hover {
+      background: #f8fbff;
+    }
+
+    .case-card.active {
+      border-color: #9ab3d6;
+      background: var(--accent);
+    }
+
+    .case-id {
+      font-weight: 700;
+    }
+
+    .case-meta {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .prototype-main {
+      padding: 18px;
+      background: #fcfcfc;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card,
+    .panel,
+    .metric-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .summary-card,
+    .metric-card,
+    .panel {
+      padding: 13px;
+    }
+
+    .summary-label,
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .summary-value,
+    .metric-value {
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 0.92fr;
+      gap: 14px;
+    }
+
+    .viewer {
+      border: 1px dashed #b8c4d4;
+      border-radius: 8px;
+      height: 340px;
+      background:
+        linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.78)),
+        radial-gradient(circle at 20% 30%, #d8c2d9 0, #d8c2d9 12%, transparent 13%),
+        radial-gradient(circle at 52% 55%, #ceb1d9 0, #ceb1d9 10%, transparent 11%),
+        radial-gradient(circle at 75% 35%, #d2bddf 0, #d2bddf 8%, transparent 9%),
+        radial-gradient(circle at 40% 70%, #cdb7d7 0, #cdb7d7 9%, transparent 10%),
+        #efe5f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #344054;
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 12px;
+      font-size: 0.97rem;
+    }
+
+    .viewer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 1px solid #b8c4d4;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .bar {
+      height: 10px;
+      background: #edf1f5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: #9ab3d6;
+      border-radius: 999px;
+    }
+
+    .thumb-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .thumb-card.active-thumb {
+      border-color: #9ab3d6;
+      background: var(--accent);
+    }
+
+    .thumb-image {
+      height: 78px;
+      border: 1px dashed #c3cad4;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.92rem;
+      color: #555;
+      background:
+        linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+        radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
+        radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
+        #efe5f3;
+      margin-bottom: 8px;
+    }
+
+    .thumb-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .details-table th,
+    .details-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .details-table th {
+      width: 34%;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .notes ul {
+      margin-top: 8px;
+      padding-left: 22px;
+    }
+
+    .notes li {
+      margin-bottom: 8px;
+    }
+
+    .details {
+      margin-top: 22px;
+      max-width: 900px;
+    }
+
+    @media (max-width: 900px) {
+      .prototype-layout,
+      .main-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <a class="back-link" href="index.html">← Back to home</a>
+      <h1>Pathology AI Review Portal</h1>
+      <p class="subtitle">Concept demo for AI-assisted pathology review alongside Proscia Concentriq LS</p>
+    </header>
+
+    <div class="intro">
+      <p>
+        This page is a mock frontend prototype showing how model predictions, slide metadata, quality control signals, and review notes could be surfaced in a simple portal connected to a digital pathology image management system.
+      </p>
+      <p>
+        The goal is not to replicate a production system, but to demonstrate how machine learning outputs could be organized for pathologists, researchers, or translational teams in a practical workflow.
+      </p>
+    </div>
+
+    <div class="prototype-demo">
+      <div class="prototype-topbar">
+        <div><strong>Pathology AI Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
+        <div>Connected IMS: <strong>Proscia Concentriq LS</strong></div>
+      </div>
+
+      <div class="prototype-layout">
+        <aside class="prototype-sidebar">
+          <h3>Cases</h3>
+          <input class="case-search" type="text" value="Search case or slide ID" readonly />
+          <div class="case-list">
+            <div class="case-card active" onclick="selectCase('PD-1042')">
+              <div class="case-id">PD-1042</div>
+              <div class="case-meta">Substantia nigra · 3 slides · High-priority review</div>
+            </div>
+            <div class="case-card" onclick="selectCase('HD-2017')">
+              <div class="case-id">HD-2017</div>
+              <div class="case-meta">Basal ganglia · 2 slides · Model completed</div>
+            </div>
+            <div class="case-card" onclick="selectCase('CTRL-087')">
+              <div class="case-id">CTRL-087</div>
+              <div class="case-meta">Control cohort · 1 slide · QC passed</div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="prototype-main">
+          <h3 id="caseTitle">Case PD-1042</h3>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Predicted Class</div>
+              <div class="summary-value" id="predictedClass">Parkinson's disease</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Confidence</div>
+              <div class="summary-value" id="confidence">0.94</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Slides Linked</div>
+              <div class="summary-value" id="slidesLinked">3</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Status</div>
+              <div class="summary-value" id="status">Ready for review</div>
+            </div>
+          </div>
+
+          <div class="main-grid">
+            <div class="panel">
+              <h4>Slide Viewer / Heatmap Preview</h4>
+              <div class="viewer" id="viewerText">
+                Whole-slide image preview placeholder<br />
+                Tissue regions and attention heatmap overlay would appear here.
+              </div>
+              <div class="viewer-actions">
+                <button class="btn primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
+                <button class="btn" type="button">Open in Concentriq LS</button>
+                <button class="btn" type="button">Export Report</button>
+              </div>
+
+              <div class="panel" style="margin-top:12px;">
+                <h4>Linked Slides</h4>
+                <div id="slideThumbs" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+                  <div class="thumb-card" onclick="selectSlide(0)">
+                    <div class="thumb-image">Slide A</div>
+                    <div class="thumb-meta">SN-01 · H&amp;E</div>
+                  </div>
+                  <div class="thumb-card" onclick="selectSlide(1)">
+                    <div class="thumb-image">Slide B</div>
+                    <div class="thumb-meta">SN-02 · Heatmap</div>
+                  </div>
+                  <div class="thumb-card" onclick="selectSlide(2)">
+                    <div class="thumb-image">Slide C</div>
+                    <div class="thumb-meta">SN-03 · ROI</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="metric-stack">
+                <div class="metric-card">
+                  <div class="metric-label">Glial pathology score</div>
+                  <div class="metric-value" id="glialScore">0.88</div>
+                  <div class="bar"><span id="glialBar" style="width:88%"></span></div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">T-cell enrichment</div>
+                  <div class="metric-value" id="tcellScore">0.71</div>
+                  <div class="bar"><span id="tcellBar" style="width:71%"></span></div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">QC flag</div>
+                  <div class="metric-value" id="qcFlag">Pass</div>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-bottom:12px;">
+                <h4>Case Details</h4>
+                <table class="details-table">
+                  <tbody>
+                    <tr><th>Primary tissue</th><td id="detailTissue">Substantia nigra</td></tr>
+                    <tr><th>Model version</th><td id="detailModel">WSI-Classifier v0.9</td></tr>
+                    <tr><th>Reviewer status</th><td id="detailReviewer">Pending pathologist review</td></tr>
+                    <tr><th>Last updated</th><td id="detailUpdated">March 2026</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="panel notes">
+                <h4>Review Notes</h4>
+                <ul id="reviewNotes">
+                  <li>High-signal regions detected in pigmented tissue areas.</li>
+                  <li>Model heatmap overlaps with pathology-relevant regions.</li>
+                  <li>Recommend pathologist review of top-ranked tiles before sign-out.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="details">
+      <h2>What this prototype is meant to show</h2>
+      <ul>
+        <li>A lightweight review layer on top of an image management workflow.</li>
+        <li>Case-level access to slide metadata, prediction results, and quality-control information.</li>
+        <li>Heatmap-guided review to help users inspect model-attended tissue regions.</li>
+        <li>A clear path from algorithm output to human review rather than a black-box prediction display.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const caseData = {
+      "PD-1042": {
+        predictedClass: "Parkinson's disease",
+        confidence: "0.94",
+        slidesLinked: "3",
+        status: "Ready for review",
+        glialScore: "0.88",
+        glialWidth: "88%",
+        tcellScore: "0.71",
+        tcellWidth: "71%",
+        qcFlag: "Pass",
+        tissue: "Substantia nigra",
+        model: "WSI-Classifier v0.9",
+        reviewer: "Pending pathologist review",
+        updated: "March 2026",
+        viewerBase: "Whole-slide image preview placeholder
+Tissue regions and attention heatmap overlay would appear here.",
+        viewerHeatmap: "Whole-slide image preview placeholder
+Heatmap enabled: top-ranked tissue regions highlighted for reviewer inspection.",
+        slides: [
+          {label:"Slide A", meta:"SN-01 · H&E"},
+          {label:"Slide B", meta:"SN-02 · Heatmap"},
+          {label:"Slide C", meta:"SN-03 · ROI"}
+        ],
+        notes: [
+          "High-signal regions detected in pigmented tissue areas.",
+          "Model heatmap overlaps with pathology-relevant regions.",
+          "Recommend pathologist review of top-ranked tiles before sign-out."
+        ]
+      },
+      "HD-2017": {
+        predictedClass: "Huntington's disease",
+        confidence: "0.91",
+        slidesLinked: "2",
+        status: "Model completed",
+        glialScore: "0.76",
+        glialWidth: "76%",
+        tcellScore: "0.33",
+        tcellWidth: "33%",
+        qcFlag: "Pass",
+        tissue: "Basal ganglia",
+        model: "HD-ROI-Net v1.2",
+        reviewer: "Research review in progress",
+        updated: "March 2026",
+        viewerBase: "Whole-slide image preview placeholder
+Highlighted regions correspond to model-attended neuronal loss patterns.",
+        viewerHeatmap: "Whole-slide image preview placeholder
+Heatmap enabled: focal neuronal loss regions receive strongest model attention.",
+        slides: [
+          {label:"Slide A", meta:"BG-11 · H&E"},
+          {label:"Slide B", meta:"BG-12 · ROI"}
+        ],
+        notes: [
+          "Strong discriminative signal in localized tissue regions.",
+          "Case summary aligns with prior cohort-level trend.",
+          "Heatmap suggests focal regions for detailed follow-up."
+        ]
+      },
+      "CTRL-087": {
+        predictedClass: "Control",
+        confidence: "0.86",
+        slidesLinked: "1",
+        status: "QC passed",
+        glialScore: "0.24",
+        glialWidth: "24%",
+        tcellScore: "0.18",
+        tcellWidth: "18%",
+        qcFlag: "Pass",
+        tissue: "Control cohort tissue",
+        model: "Baseline QC Model v0.5",
+        reviewer: "Reference sample",
+        updated: "March 2026",
+        viewerBase: "Whole-slide image preview placeholder
+Minimal abnormal signal detected in this control sample.",
+        viewerHeatmap: "Whole-slide image preview placeholder
+Heatmap enabled: low-intensity attention consistent with control tissue.",
+        slides: [
+          {label:"Slide A", meta:"CT-01 · H&E"}
+        ],
+        notes: [
+          "No major high-attention pathology regions detected.",
+          "Distribution appears consistent with control tissue.",
+          "Case can be retained as baseline comparison sample."
+        ]
+      }
+    };
+
+    let currentCaseId = "PD-1042";
+    let heatmapOn = false;
+    let currentSlideIndex = 0;
+
+    function renderSlides(caseId) {
+      const slideThumbs = document.getElementById('slideThumbs');
+      const slides = caseData[caseId].slides;
+      slideThumbs.innerHTML = slides.map((slide, idx) => `
+        <div class="thumb-card ${idx === 0 ? 'active-thumb' : ''}" onclick="selectSlide(${idx})">
+          <div class="thumb-image">${slide.label}</div>
+          <div class="thumb-meta">${slide.meta}</div>
+        </div>
+      `).join('');
+      currentSlideIndex = 0;
+    }
+
+    function updateViewerText() {
+      const data = caseData[currentCaseId];
+      const baseText = heatmapOn ? data.viewerHeatmap : data.viewerBase;
+      const slideMeta = data.slides[currentSlideIndex] ? `
+Selected: ${data.slides[currentSlideIndex].meta}` : '';
+      document.getElementById('viewerText').innerHTML = (baseText + slideMeta).replace(/
+/g, '<br />');
+    }
+
+    function selectSlide(index) {
+      currentSlideIndex = index;
+      document.querySelectorAll('.thumb-card').forEach((card, idx) => {
+        card.classList.toggle('active-thumb', idx === index);
+      });
+      updateViewerText();
+    }
+
+    function toggleHeatmap() {
+      heatmapOn = !heatmapOn;
+      updateViewerText();
+    }
+
+    function selectCase(caseId) {
+      currentCaseId = caseId;
+      heatmapOn = false;
+      const data = caseData[caseId];
+      document.getElementById('caseTitle').textContent = `Case ${caseId}`;
+      document.getElementById('predictedClass').textContent = data.predictedClass;
+      document.getElementById('confidence').textContent = data.confidence;
+      document.getElementById('slidesLinked').textContent = data.slidesLinked;
+      document.getElementById('status').textContent = data.status;
+      document.getElementById('glialScore').textContent = data.glialScore;
+      document.getElementById('tcellScore').textContent = data.tcellScore;
+      document.getElementById('qcFlag').textContent = data.qcFlag;
+      document.getElementById('detailTissue').textContent = data.tissue;
+      document.getElementById('detailModel').textContent = data.model;
+      document.getElementById('detailReviewer').textContent = data.reviewer;
+      document.getElementById('detailUpdated').textContent = data.updated;
+      document.getElementById('glialBar').style.width = data.glialWidth;
+      document.getElementById('tcellBar').style.width = data.tcellWidth;
+
+      const notes = document.getElementById('reviewNotes');
+      notes.innerHTML = data.notes.map(note => `<li>${note}</li>`).join('');
+
+      document.querySelectorAll('.case-card').forEach(card => {
+        card.classList.remove('active');
+        if (card.querySelector('.case-id').textContent === caseId) {
+          card.classList.add('active');
+        }
+      });
+
+      renderSlides(caseId);
+      updateViewerText();
+    }
+
+    selectCase('PD-1042');
+  </script>
+</body>
+</html>
