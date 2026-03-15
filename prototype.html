@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathology Image Management System Review Portal | Jaeseung Lee</title>
+  <title>Pathology AI Review Portal | Jaeseung Lee</title>
   <style>
     :root {
       --text: #111;
@@ -348,8 +348,8 @@
   <main class="container">
     <header class="page-header">
       <a class="back-link" href="index.html">← Back to home</a>
-      <h1>Digital Pathology Review Portal</h1>
-      <p class="subtitle">Concept demo for digital pathology review alongside Proscia Concentriq LS</p>
+      <h1>Pathology AI Review Portal</h1>
+      <p class="subtitle">Concept demo for AI-assisted pathology review alongside Proscia Concentriq LS</p>
     </header>
 
     <div class="intro">
@@ -363,28 +363,15 @@
 
     <div class="prototype-demo">
       <div class="prototype-topbar">
-        <div><strong>Digital Pathology Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
+        <div><strong>Pathology AI Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
         <div>Connected IMS: <strong>Proscia Concentriq LS</strong></div>
       </div>
 
       <div class="prototype-layout">
         <aside class="prototype-sidebar">
           <h3>Cases</h3>
-          <input class="case-search" type="text" value="Search case or slide ID" readonly />
-          <div class="case-list">
-            <div class="case-card active" onclick="selectCase('PD-1042')">
-              <div class="case-id">PD-1042</div>
-              <div class="case-meta">Substantia nigra · 3 slides · High-priority review</div>
-            </div>
-            <div class="case-card" onclick="selectCase('HD-2017')">
-              <div class="case-id">HD-2017</div>
-              <div class="case-meta">Basal ganglia · 2 slides · Model completed</div>
-            </div>
-            <div class="case-card" onclick="selectCase('CTRL-087')">
-              <div class="case-id">CTRL-087</div>
-              <div class="case-meta">Control cohort · 1 slide · QC passed</div>
-            </div>
-          </div>
+          <input class="case-search" id="caseSearch" type="text" placeholder="Search case or slide ID" oninput="filterCases()" />
+          <div class="case-list" id="caseList"></div>
         </aside>
 
         <section class="prototype-main">
@@ -417,8 +404,8 @@
               </div>
               <div class="viewer-actions">
                 <button class="btn primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
-                <button class="btn" type="button">Open in Concentriq LS</button>
-                <button class="btn" type="button">Export Report</button>
+                <button class="btn" type="button" onclick="openIMS()">Open in Concentriq LS</button>
+                <button class="btn" type="button" onclick="exportReport()">Export Report</button>
               </div>
 
               <div class="panel" style="margin-top:12px;">
@@ -587,6 +574,30 @@ Heatmap enabled: low-intensity attention consistent with control tissue.",
     let heatmapOn = false;
     let currentSlideIndex = 0;
 
+    function renderCaseList(filteredIds = null) {
+      const ids = filteredIds || Object.keys(caseData);
+      const caseList = document.getElementById('caseList');
+      caseList.innerHTML = ids.map(caseId => {
+        const data = caseData[caseId];
+        return `
+          <div class="case-card ${caseId === currentCaseId ? 'active' : ''}" onclick="selectCase('${caseId}')">
+            <div class="case-id">${caseId}</div>
+            <div class="case-meta">${data.tissue} · ${data.slidesLinked} slide${data.slidesLinked === '1' ? '' : 's'} · ${data.status}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterCases() {
+      const query = document.getElementById('caseSearch').value.trim().toLowerCase();
+      const filtered = Object.keys(caseData).filter(caseId => {
+        const data = caseData[caseId];
+        const slideText = data.slides.map(slide => `${slide.label} ${slide.meta}`.toLowerCase()).join(' ');
+        return caseId.toLowerCase().includes(query) || data.tissue.toLowerCase().includes(query) || data.predictedClass.toLowerCase().includes(query) || slideText.includes(query);
+      });
+      renderCaseList(filtered);
+    }
+
     function renderSlides(caseId) {
       const slideThumbs = document.getElementById('slideThumbs');
       const slides = caseData[caseId].slides;
@@ -643,17 +654,21 @@ Selected: ${data.slides[currentSlideIndex].meta}` : '';
       const notes = document.getElementById('reviewNotes');
       notes.innerHTML = data.notes.map(note => `<li>${note}</li>`).join('');
 
-      document.querySelectorAll('.case-card').forEach(card => {
-        card.classList.remove('active');
-        if (card.querySelector('.case-id').textContent === caseId) {
-          card.classList.add('active');
-        }
-      });
+      renderCaseList();
 
       renderSlides(caseId);
       updateViewerText();
     }
 
+    function openIMS(){
+      alert("Demo: this would open the slide in Proscia Concentriq LS using an API deep-link.");
+    }
+
+    function exportReport(){
+      alert("Demo: this would export a case report generated from backend API results.");
+    }
+
+    renderCaseList();
     selectCase('PD-1042');
   </script>
 </body>
