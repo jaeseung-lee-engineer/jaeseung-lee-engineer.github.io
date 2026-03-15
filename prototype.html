@@ -387,7 +387,10 @@
             <div class="quick-case-buttons" id="quickCaseList"></div>
           </div>
 
-          <div class="case-list" id="caseList"></div>
+          <div class="quick-cases">
+            <h4 style="margin:0 0 10px;">Recently Viewed</h4>
+            <div class="quick-case-buttons" id="recentCaseList"></div>
+          </div>
         </aside>
 
         <section class="prototype-main">
@@ -565,6 +568,7 @@
     let currentCaseId = "PD-1042";
     let currentSlideIndex = 0;
     let heatmapOn = false;
+    let recentCases = ["PD-1042"];
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
@@ -600,30 +604,27 @@
       });
     }
 
-    function renderCaseList(caseIds) {
-      const ids = caseIds && caseIds.length ? caseIds : Object.keys(caseData);
-      const caseList = document.getElementById("caseList");
-      if (!ids.length) {
-        caseList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
+    function renderRecentCaseList() {
+      const recentList = document.getElementById("recentCaseList");
+      if (!recentCases.length) {
+        recentList.innerHTML = '<div class="empty-text">No recently viewed cases yet.</div>';
         return;
       }
-      caseList.innerHTML = ids
+      recentList.innerHTML = recentCases
         .map((caseId) => {
-          const data = caseData[caseId];
-          const activeClass = caseId === currentCaseId ? "active" : "";
-          const slideLabel = Number(data.slidesLinked) === 1 ? "slide" : "slides";
-          return `
-            <div class="case-card ${activeClass}" data-case="${caseId}">
-              <div class="case-id">${caseId}</div>
-              <div class="case-meta">${data.tissue} · ${data.slidesLinked} ${slideLabel} · ${data.status}</div>
-            </div>
-          `;
+          const activeClass = caseId === currentCaseId ? "primary" : "";
+          return `<button class="btn ${activeClass}" type="button" data-recent-case="${caseId}">${caseId}</button>`;
         })
         .join("");
 
-      caseList.querySelectorAll(".case-card[data-case]").forEach((card) => {
-        card.addEventListener("click", () => selectCase(card.dataset.case));
+      recentList.querySelectorAll("button[data-recent-case]").forEach((btn) => {
+        btn.addEventListener("click", () => selectCase(btn.dataset.recentCase));
       });
+    }
+
+    function updateRecentCases(caseId) {
+      recentCases = [caseId, ...recentCases.filter((id) => id !== caseId)].slice(0, 5);
+      renderRecentCaseList();
     }
 
     function renderSlides(caseId) {
@@ -684,7 +685,7 @@
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
-      renderCaseList(filtered);
+      updateRecentCases(caseId);
       renderSlides(caseId);
       updateViewerText();
     }
@@ -692,14 +693,12 @@
     function applySearch() {
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
-      renderCaseList(filtered);
       if (filtered.length > 0) selectCase(filtered[0]);
     }
 
     function liveFilter() {
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
-      renderCaseList(filtered);
     }
 
     function toggleHeatmap() {
@@ -726,7 +725,7 @@
       document.getElementById("exportBtn").addEventListener("click", exportReport);
 
       renderQuickCaseList(Object.keys(caseData));
-      renderCaseList(Object.keys(caseData));
+      renderRecentCaseList();
       selectCase("PD-1042");
     });
   </script>
