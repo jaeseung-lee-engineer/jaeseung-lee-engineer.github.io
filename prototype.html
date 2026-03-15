@@ -7,17 +7,16 @@
   <style>
     :root {
       --text: #111;
-      --muted: #4a4a4a;
+      --muted: #555;
       --link: #1a56b3;
       --border: #d9d9d9;
       --bg: #ffffff;
       --panel: #fafafa;
       --accent: #eef5ff;
+      --accent-border: #9ab3d6;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -33,21 +32,16 @@
       padding: 36px 24px 64px;
     }
 
-    .page-header {
-      margin-bottom: 24px;
-    }
+    .page-header { margin-bottom: 24px; }
 
-    .back-link {
-      display: inline-block;
-      margin-bottom: 12px;
+    .back-link,
+    a {
       color: var(--link);
       text-decoration: none;
     }
 
     .back-link:hover,
-    a:hover {
-      text-decoration: underline;
-    }
+    a:hover { text-decoration: underline; }
 
     h1 {
       font-size: 2.15rem;
@@ -58,11 +52,6 @@
     .subtitle {
       color: var(--muted);
       margin: 0 0 10px;
-    }
-
-    a {
-      color: var(--link);
-      text-decoration: none;
     }
 
     .intro {
@@ -110,10 +99,21 @@
       padding: 16px;
     }
 
+    .prototype-main {
+      padding: 18px;
+      background: #fcfcfc;
+    }
+
     .prototype-sidebar h3,
     .prototype-main h3,
     .prototype-main h4 {
       margin-top: 0;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
     .case-search {
@@ -121,10 +121,35 @@
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      margin-bottom: 14px;
       font: inherit;
       background: #fff;
-      color: #666;
+    }
+
+    .btn {
+      border: 1px solid #b8c4d4;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .quick-cases {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .quick-case-buttons {
+      display: grid;
+      gap: 8px;
     }
 
     .case-list {
@@ -138,31 +163,19 @@
       padding: 11px 12px;
       background: #fff;
       cursor: pointer;
-      transition: background 0.2s ease, border-color 0.2s ease;
-    }
-
-    .case-card:hover {
-      background: #f8fbff;
     }
 
     .case-card.active {
-      border-color: #9ab3d6;
+      border-color: var(--accent-border);
       background: var(--accent);
     }
 
-    .case-id {
-      font-weight: 700;
-    }
+    .case-id { font-weight: 700; }
 
     .case-meta {
       font-size: 0.92rem;
       color: var(--muted);
       margin-top: 4px;
-    }
-
-    .prototype-main {
-      padding: 18px;
-      background: #fcfcfc;
     }
 
     .summary-grid {
@@ -178,11 +191,6 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       background: #fff;
-    }
-
-    .summary-card,
-    .metric-card,
-    .panel {
       padding: 13px;
     }
 
@@ -224,6 +232,7 @@
       padding: 20px;
       margin-bottom: 12px;
       font-size: 0.97rem;
+      white-space: pre-line;
     }
 
     .viewer-actions {
@@ -232,38 +241,10 @@
       gap: 10px;
     }
 
-    .btn {
-      border: 1px solid #b8c4d4;
-      background: #fff;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font: inherit;
-      cursor: pointer;
-    }
-
-    .btn.primary {
-      background: var(--accent);
-    }
-
-    .metric-stack {
+    .thumb-grid {
       display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .bar {
-      height: 10px;
-      background: #edf1f5;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-
-    .bar > span {
-      display: block;
-      height: 100%;
-      background: #9ab3d6;
-      border-radius: 999px;
     }
 
     .thumb-card {
@@ -275,7 +256,7 @@
     }
 
     .thumb-card.active-thumb {
-      border-color: #9ab3d6;
+      border-color: var(--accent-border);
       background: var(--accent);
     }
 
@@ -299,6 +280,27 @@
     .thumb-meta {
       font-size: 0.88rem;
       color: var(--muted);
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .bar {
+      height: 10px;
+      background: #edf1f5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: #9ab3d6;
+      border-radius: 999px;
     }
 
     .details-table {
@@ -326,19 +328,24 @@
       padding-left: 22px;
     }
 
-    .notes li {
-      margin-bottom: 8px;
-    }
-
     .details {
       margin-top: 22px;
       max-width: 900px;
+    }
+
+    .empty-text {
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 900px) {
       .prototype-layout,
       .main-grid,
       .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .thumb-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -357,7 +364,7 @@
         This page is a mock frontend prototype showing how model predictions, slide metadata, quality control signals, and review notes could be surfaced in a simple portal connected to a digital pathology image management system.
       </p>
       <p>
-        The goal is not to replicate a production system, but to demonstrate how machine learning outputs could be organized for pathologists, researchers, or translational teams in a practical workflow.
+        The goal is to demonstrate how machine learning outputs could be organized for pathologists, researchers, or translational teams in a practical workflow.
       </p>
     </div>
 
@@ -370,7 +377,16 @@
       <div class="prototype-layout">
         <aside class="prototype-sidebar">
           <h3>Cases</h3>
-          <input class="case-search" id="caseSearch" type="text" placeholder="Search case or slide ID" oninput="filterCases()" />
+          <div class="search-row">
+            <input class="case-search" id="caseSearch" type="text" placeholder="Search case or slide ID" />
+            <button class="btn" type="button" id="searchBtn">Search</button>
+          </div>
+
+          <div class="quick-cases">
+            <h4 style="margin:0 0 10px;">Available Cases</h4>
+            <div class="quick-case-buttons" id="quickCaseList"></div>
+          </div>
+
           <div class="case-list" id="caseList"></div>
         </aside>
 
@@ -396,34 +412,20 @@
           </div>
 
           <div class="main-grid">
-            <div class="panel">
-              <h4>Slide Viewer / Heatmap Preview</h4>
-              <div class="viewer" id="viewerText">
-                Whole-slide image preview placeholder<br />
-                Tissue regions and attention heatmap overlay would appear here.
-              </div>
-              <div class="viewer-actions">
-                <button class="btn primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
-                <button class="btn" type="button" onclick="openIMS()">Open in Concentriq LS</button>
-                <button class="btn" type="button" onclick="exportReport()">Export Report</button>
+            <div>
+              <div class="panel">
+                <h4>Slide Viewer / Heatmap Preview</h4>
+                <div class="viewer" id="viewerText"></div>
+                <div class="viewer-actions">
+                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
+                  <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+                  <button class="btn" type="button" id="exportBtn">Export Report</button>
+                </div>
               </div>
 
               <div class="panel" style="margin-top:12px;">
                 <h4>Linked Slides</h4>
-                <div id="slideThumbs" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
-                  <div class="thumb-card" onclick="selectSlide(0)">
-                    <div class="thumb-image">Slide A</div>
-                    <div class="thumb-meta">SN-01 · H&amp;E</div>
-                  </div>
-                  <div class="thumb-card" onclick="selectSlide(1)">
-                    <div class="thumb-image">Slide B</div>
-                    <div class="thumb-meta">SN-02 · Heatmap</div>
-                  </div>
-                  <div class="thumb-card" onclick="selectSlide(2)">
-                    <div class="thumb-image">Slide C</div>
-                    <div class="thumb-meta">SN-03 · ROI</div>
-                  </div>
-                </div>
+                <div class="thumb-grid" id="slideThumbs"></div>
               </div>
             </div>
 
@@ -431,17 +433,17 @@
               <div class="metric-stack">
                 <div class="metric-card">
                   <div class="metric-label">Glial pathology score</div>
-                  <div class="metric-value" id="glialScore">0.88</div>
-                  <div class="bar"><span id="glialBar" style="width:88%"></span></div>
+                  <div class="metric-value" id="glialScore"></div>
+                  <div class="bar"><span id="glialBar"></span></div>
                 </div>
                 <div class="metric-card">
                   <div class="metric-label">T-cell enrichment</div>
-                  <div class="metric-value" id="tcellScore">0.71</div>
-                  <div class="bar"><span id="tcellBar" style="width:71%"></span></div>
+                  <div class="metric-value" id="tcellScore"></div>
+                  <div class="bar"><span id="tcellBar"></span></div>
                 </div>
                 <div class="metric-card">
                   <div class="metric-label">QC flag</div>
-                  <div class="metric-value" id="qcFlag">Pass</div>
+                  <div class="metric-value" id="qcFlag"></div>
                 </div>
               </div>
 
@@ -449,21 +451,17 @@
                 <h4>Case Details</h4>
                 <table class="details-table">
                   <tbody>
-                    <tr><th>Primary tissue</th><td id="detailTissue">Substantia nigra</td></tr>
-                    <tr><th>Model version</th><td id="detailModel">WSI-Classifier v0.9</td></tr>
-                    <tr><th>Reviewer status</th><td id="detailReviewer">Pending pathologist review</td></tr>
-                    <tr><th>Last updated</th><td id="detailUpdated">March 2026</td></tr>
+                    <tr><th>Primary tissue</th><td id="detailTissue"></td></tr>
+                    <tr><th>Model version</th><td id="detailModel"></td></tr>
+                    <tr><th>Reviewer status</th><td id="detailReviewer"></td></tr>
+                    <tr><th>Last updated</th><td id="detailUpdated"></td></tr>
                   </tbody>
                 </table>
               </div>
 
               <div class="panel notes">
                 <h4>Review Notes</h4>
-                <ul id="reviewNotes">
-                  <li>High-signal regions detected in pigmented tissue areas.</li>
-                  <li>Model heatmap overlaps with pathology-relevant regions.</li>
-                  <li>Recommend pathologist review of top-ranked tiles before sign-out.</li>
-                </ul>
+                <ul id="reviewNotes"></ul>
               </div>
             </div>
           </div>
@@ -498,14 +496,12 @@
         model: "WSI-Classifier v0.9",
         reviewer: "Pending pathologist review",
         updated: "March 2026",
-        viewerBase: "Whole-slide image preview placeholder
-Tissue regions and attention heatmap overlay would appear here.",
-        viewerHeatmap: "Whole-slide image preview placeholder
-Heatmap enabled: top-ranked tissue regions highlighted for reviewer inspection.",
+        viewerBase: "Whole-slide image preview placeholder\nTissue regions and attention heatmap overlay would appear here.",
+        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: top-ranked tissue regions highlighted for reviewer inspection.",
         slides: [
-          {label:"Slide A", meta:"SN-01 · H&E"},
-          {label:"Slide B", meta:"SN-02 · Heatmap"},
-          {label:"Slide C", meta:"SN-03 · ROI"}
+          { label: "Slide A", meta: "SN-01 · H&E" },
+          { label: "Slide B", meta: "SN-02 · Heatmap" },
+          { label: "Slide C", meta: "SN-03 · ROI" }
         ],
         notes: [
           "High-signal regions detected in pigmented tissue areas.",
@@ -527,13 +523,11 @@ Heatmap enabled: top-ranked tissue regions highlighted for reviewer inspection."
         model: "HD-ROI-Net v1.2",
         reviewer: "Research review in progress",
         updated: "March 2026",
-        viewerBase: "Whole-slide image preview placeholder
-Highlighted regions correspond to model-attended neuronal loss patterns.",
-        viewerHeatmap: "Whole-slide image preview placeholder
-Heatmap enabled: focal neuronal loss regions receive strongest model attention.",
+        viewerBase: "Whole-slide image preview placeholder\nHighlighted regions correspond to model-attended neuronal loss patterns.",
+        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: focal neuronal loss regions receive strongest model attention.",
         slides: [
-          {label:"Slide A", meta:"BG-11 · H&E"},
-          {label:"Slide B", meta:"BG-12 · ROI"}
+          { label: "Slide A", meta: "BG-11 · H&E" },
+          { label: "Slide B", meta: "BG-12 · ROI" }
         ],
         notes: [
           "Strong discriminative signal in localized tissue regions.",
@@ -555,12 +549,10 @@ Heatmap enabled: focal neuronal loss regions receive strongest model attention."
         model: "Baseline QC Model v0.5",
         reviewer: "Reference sample",
         updated: "March 2026",
-        viewerBase: "Whole-slide image preview placeholder
-Minimal abnormal signal detected in this control sample.",
-        viewerHeatmap: "Whole-slide image preview placeholder
-Heatmap enabled: low-intensity attention consistent with control tissue.",
+        viewerBase: "Whole-slide image preview placeholder\nMinimal abnormal signal detected in this control sample.",
+        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: low-intensity attention consistent with control tissue.",
         slides: [
-          {label:"Slide A", meta:"CT-01 · H&E"}
+          { label: "Slide A", meta: "CT-01 · H&E" }
         ],
         notes: [
           "No major high-attention pathology regions detected.",
@@ -571,64 +563,102 @@ Heatmap enabled: low-intensity attention consistent with control tissue.",
     };
 
     let currentCaseId = "PD-1042";
-    let heatmapOn = false;
     let currentSlideIndex = 0;
+    let heatmapOn = false;
 
-    function renderCaseList(filteredIds = null) {
-      const ids = filteredIds || Object.keys(caseData);
-      const caseList = document.getElementById('caseList');
-      caseList.innerHTML = ids.map(caseId => {
+    function getFilteredCaseIds(query) {
+      const q = (query || "").trim().toLowerCase();
+      if (!q) return Object.keys(caseData);
+      return Object.keys(caseData).filter((caseId) => {
         const data = caseData[caseId];
-        return `
-          <div class="case-card ${caseId === currentCaseId ? 'active' : ''}" onclick="selectCase('${caseId}')">
-            <div class="case-id">${caseId}</div>
-            <div class="case-meta">${data.tissue} · ${data.slidesLinked} slide${data.slidesLinked === '1' ? '' : 's'} · ${data.status}</div>
-          </div>
-        `;
-      }).join('');
+        const slideText = data.slides.map((slide) => `${slide.label} ${slide.meta}`.toLowerCase()).join(" ");
+        return (
+          caseId.toLowerCase().includes(q) ||
+          data.tissue.toLowerCase().includes(q) ||
+          data.predictedClass.toLowerCase().includes(q) ||
+          slideText.includes(q)
+        );
+      });
     }
 
-    function filterCases() {
-      const query = document.getElementById('caseSearch').value.trim().toLowerCase();
-      const filtered = Object.keys(caseData).filter(caseId => {
-        const data = caseData[caseId];
-        const slideText = data.slides.map(slide => `${slide.label} ${slide.meta}`.toLowerCase()).join(' ');
-        return caseId.toLowerCase().includes(query) || data.tissue.toLowerCase().includes(query) || data.predictedClass.toLowerCase().includes(query) || slideText.includes(query);
+    function renderQuickCaseList(caseIds) {
+      const ids = caseIds && caseIds.length ? caseIds : Object.keys(caseData);
+      const quickList = document.getElementById("quickCaseList");
+      if (!ids.length) {
+        quickList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
+        return;
+      }
+      quickList.innerHTML = ids
+        .map((caseId) => {
+          const activeClass = caseId === currentCaseId ? "primary" : "";
+          return `<button class="btn ${activeClass}" type="button" data-case="${caseId}">${caseId}</button>`;
+        })
+        .join("");
+
+      quickList.querySelectorAll("button[data-case]").forEach((btn) => {
+        btn.addEventListener("click", () => selectCase(btn.dataset.case));
       });
-      renderCaseList(filtered);
+    }
+
+    function renderCaseList(caseIds) {
+      const ids = caseIds && caseIds.length ? caseIds : Object.keys(caseData);
+      const caseList = document.getElementById("caseList");
+      if (!ids.length) {
+        caseList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
+        return;
+      }
+      caseList.innerHTML = ids
+        .map((caseId) => {
+          const data = caseData[caseId];
+          const activeClass = caseId === currentCaseId ? "active" : "";
+          const slideLabel = Number(data.slidesLinked) === 1 ? "slide" : "slides";
+          return `
+            <div class="case-card ${activeClass}" data-case="${caseId}">
+              <div class="case-id">${caseId}</div>
+              <div class="case-meta">${data.tissue} · ${data.slidesLinked} ${slideLabel} · ${data.status}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      caseList.querySelectorAll(".case-card[data-case]").forEach((card) => {
+        card.addEventListener("click", () => selectCase(card.dataset.case));
+      });
     }
 
     function renderSlides(caseId) {
-      const slideThumbs = document.getElementById('slideThumbs');
+      const slideThumbs = document.getElementById("slideThumbs");
       const slides = caseData[caseId].slides;
-      slideThumbs.innerHTML = slides.map((slide, idx) => `
-        <div class="thumb-card ${idx === 0 ? 'active-thumb' : ''}" onclick="selectSlide(${idx})">
-          <div class="thumb-image">${slide.label}</div>
-          <div class="thumb-meta">${slide.meta}</div>
-        </div>
-      `).join('');
       currentSlideIndex = 0;
+      slideThumbs.innerHTML = slides
+        .map((slide, idx) => {
+          const activeClass = idx === 0 ? "active-thumb" : "";
+          return `
+            <div class="thumb-card ${activeClass}" data-slide-index="${idx}">
+              <div class="thumb-image">${slide.label}</div>
+              <div class="thumb-meta">${slide.meta}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      slideThumbs.querySelectorAll(".thumb-card[data-slide-index]").forEach((card) => {
+        card.addEventListener("click", () => selectSlide(Number(card.dataset.slideIndex)));
+      });
     }
 
     function updateViewerText() {
       const data = caseData[currentCaseId];
       const baseText = heatmapOn ? data.viewerHeatmap : data.viewerBase;
-      const slideMeta = data.slides[currentSlideIndex] ? `
-Selected: ${data.slides[currentSlideIndex].meta}` : '';
-      document.getElementById('viewerText').innerHTML = (baseText + slideMeta).replace(/
-/g, '<br />');
+      const selectedSlide = data.slides[currentSlideIndex] ? `\nSelected: ${data.slides[currentSlideIndex].meta}` : "";
+      document.getElementById("viewerText").textContent = baseText + selectedSlide;
     }
 
     function selectSlide(index) {
       currentSlideIndex = index;
-      document.querySelectorAll('.thumb-card').forEach((card, idx) => {
-        card.classList.toggle('active-thumb', idx === index);
+      document.querySelectorAll(".thumb-card").forEach((card, idx) => {
+        card.classList.toggle("active-thumb", idx === index);
       });
-      updateViewerText();
-    }
-
-    function toggleHeatmap() {
-      heatmapOn = !heatmapOn;
       updateViewerText();
     }
 
@@ -636,41 +666,68 @@ Selected: ${data.slides[currentSlideIndex].meta}` : '';
       currentCaseId = caseId;
       heatmapOn = false;
       const data = caseData[caseId];
-      document.getElementById('caseTitle').textContent = `Case ${caseId}`;
-      document.getElementById('predictedClass').textContent = data.predictedClass;
-      document.getElementById('confidence').textContent = data.confidence;
-      document.getElementById('slidesLinked').textContent = data.slidesLinked;
-      document.getElementById('status').textContent = data.status;
-      document.getElementById('glialScore').textContent = data.glialScore;
-      document.getElementById('tcellScore').textContent = data.tcellScore;
-      document.getElementById('qcFlag').textContent = data.qcFlag;
-      document.getElementById('detailTissue').textContent = data.tissue;
-      document.getElementById('detailModel').textContent = data.model;
-      document.getElementById('detailReviewer').textContent = data.reviewer;
-      document.getElementById('detailUpdated').textContent = data.updated;
-      document.getElementById('glialBar').style.width = data.glialWidth;
-      document.getElementById('tcellBar').style.width = data.tcellWidth;
+      document.getElementById("caseTitle").textContent = `Case ${caseId}`;
+      document.getElementById("predictedClass").textContent = data.predictedClass;
+      document.getElementById("confidence").textContent = data.confidence;
+      document.getElementById("slidesLinked").textContent = data.slidesLinked;
+      document.getElementById("status").textContent = data.status;
+      document.getElementById("glialScore").textContent = data.glialScore;
+      document.getElementById("tcellScore").textContent = data.tcellScore;
+      document.getElementById("qcFlag").textContent = data.qcFlag;
+      document.getElementById("detailTissue").textContent = data.tissue;
+      document.getElementById("detailModel").textContent = data.model;
+      document.getElementById("detailReviewer").textContent = data.reviewer;
+      document.getElementById("detailUpdated").textContent = data.updated;
+      document.getElementById("glialBar").style.width = data.glialWidth;
+      document.getElementById("tcellBar").style.width = data.tcellWidth;
+      document.getElementById("reviewNotes").innerHTML = data.notes.map((note) => `<li>${note}</li>`).join("");
 
-      const notes = document.getElementById('reviewNotes');
-      notes.innerHTML = data.notes.map(note => `<li>${note}</li>`).join('');
-
-      renderCaseList();
-
+      const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
+      renderQuickCaseList(filtered);
+      renderCaseList(filtered);
       renderSlides(caseId);
       updateViewerText();
     }
 
-    function openIMS(){
+    function applySearch() {
+      const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
+      renderQuickCaseList(filtered);
+      renderCaseList(filtered);
+      if (filtered.length > 0) selectCase(filtered[0]);
+    }
+
+    function liveFilter() {
+      const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
+      renderQuickCaseList(filtered);
+      renderCaseList(filtered);
+    }
+
+    function toggleHeatmap() {
+      heatmapOn = !heatmapOn;
+      updateViewerText();
+    }
+
+    function openIMS() {
       alert("Demo: this would open the slide in Proscia Concentriq LS using an API deep-link.");
     }
 
-    function exportReport(){
+    function exportReport() {
       alert("Demo: this would export a case report generated from backend API results.");
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      renderCaseList();
-      selectCase('PD-1042');
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("searchBtn").addEventListener("click", applySearch);
+      document.getElementById("caseSearch").addEventListener("input", liveFilter);
+      document.getElementById("caseSearch").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") applySearch();
+      });
+      document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
+      document.getElementById("imsBtn").addEventListener("click", openIMS);
+      document.getElementById("exportBtn").addEventListener("click", exportReport);
+
+      renderQuickCaseList(Object.keys(caseData));
+      renderCaseList(Object.keys(caseData));
+      selectCase("PD-1042");
     });
   </script>
 </body>
