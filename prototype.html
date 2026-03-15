@@ -398,8 +398,8 @@
               <div class="summary-value" id="diagnosis">Parkinson's disease</div>
             </div>
             <div class="summary-card">
-              <div class="summary-label">Confidence</div>
-              <div class="summary-value" id="confidence">0.94</div>
+              <div class="summary-label">Age</div>
+              <div class="summary-value" id="age">94</div>
             </div>
             <div class="summary-card">
               <div class="summary-label">Status</div>
@@ -484,7 +484,7 @@
     const caseData = {
       "PD-1042": {
         diagnosis: "Parkinson's disease",
-        confidence: "0.94",
+        age: "94",
         slidesLinked: "3",
         status: "Ready for review",
         glialScore: "0.88",
@@ -511,7 +511,7 @@
       },
       "HD-2017": {
         diagnosis: "Huntington's disease",
-        confidence: "0.91",
+        age: "38",
         slidesLinked: "2",
         status: "Model completed",
         glialScore: "0.76",
@@ -537,7 +537,7 @@
       },
       "CTRL-087": {
         diagnosis: "Control",
-        confidence: "0.86",
+        age: "81",
         slidesLinked: "1",
         status: "QC passed",
         glialScore: "0.24",
@@ -666,7 +666,7 @@
       const data = caseData[caseId];
       document.getElementById("caseTitle").textContent = `Case ${caseId}`;
       document.getElementById("diagnosis").textContent = data.diagnosis;
-      document.getElementById("confidence").textContent = data.confidence;
+      document.getElementById("age").textContent = data.age;
       document.getElementById("slidesLinked").textContent = data.slidesLinked;
       document.getElementById("status").textContent = data.status;
       document.getElementById("glialScore").textContent = data.glialScore;
