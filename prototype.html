@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathology AI Review Portal | Jaeseung Lee</title>
+  <title>Demo: Digital Pathology Review Portal | Jaeseung Lee</title>
   <style>
     :root {
       --text: #111;
@@ -355,7 +355,7 @@
   <main class="container">
     <header class="page-header">
       <a class="back-link" href="index.html">← Back to home</a>
-      <h1>Pathology AI Review Portal</h1>
+      <h1>Demo: Digital Pathology Review Portal</h1>
       <p class="subtitle">Concept demo for AI-assisted pathology review alongside Proscia Concentriq LS</p>
     </header>
 
@@ -370,7 +370,7 @@
 
     <div class="prototype-demo">
       <div class="prototype-topbar">
-        <div><strong>Pathology AI Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
+        <div><strong>Demo: Digital Pathology Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
         <div>Connected IMS: <strong>Proscia Concentriq LS</strong></div>
       </div>
 
@@ -398,7 +398,7 @@
           <div class="summary-grid">
             <div class="summary-card">
               <div class="summary-label">Predicted Class</div>
-              <div class="summary-value" id="predictedClass">Parkinson's disease</div>
+              <div class="summary-value" id="diagnosis">Parkinson's disease</div>
             </div>
             <div class="summary-card">
               <div class="summary-label">Confidence</div>
@@ -479,7 +479,7 @@
       </p>
 
       <div style="border:1px solid var(--border); border-radius:12px; padding:18px; background:#fff; margin:16px 0 24px; overflow:auto;">
-        <svg viewBox="0 0 980 360" width="100%" role="img" aria-label="System architecture diagram for pathology AI review portal">
+        <svg viewBox="0 0 980 360" width="100%" role="img" aria-label="System architecture diagram for Demo: Digital Pathology Review Portal">
           <defs>
             <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
               <path d="M0,0 L0,6 L9,3 z" fill="#8aa5cc"></path>
@@ -586,7 +586,7 @@
   <script>
     const caseData = {
       "PD-1042": {
-        predictedClass: "Parkinson's disease",
+        diagnosis: "Parkinson's disease",
         confidence: "0.94",
         slidesLinked: "3",
         status: "Ready for review",
@@ -613,7 +613,7 @@
         ]
       },
       "HD-2017": {
-        predictedClass: "Huntington's disease",
+        diagnosis: "Huntington's disease",
         confidence: "0.91",
         slidesLinked: "2",
         status: "Model completed",
@@ -639,7 +639,7 @@
         ]
       },
       "CTRL-087": {
-        predictedClass: "Control",
+        diagnosis: "Control",
         confidence: "0.86",
         slidesLinked: "1",
         status: "QC passed",
@@ -679,7 +679,7 @@
         return (
           caseId.toLowerCase().includes(q) ||
           data.tissue.toLowerCase().includes(q) ||
-          data.predictedClass.toLowerCase().includes(q) ||
+          data.diagnosis.toLowerCase().includes(q) ||
           slideText.includes(q)
         );
       });
@@ -768,7 +768,7 @@
       heatmapOn = false;
       const data = caseData[caseId];
       document.getElementById("caseTitle").textContent = `Case ${caseId}`;
-      document.getElementById("predictedClass").textContent = data.predictedClass;
+      document.getElementById("diagnosis").textContent = data.diagnosis;
       document.getElementById("confidence").textContent = data.confidence;
       document.getElementById("slidesLinked").textContent = data.slidesLinked;
       document.getElementById("status").textContent = data.status;
