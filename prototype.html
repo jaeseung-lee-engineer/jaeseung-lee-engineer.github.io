@@ -361,11 +361,9 @@
 
     <div class="intro">
       <p>
-        Prototype interface for integrating slide metadata, case details and review notes into a digital pathology image management workflow.
+        Mock front-end prototype demonstrating how AI predictions, slide metadata, quality control signals, and review notes could be integrated into a digital pathology image management system(IMS).
       </p>
-      <p>
-        The goal is to demonstrate how our image management system could be organized for pathologists, researchers, or translational teams in a practical workflow.
-      </p>
+      
     </div>
 
     <div class="prototype-demo">
@@ -397,16 +395,16 @@
           <h3 id="caseTitle">Case PD-1042</h3>
           <div class="summary-grid">
             <div class="summary-card">
-              <div class="summary-label">Predicted Class</div>
-              <div class="summary-value" id="predictedClass">Parkinson's disease</div>
+              <div class="summary-label">Diagnosis</div>
+              <div class="summary-value" id="Diagnosis">Parkinson's disease</div>
             </div>
             <div class="summary-card">
-              <div class="summary-label">Confidence</div>
-              <div class="summary-value" id="confidence">0.94</div>
+              <div class="summary-label">Age</div>
+              <div class="summary-value" id="Age">0.94</div>
             </div>
             <div class="summary-card">
-              <div class="summary-label">Slides Linked</div>
-              <div class="summary-value" id="slidesLinked">3</div>
+              <div class="summary-label">Sex</div>
+              <div class="summary-value" id="sex">3</div>
             </div>
             <div class="summary-card">
               <div class="summary-label">Status</div>
@@ -486,9 +484,9 @@
   <script>
     const caseData = {
       "PD-1042": {
-        predictedClass: "Parkinson's disease",
-        confidence: "0.94",
-        slidesLinked: "3",
+        Diagnosis: "Parkinson's disease",
+        Age: "89",
+        sex: "M",
         status: "Ready for review",
         glialScore: "0.88",
         glialWidth: "88%",
@@ -513,9 +511,9 @@
         ]
       },
       "HD-2017": {
-        predictedClass: "Huntington's disease",
-        confidence: "0.91",
-        slidesLinked: "2",
+        Diagnosis: "Huntington's disease",
+        Age: "48",
+        sex: "F",
         status: "Model completed",
         glialScore: "0.76",
         glialWidth: "76%",
@@ -539,9 +537,9 @@
         ]
       },
       "CTRL-087": {
-        predictedClass: "Control",
-        confidence: "0.86",
-        slidesLinked: "1",
+        Diagnosis: "Control",
+        Age: "76",
+        sex: "M",
         status: "QC passed",
         glialScore: "0.24",
         glialWidth: "24%",
@@ -579,7 +577,7 @@
         return (
           caseId.toLowerCase().includes(q) ||
           data.tissue.toLowerCase().includes(q) ||
-          data.predictedClass.toLowerCase().includes(q) ||
+          data.Diagnosis.toLowerCase().includes(q) ||
           slideText.includes(q)
         );
       });
@@ -668,9 +666,9 @@
       heatmapOn = false;
       const data = caseData[caseId];
       document.getElementById("caseTitle").textContent = `Case ${caseId}`;
-      document.getElementById("predictedClass").textContent = data.predictedClass;
-      document.getElementById("confidence").textContent = data.confidence;
-      document.getElementById("slidesLinked").textContent = data.slidesLinked;
+      document.getElementById("Diagnosis").textContent = data.Diagnosis;
+      document.getElementById("Age").textContent = data.Age;
+      document.getElementById("Confidence").textContent = data.Confidence;
       document.getElementById("status").textContent = data.status;
       document.getElementById("glialScore").textContent = data.glialScore;
       document.getElementById("tcellScore").textContent = data.tcellScore;
