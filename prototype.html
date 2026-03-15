@@ -668,8 +668,10 @@ Selected: ${data.slides[currentSlideIndex].meta}` : '';
       alert("Demo: this would export a case report generated from backend API results.");
     }
 
-    renderCaseList();
-    selectCase('PD-1042');
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCaseList();
+      selectCase('PD-1042');
+    });
   </script>
 </body>
 </html>
