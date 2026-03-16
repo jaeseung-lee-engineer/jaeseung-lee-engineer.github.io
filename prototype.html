@@ -27,9 +27,9 @@
     }
 
     .container {
-      max-width: 1300px;
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 36px 24px 64px;
+      padding: 28px 24px 64px;
     }
 
     .page-header { margin-bottom: 24px; }
@@ -183,8 +183,12 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: 1.7fr 0.9fr;
+      grid-template-columns: minmax(0, 1.95fr) minmax(320px, 0.9fr);
+      grid-template-areas:
+        "viewer righttop"
+        "linked notes";
       gap: 14px;
+      align-items: stretch;
     }
 
     .viewer {
@@ -294,10 +298,45 @@
       color: var(--muted);
     }
 
+    .viewer-panel {
+      grid-area: viewer;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .right-top {
+      grid-area: righttop;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      height: 100%;
+    }
+    
+    .linked-panel {
+      grid-area: linked;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .notes-panel {
+      grid-area: notes;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .case-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
     .metric-stack {
       display: grid;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 0;
     }
 
     .bar {
@@ -352,11 +391,19 @@
 
     @media (max-width: 900px) {
       .prototype-layout,
-      .main-grid,
       .summary-grid {
         grid-template-columns: 1fr;
       }
-
+    
+      .main-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "viewer"
+          "righttop"
+          "linked"
+          "notes";
+      }
+    
       .thumb-grid {
         grid-template-columns: 1fr;
       }
@@ -425,37 +472,31 @@
           </div>
 
           <div class="main-grid">
-            <div>
-              <div class="panel">
-                <h4>Slide Viewer — TCGA public dataset (demo)</h4>
-                <div class="viewer" id="viewer-wrapper">
-                  <div id="openseadragon-viewer"></div>
-                
-                  <div id="heatmapOverlay" aria-hidden="true">
-                    <div class="heatmapMessage">
-                      <h4>AI Heatmap Visualization</h4>
-                      <p>
-                        This area will display AI-generated heatmap predictions
-                        highlighting regions of interest on the slide.
-                      </p>
-                      <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
-                    </div>
+            <div class="panel viewer-panel">
+              <h4>Slide Viewer — TCGA public dataset (demo)</h4>
+              <div class="viewer" id="viewer-wrapper">
+                <div id="openseadragon-viewer"></div>
+          
+                <div id="heatmapOverlay" aria-hidden="true">
+                  <div class="heatmapMessage">
+                    <h4>AI Heatmap Visualization</h4>
+                    <p>
+                      This area will display AI-generated heatmap predictions
+                      highlighting regions of interest on the slide.
+                    </p>
+                    <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
                   </div>
                 </div>
-                <div class="viewer-actions">
-                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
-                  <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-                  <button class="btn" type="button" id="exportBtn">Export Report</button>
-                </div>
               </div>
-
-              <div class="panel" style="margin-top:12px;">
-                <h4>Linked Slides</h4>
-                <div class="thumb-grid" id="slideThumbs"></div>
+          
+              <div class="viewer-actions">
+                <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
+                <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+                <button class="btn" type="button" id="exportBtn">Export Report</button>
               </div>
             </div>
-
-            <div>
+          
+            <div class="right-top">
               <div class="metric-stack">
                 <div class="metric-card">
                   <div class="metric-label">Review completion</div>
@@ -467,8 +508,8 @@
                   <div class="metric-value" id="qcFlag"></div>
                 </div>
               </div>
-
-              <div class="panel" style="margin-bottom:12px;">
+          
+              <div class="panel case-panel">
                 <h4>Case Details</h4>
                 <table class="details-table">
                   <tbody>
@@ -484,11 +525,16 @@
                   </tbody>
                 </table>
               </div>
-
-              <div class="panel notes">
-                <h4>Review Notes</h4>
-                <ul id="reviewNotes"></ul>
-              </div>
+            </div>
+          
+            <div class="panel linked-panel">
+              <h4>Linked Slides</h4>
+              <div class="thumb-grid" id="slideThumbs"></div>
+            </div>
+          
+            <div class="panel notes notes-panel">
+              <h4>Review Notes</h4>
+              <ul id="reviewNotes"></ul>
             </div>
           </div>
         </section>
