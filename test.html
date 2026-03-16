@@ -183,8 +183,23 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: 1.7fr 0.9fr;
+      grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
+      grid-template-areas:
+        "left right"
+        "notes notes";
       gap: 14px;
+    }
+    
+    .left-column {
+      grid-area: left;
+    }
+    
+    .right-column {
+      grid-area: right;
+    }
+    
+    .notes-full {
+      grid-area: notes;
     }
 
     .viewer {
@@ -255,14 +270,25 @@
 
     .thumb-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 10px;
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .right-column {
+      display: flex;
+      flex-direction: column;
     }
 
     .thumb-card {
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 8px;
+      padding: 7px;
       background: #fff;
       cursor: pointer;
     }
@@ -273,7 +299,7 @@
     }
 
     .thumb-image {
-      height: 78px;
+      height: 64px;
       border: 1px dashed #c3cad4;
       border-radius: 6px;
       display: flex;
@@ -356,7 +382,14 @@
       .summary-grid {
         grid-template-columns: 1fr;
       }
-
+    
+      .main-grid {
+        grid-template-areas:
+          "left"
+          "right"
+          "notes";
+      }
+    
       .thumb-grid {
         grid-template-columns: 1fr;
       }
@@ -404,7 +437,7 @@
         </aside>
 
         <section class="prototype-main">
-          <h3 id="caseTitle">Case PD-1042</h3>
+          <h3 id="caseTitle">Case ID: PD-1042</h3>
           <div class="summary-grid">
             <div class="summary-card">
               <div class="summary-label">Diagnosis</div>
@@ -425,12 +458,17 @@
           </div>
 
           <div class="main-grid">
-            <div>
-              <div class="panel">
+            <div class="left-column">
+              <div class="panel linked-panel">
+                <h4>Linked Slides</h4>
+                <div class="thumb-grid" id="slideThumbs"></div>
+              </div>
+          
+              <div class="panel viewer-panel">
                 <h4>Slide Viewer — TCGA public dataset (demo)</h4>
                 <div class="viewer" id="viewer-wrapper">
                   <div id="openseadragon-viewer"></div>
-                
+          
                   <div id="heatmapOverlay" aria-hidden="true">
                     <div class="heatmapMessage">
                       <h4>AI Heatmap Visualization</h4>
@@ -442,20 +480,16 @@
                     </div>
                   </div>
                 </div>
+          
                 <div class="viewer-actions">
                   <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
                   <button class="btn" type="button" id="exportBtn">Export Report</button>
                 </div>
               </div>
-
-              <div class="panel" style="margin-top:12px;">
-                <h4>Linked Slides</h4>
-                <div class="thumb-grid" id="slideThumbs"></div>
-              </div>
             </div>
-
-            <div>
+          
+            <div class="right-column">
               <div class="metric-stack">
                 <div class="metric-card">
                   <div class="metric-label">Review completion</div>
@@ -467,7 +501,7 @@
                   <div class="metric-value" id="qcFlag"></div>
                 </div>
               </div>
-
+          
               <div class="panel" style="margin-bottom:12px;">
                 <h4>Case Details</h4>
                 <table class="details-table">
@@ -484,11 +518,11 @@
                   </tbody>
                 </table>
               </div>
-
-              <div class="panel notes">
-                <h4>Review Notes</h4>
-                <ul id="reviewNotes"></ul>
-              </div>
+            </div>
+          
+            <div class="panel notes notes-full">
+              <h4>Review Notes</h4>
+              <ul id="reviewNotes"></ul>
             </div>
           </div>
         </section>
@@ -819,7 +853,7 @@
       
       const data = caseData[caseId];
 
-      document.getElementById("caseTitle").textContent = `Case ${caseId}`;
+      document.getElementById("caseTitle").textContent = `Case ID: ${caseId}`;
       document.getElementById("diagnosis").textContent = data.diagnosis;
       document.getElementById("age").textContent = data.age;
       document.getElementById("slidesLinked").textContent = data.slidesLinked;
