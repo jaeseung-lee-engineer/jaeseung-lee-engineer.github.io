@@ -5,12 +5,12 @@ This repository contains a front-end prototype of a digital pathology review por
 <a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank" rel="noopener noreferrer">[Project Web Demo]</a>
 
 ## Project Overview
-<img src="images/digital_pathology_workflow.png" width="850">
 Digital pathology workflows typically rely on an Image Management System (IMS) to store, retrieve, and manage whole-slide images (WSI) along with associated case metadata.  
 
 This prototype demonstrates a concept interface designed to interact with such systems by presenting slide images, case information, linked slides, and analysis outputs within a unified review environment.
 
-The focus of this project is on **workflow-oriented interface design** rather than backend infrastructure.
+<img src="images/digital_pathology_workflow.png" width="850">
+Note: The FastAPI backend shown in this diagram is a conceptual component intended to illustrate how the portal could interact with a digital pathology image management system.
 
 ## Interface Concept
 
@@ -49,12 +49,6 @@ This prototype demonstrates how these elements could be organized in a streamlin
 - HTML
 - CSS
 - JavaScript
-
-## Purpose
-
-The goal of this demo is to explore interface concepts for digital pathology workflows and to demonstrate how computational tools and AI-generated insights might be integrated into pathology slide review environments.
-
-This project is intended as a **concept prototype and portfolio demonstration**, not a production system.
 
 ## Disclaimer
 
