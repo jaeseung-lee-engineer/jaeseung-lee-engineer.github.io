@@ -191,22 +191,9 @@
       border: 1px dashed #b8c4d4;
       border-radius: 8px;
       height: 340px;
-      background:
-        linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.78)),
-        radial-gradient(circle at 20% 30%, #d8c2d9 0, #d8c2d9 12%, transparent 13%),
-        radial-gradient(circle at 52% 55%, #ceb1d9 0, #ceb1d9 10%, transparent 11%),
-        radial-gradient(circle at 75% 35%, #d2bddf 0, #d2bddf 8%, transparent 9%),
-        radial-gradient(circle at 40% 70%, #cdb7d7 0, #cdb7d7 9%, transparent 10%),
-        #efe5f3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #344054;
-      text-align: center;
-      padding: 20px;
+      background: #f8fafc;
       margin-bottom: 12px;
-      font-size: 0.97rem;
-      white-space: pre-line;
+      overflow: hidden;
     }
 
     .viewer-actions {
@@ -324,6 +311,7 @@
       }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/openseadragon.min.js"></script>
 </head>
 <body>
   <main class="container">
@@ -389,7 +377,7 @@
             <div>
               <div class="panel">
                 <h4>Slide Viewer / Heatmap Preview</h4>
-                <div class="viewer" id="viewerText"></div>
+                <div class="viewer" id="openseadragon-viewer"></div>
                 <div class="viewer-actions">
                   <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
@@ -598,6 +586,39 @@
       }
     };
 
+    let osdViewer = null;
+
+    function getTileSourceForCurrentSlide() {
+      const data = caseData[currentCaseId];
+      const slide = data.slides[currentSlideIndex];
+    
+      if (slide.tileSource) return slide.tileSource;
+    
+      return "slides/roi.dzi";
+    }
+    
+    function initializeViewer() {
+      const tileSource = getTileSourceForCurrentSlide();
+    
+      if (osdViewer) {
+        osdViewer.open(tileSource);
+        return;
+      }
+    
+      osdViewer = OpenSeadragon({
+        id: "openseadragon-viewer",
+        prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/images/",
+        tileSources: tileSource,
+        showNavigator: true,
+        animationTime: 0.8,
+        blendTime: 0.1,
+        constrainDuringPan: true,
+        maxZoomPixelRatio: 2,
+        minZoomLevel: 0.8,
+        visibilityRatio: 1
+      });
+    }
+    
     let currentCaseId = "PD-1042";
     let currentSlideIndex = 0;
     let heatmapOn = false;
@@ -691,12 +712,7 @@
     }
 
     function updateViewerText() {
-      const data = caseData[currentCaseId];
-      const baseText = heatmapOn ? data.viewerHeatmap : data.viewerBase;
-      const selectedSlide = data.slides[currentSlideIndex]
-        ? `\nSelected: ${data.slides[currentSlideIndex].meta}`
-        : "";
-      document.getElementById("viewerText").textContent = baseText + selectedSlide;
+      initializeViewer();
     }
 
     function updateSlideDetails() {
