@@ -1,8 +1,9 @@
 # Digital Pathology Web Portal Demo
 
 This repository contains a front-end prototype of a digital pathology review portal developed as part of my personal portfolio. The project explores how a pathology case review interface could integrate with a Digital Pathology Image Management System (IMS) to support slide viewing, and case navigation.
-
-<a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank" rel="noopener noreferrer">[Project Web Demo]</a>
+<a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank">
+Open the Digital Pathology Demo Portal
+</a>
 
 ## Project Overview
 Digital pathology workflows typically rely on an Image Management System (IMS) to store, retrieve, and manage whole-slide images (WSI) along with associated case metadata.  
