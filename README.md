@@ -11,7 +11,7 @@ Digital pathology workflows typically rely on an Image Management System (IMS) t
 This prototype demonstrates a concept interface designed to interact with such systems by presenting slide images, case information, linked slides, and analysis outputs within a unified review environment.
 
 <img src="images/digital_pathology_workflow.png" width="850">
-Note: The FastAPI backend shown in this diagram is a conceptual component intended to illustrate how the portal could interact with a digital pathology image management system.
+- **Note: The FastAPI backend shown in this diagram is a conceptual component intended to illustrate how the portal could interact with a digital pathology image management system.
 
 ## Interface Concept
 
