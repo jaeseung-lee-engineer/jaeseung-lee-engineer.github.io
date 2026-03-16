@@ -14,6 +14,7 @@
       --panel: #fafafa;
       --accent: #eef5ff;
       --accent-border: #9ab3d6;
+      --success: #1f5f3a;
     }
 
     * { box-sizing: border-box; }
@@ -27,9 +28,9 @@
     }
 
     .container {
-      max-width: 1300px;
+      max-width: 1520px;
       margin: 0 auto;
-      padding: 36px 24px 64px;
+      padding: 28px 24px 64px;
     }
 
     .page-header { margin-bottom: 24px; }
@@ -154,51 +155,67 @@
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
 
     .summary-card,
-    .panel,
-    .metric-card {
+    .panel {
       border: 1px solid var(--border);
       border-radius: 8px;
       background: #fff;
       padding: 13px;
     }
 
-    .summary-label,
-    .metric-label {
+    .summary-card {
+      min-height: 92px;
+    }
+
+    .summary-label {
       color: var(--muted);
       font-size: 0.9rem;
       margin-bottom: 6px;
     }
 
-    .summary-value,
-    .metric-value {
-      font-size: 1.08rem;
+    .summary-value {
+      font-size: 1.05rem;
       font-weight: 700;
+      line-height: 1.35;
+    }
+
+    #qcFlag {
+      color: var(--success);
     }
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
+      grid-template-columns: minmax(0, 1.95fr) minmax(300px, 0.82fr);
       grid-template-areas:
-        "left right"
+        "linked case"
+        "viewer case"
         "notes notes";
       gap: 14px;
+      align-items: start;
     }
-    
-    .left-column {
-      grid-area: left;
+
+    .linked-panel {
+      grid-area: linked;
     }
-    
-    .right-column {
-      grid-area: right;
+
+    .viewer-panel {
+      grid-area: viewer;
     }
-    
-    .notes-full {
+
+    .case-panel {
+      grid-area: case;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      align-self: stretch;
+    }
+
+    .notes-panel {
       grid-area: notes;
     }
 
@@ -217,7 +234,7 @@
       width: 100%;
       height: 100%;
     }
-    
+
     #heatmapOverlay {
       position: absolute;
       inset: 0;
@@ -229,11 +246,11 @@
       pointer-events: none;
       padding: 24px;
     }
-    
+
     #heatmapOverlay.visible {
       display: flex;
     }
-    
+
     .heatmapMessage {
       max-width: 420px;
       background: rgba(255, 255, 255, 0.92);
@@ -243,19 +260,19 @@
       text-align: center;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
-    
+
     .heatmapMessage h4 {
       margin: 0 0 10px;
       font-size: 1.05rem;
     }
-    
+
     .heatmapMessage p {
       margin: 0;
       color: #333;
       font-size: 0.95rem;
       line-height: 1.5;
     }
-    
+
     .heatmapDisclaimer {
       margin-top: 10px !important;
       color: #666 !important;
@@ -272,17 +289,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 10px;
-    }
-
-    .left-column {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .right-column {
-      display: flex;
-      flex-direction: column;
     }
 
     .thumb-card {
@@ -320,12 +326,6 @@
       color: var(--muted);
     }
 
-    .metric-stack {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
     .bar {
       height: 10px;
       background: #edf1f5;
@@ -361,7 +361,7 @@
       font-weight: 600;
     }
 
-    .notes ul {
+    .notes-panel ul {
       margin-top: 8px;
       padding-left: 22px;
     }
@@ -376,22 +376,43 @@
       font-size: 0.95rem;
     }
 
+    @media (max-width: 1200px) {
+      .summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 900px) {
       .prototype-layout,
-      .main-grid,
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .main-grid {
+        grid-template-areas:
+          "linked"
+          "case"
+          "viewer"
+          "notes";
+      }
+
+      .thumb-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
       .summary-grid {
         grid-template-columns: 1fr;
       }
-    
-      .main-grid {
-        grid-template-areas:
-          "left"
-          "right"
-          "notes";
-      }
-    
-      .thumb-grid {
-        grid-template-columns: 1fr;
+
+      .prototype-topbar {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -438,89 +459,88 @@
 
         <section class="prototype-main">
           <h3 id="caseTitle">Case ID: PD-1042</h3>
+
           <div class="summary-grid">
             <div class="summary-card">
               <div class="summary-label">Diagnosis</div>
               <div class="summary-value" id="diagnosis">Parkinson's disease</div>
             </div>
+
             <div class="summary-card">
               <div class="summary-label">Age</div>
               <div class="summary-value" id="age">94</div>
             </div>
+
             <div class="summary-card">
               <div class="summary-label">Sex</div>
               <div class="summary-value" id="sex">M</div>
             </div>
+
             <div class="summary-card">
               <div class="summary-label">Slides Linked</div>
               <div class="summary-value" id="slidesLinked">3</div>
             </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Review completion</div>
+              <div class="summary-value" id="reviewCompletion"></div>
+              <div class="bar"><span id="reviewBar"></span></div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">QC flag</div>
+              <div class="summary-value" id="qcFlag"></div>
+            </div>
           </div>
 
           <div class="main-grid">
-            <div class="left-column">
-              <div class="panel linked-panel">
-                <h4>Linked Slides</h4>
-                <div class="thumb-grid" id="slideThumbs"></div>
-              </div>
-          
-              <div class="panel viewer-panel">
-                <h4>Slide Viewer — TCGA public dataset (demo)</h4>
-                <div class="viewer" id="viewer-wrapper">
-                  <div id="openseadragon-viewer"></div>
-          
-                  <div id="heatmapOverlay" aria-hidden="true">
-                    <div class="heatmapMessage">
-                      <h4>AI Heatmap Visualization</h4>
-                      <p>
-                        This area will display AI-generated heatmap predictions
-                        highlighting regions of interest on the slide.
-                      </p>
-                      <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
-                    </div>
+            <div class="panel linked-panel">
+              <h4>Linked Slides</h4>
+              <div class="thumb-grid" id="slideThumbs"></div>
+            </div>
+
+            <div class="panel case-panel">
+              <h4>Case Details</h4>
+              <table class="details-table">
+                <tbody>
+                  <tr><th>Slide ID</th><td id="detailSlideId"></td></tr>
+                  <tr><th>Region</th><td id="detailRegion"></td></tr>
+                  <tr><th>Brodmann area</th><td id="detailBrodmann"></td></tr>
+                  <tr><th>Structure</th><td id="detailStructure"></td></tr>
+                  <tr><th>Scan date</th><td id="detailScanDate"></td></tr>
+                  <tr><th>QC status</th><td id="detailQc"></td></tr>
+                  <tr><th>Scanner</th><td id="detailModel"></td></tr>
+                  <tr><th>Reviewer status</th><td id="detailReviewer"></td></tr>
+                  <tr><th>Last updated</th><td id="detailUpdated"></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="panel viewer-panel">
+              <h4>Slide Viewer — TCGA public dataset (demo)</h4>
+              <div class="viewer" id="viewer-wrapper">
+                <div id="openseadragon-viewer"></div>
+
+                <div id="heatmapOverlay" aria-hidden="true">
+                  <div class="heatmapMessage">
+                    <h4>AI Heatmap Visualization</h4>
+                    <p>
+                      This area will display AI-generated heatmap predictions
+                      highlighting regions of interest on the slide.
+                    </p>
+                    <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
                   </div>
                 </div>
-          
-                <div class="viewer-actions">
-                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
-                  <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-                  <button class="btn" type="button" id="exportBtn">Export Report</button>
-                </div>
+              </div>
+
+              <div class="viewer-actions">
+                <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
+                <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+                <button class="btn" type="button" id="exportBtn">Export Report</button>
               </div>
             </div>
-          
-            <div class="right-column">
-              <div class="metric-stack">
-                <div class="metric-card">
-                  <div class="metric-label">Review completion</div>
-                  <div class="metric-value" id="reviewCompletion"></div>
-                  <div class="bar"><span id="reviewBar"></span></div>
-                </div>
-                <div class="metric-card">
-                  <div class="metric-label">QC flag</div>
-                  <div class="metric-value" id="qcFlag"></div>
-                </div>
-              </div>
-          
-              <div class="panel" style="margin-bottom:12px;">
-                <h4>Case Details</h4>
-                <table class="details-table">
-                  <tbody>
-                    <tr><th>Slide ID</th><td id="detailSlideId"></td></tr>
-                    <tr><th>Region</th><td id="detailRegion"></td></tr>
-                    <tr><th>Brodmann area</th><td id="detailBrodmann"></td></tr>
-                    <tr><th>Structure</th><td id="detailStructure"></td></tr>
-                    <tr><th>Scan date</th><td id="detailScanDate"></td></tr>
-                    <tr><th>QC status</th><td id="detailQc"></td></tr>
-                    <tr><th>Scanner</th><td id="detailModel"></td></tr>
-                    <tr><th>Reviewer status</th><td id="detailReviewer"></td></tr>
-                    <tr><th>Last updated</th><td id="detailUpdated"></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          
-            <div class="panel notes notes-full">
+
+            <div class="panel notes-panel">
               <h4>Review Notes</h4>
               <ul id="reviewNotes"></ul>
             </div>
@@ -535,11 +555,11 @@
         <li>A lightweight review layer on top of an image management workflow.</li>
         <li>Case-level access to slide metadata, diagnosis, and quality-control information.</li>
         <li>
-        Slide image from the National Cancer Institute (NCI) Genomic Data Commons,
-        The Cancer Genome Atlas (TCGA-BRCA) project. Public open-access dataset.
+          Slide image from the National Cancer Institute (NCI) Genomic Data Commons,
+          The Cancer Genome Atlas (TCGA-BRCA) project. Public open-access dataset.
         </li>
         <li>
-        Whole-slide image ID: TCGA-AO-A1KO-01Z-00-DX1.EEB5E0A0-92B2-42CD-9F7A-00E9250B561F
+          Whole-slide image ID: TCGA-AO-A1KO-01Z-00-DX1.EEB5E0A0-92B2-42CD-9F7A-00E9250B561F
         </li>
       </ul>
     </section>
@@ -690,24 +710,28 @@
     };
 
     let osdViewer = null;
+    let currentCaseId = "PD-1042";
+    let currentSlideIndex = 0;
+    let heatmapOn = false;
+    let recentCases = ["PD-1042"];
 
     function getTileSourceForCurrentSlide() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
-    
+
       if (slide.tileSource) return slide.tileSource;
-    
+
       return "slides/roi.dzi";
     }
-    
+
     function initializeViewer() {
       const tileSource = getTileSourceForCurrentSlide();
-    
+
       if (osdViewer) {
         osdViewer.open(tileSource);
         return;
       }
-    
+
       osdViewer = OpenSeadragon({
         id: "openseadragon-viewer",
         prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/images/",
@@ -721,15 +745,11 @@
         visibilityRatio: 1
       });
     }
-    
-    let currentCaseId = "PD-1042";
-    let currentSlideIndex = 0;
-    let heatmapOn = false;
-    let recentCases = ["PD-1042"];
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
       if (!q) return Object.keys(caseData);
+
       return Object.keys(caseData).filter((caseId) => {
         const data = caseData[caseId];
         const slideText = data.slides
@@ -737,6 +757,7 @@
             `${slide.label} ${slide.meta} ${slide.region || ""} ${slide.brodmann || ""} ${slide.structure || ""}`.toLowerCase()
           )
           .join(" ");
+
         return (
           caseId.toLowerCase().includes(q) ||
           data.tissue.toLowerCase().includes(q) ||
@@ -749,10 +770,12 @@
     function renderQuickCaseList(caseIds) {
       const ids = caseIds && caseIds.length ? caseIds : Object.keys(caseData);
       const quickList = document.getElementById("quickCaseList");
+
       if (!ids.length) {
         quickList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
         return;
       }
+
       quickList.innerHTML = ids
         .map((caseId) => {
           const activeClass = caseId === currentCaseId ? "primary" : "";
@@ -767,10 +790,12 @@
 
     function renderRecentCaseList() {
       const recentList = document.getElementById("recentCaseList");
+
       if (!recentCases.length) {
         recentList.innerHTML = '<div class="empty-text">No recently viewed cases yet.</div>';
         return;
       }
+
       recentList.innerHTML = recentCases
         .map((caseId) => {
           const activeClass = caseId === currentCaseId ? "primary" : "";
@@ -792,6 +817,7 @@
       const slideThumbs = document.getElementById("slideThumbs");
       const slides = caseData[caseId].slides;
       currentSlideIndex = 0;
+
       slideThumbs.innerHTML = slides
         .map((slide, idx) => {
           const activeClass = idx === 0 ? "active-thumb" : "";
@@ -837,9 +863,11 @@
 
     function selectSlide(index) {
       currentSlideIndex = index;
+
       document.querySelectorAll(".thumb-card").forEach((card, idx) => {
         card.classList.toggle("active-thumb", idx === index);
       });
+
       updateViewerText();
       updateSlideDetails();
     }
@@ -850,7 +878,7 @@
 
       const overlay = document.getElementById("heatmapOverlay");
       if (overlay) overlay.classList.remove("visible");
-      
+
       const data = caseData[caseId];
 
       document.getElementById("caseTitle").textContent = `Case ID: ${caseId}`;
@@ -858,10 +886,8 @@
       document.getElementById("age").textContent = data.age;
       document.getElementById("slidesLinked").textContent = data.slidesLinked;
       document.getElementById("sex").textContent = data.sex;
-
       document.getElementById("reviewCompletion").textContent = `${data.reviewCompletion} (${data.reviewedSlides})`;
       document.getElementById("reviewBar").style.width = data.reviewWidth;
-
       document.getElementById("reviewNotes").innerHTML = data.notes.map((note) => `<li>${note}</li>`).join("");
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
@@ -885,7 +911,6 @@
 
     function toggleHeatmap() {
       heatmapOn = !heatmapOn;
-    
       const overlay = document.getElementById("heatmapOverlay");
       overlay.classList.toggle("visible", heatmapOn);
     }
