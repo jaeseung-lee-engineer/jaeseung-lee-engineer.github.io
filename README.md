@@ -2,7 +2,7 @@
 
 This repository contains a front-end prototype of a digital pathology review portal developed as part of my personal portfolio. The project explores how a pathology case review interface could integrate with a Digital Pathology Image Management System (IMS) to support slide viewing, and case navigation.
 
-https://jaeseung-lee-engineer.github.io/prototype.html
+<a href="https://github.com/jaeseung-lee-engineer/" target="_blank" rel="noopener noreferrer">[GitHub]</a>
 
 ## Project Overview
 <img src="images/digital_pathology_workflow.png" width="850">
