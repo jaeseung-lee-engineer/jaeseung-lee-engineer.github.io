@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo: Digital Pathology Review Portal | Jaeseung Lee</title>
+  <style>
+    :root {
+      --text: #111;
+      --muted: #555;
+      --link: #1a56b3;
+      --border: #d9d9d9;
+      --bg: #ffffff;
+      --panel: #fafafa;
+      --accent: #eef5ff;
+      --accent-border: #9ab3d6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 36px 24px 64px;
+    }
+
+    .page-header { margin-bottom: 24px; }
+
+    .back-link,
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .back-link:hover,
+    a:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 2.15rem;
+      line-height: 1.2;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    .intro {
+      max-width: 860px;
+      margin-bottom: 22px;
+    }
+
+    .prototype-demo {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .prototype-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #f2f4f7;
+      font-size: 0.95rem;
+    }
+
+    .prototype-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border: 1px solid #c9d4e5;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 0.84rem;
+      margin-left: 8px;
+    }
+
+    .prototype-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 640px;
+    }
+
+    .prototype-sidebar {
+      border-right: 1px solid var(--border);
+      background: #fff;
+      padding: 16px;
+    }
+
+    .prototype-main {
+      padding: 18px;
+      background: #fcfcfc;
+    }
+
+    .prototype-sidebar h3,
+    .prototype-main h3,
+    .prototype-main h4 {
+      margin-top: 0;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .case-search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      background: #fff;
+    }
+
+    .btn {
+      border: 1px solid #b8c4d4;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .quick-cases {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .quick-case-buttons {
+      display: grid;
+      gap: 8px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card,
+    .panel,
+    .metric-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 13px;
+    }
+
+    .summary-label,
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .summary-value,
+    .metric-value {
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 0.92fr;
+      gap: 14px;
+    }
+
+    .viewer {
+      border: 1px dashed #b8c4d4;
+      border-radius: 8px;
+      height: 340px;
+      background: #f8fafc;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .viewer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .thumb-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .thumb-card.active-thumb {
+      border-color: var(--accent-border);
+      background: var(--accent);
+    }
+
+    .thumb-image {
+      height: 78px;
+      border: 1px dashed #c3cad4;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.92rem;
+      color: #555;
+      background:
+        linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+        radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
+        radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
+        #efe5f3;
+      margin-bottom: 8px;
+    }
+
+    .thumb-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .bar {
+      height: 10px;
+      background: #edf1f5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: #9ab3d6;
+      border-radius: 999px;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .details-table th,
+    .details-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .details-table th {
+      width: 34%;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .notes ul {
+      margin-top: 8px;
+      padding-left: 22px;
+    }
+
+    .details {
+      margin-top: 22px;
+      max-width: 900px;
+    }
+
+    .empty-text {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      .prototype-layout,
+      .main-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .thumb-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/openseadragon.min.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <a class="back-link" href="index.html">← Back to home</a>
+      <h1>Demo: Digital Pathology Review Portal</h1>
+      <p class="subtitle">Concept demo for Digital pathology review alongside Proscia Concentriq LS</p>
+    </header>
+
+    <div class="intro">
+      <p>
+        This page is a mock frontend prototype showing how slide metadata, quality control signals, and review notes could be surfaced in a simple portal connected to a digital pathology image management system.
+      </p>
+    </div>
+
+    <div class="prototype-demo">
+      <div class="prototype-topbar">
+        <div><strong>Demo: Digital Pathology Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
+        <div>Connected IMS: <strong>Proscia Concentriq LS</strong></div>
+      </div>
+
+      <div class="prototype-layout">
+        <aside class="prototype-sidebar">
+          <h3>Cases</h3>
+          <div class="search-row">
+            <input class="case-search" id="caseSearch" type="text" placeholder="Search case or slide ID" />
+            <button class="btn" type="button" id="searchBtn">Search</button>
+          </div>
+
+          <div class="quick-cases">
+            <h4 style="margin:0 0 10px;">Available Cases</h4>
+            <div class="quick-case-buttons" id="quickCaseList"></div>
+          </div>
+
+          <div class="quick-cases">
+            <h4 style="margin:0 0 10px;">Recently Viewed</h4>
+            <div class="quick-case-buttons" id="recentCaseList"></div>
+          </div>
+        </aside>
+
+        <section class="prototype-main">
+          <h3 id="caseTitle">Case PD-1042</h3>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Diagnosis</div>
+              <div class="summary-value" id="diagnosis">Parkinson's disease</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Age</div>
+              <div class="summary-value" id="age">94</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Sex</div>
+              <div class="summary-value" id="sex">M</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Slides Linked</div>
+              <div class="summary-value" id="slidesLinked">3</div>
+            </div>
+          </div>
+
+          <div class="main-grid">
+            <div>
+              <div class="panel">
+                <h4>Slide Viewer / Heatmap Preview</h4>
+                <div class="viewer" id="openseadragon-viewer"></div>
+                <div class="viewer-actions">
+                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
+                  <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+                  <button class="btn" type="button" id="exportBtn">Export Report</button>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-top:12px;">
+                <h4>Linked Slides</h4>
+                <div class="thumb-grid" id="slideThumbs"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="metric-stack">
+                <div class="metric-card">
+                  <div class="metric-label">Review completion</div>
+                  <div class="metric-value" id="reviewCompletion"></div>
+                  <div class="bar"><span id="reviewBar"></span></div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">QC flag</div>
+                  <div class="metric-value" id="qcFlag"></div>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-bottom:12px;">
+                <h4>Case Details</h4>
+                <table class="details-table">
+                  <tbody>
+                    <tr><th>Slide ID</th><td id="detailSlideId"></td></tr>
+                    <tr><th>Region</th><td id="detailRegion"></td></tr>
+                    <tr><th>Brodmann area</th><td id="detailBrodmann"></td></tr>
+                    <tr><th>Structure</th><td id="detailStructure"></td></tr>
+                    <tr><th>Scan date</th><td id="detailScanDate"></td></tr>
+                    <tr><th>QC status</th><td id="detailQc"></td></tr>
+                    <tr><th>Scanner</th><td id="detailModel"></td></tr>
+                    <tr><th>Reviewer status</th><td id="detailReviewer"></td></tr>
+                    <tr><th>Last updated</th><td id="detailUpdated"></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="panel notes">
+                <h4>Review Notes</h4>
+                <ul id="reviewNotes"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="details">
+      <h2>What this prototype is meant to show</h2>
+      <ul>
+        <li>A lightweight review layer on top of an image management workflow.</li>
+        <li>Case-level access to slide metadata, prediction results, and quality-control information.</li>
+        <li>Heatmap-guided review to help users inspect model-attended tissue regions.</li>
+        <li>A clear path from algorithm output to human review rather than a black-box prediction display.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const caseData = {
+      "PD-1042": {
+        diagnosis: "Parkinson's disease",
+        age: "94",
+        slidesLinked: "3",
+        sex: "M",
+        reviewCompletion: "67%",
+        reviewWidth: "67%",
+        reviewedSlides: "2 / 3 slides reviewed",
+        qcFlag: "Pass",
+        tissue: "Substantia nigra",
+        model: "Leica GT450",
+        reviewer: "Pending pathologist review",
+        updated: "March 2026",
+        viewerBase: "Whole-slide image preview placeholder\nTissue regions and attention heatmap overlay would appear here.",
+        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: top-ranked tissue regions highlighted for reviewer inspection.",
+        slides: [
+          {
+            label: "Slide A",
+            meta: "SNpc-01 · H&E",
+            tileSource: "slides/roi.dzi",
+            region: "Midbrain",
+            brodmann: "-",
+            structure: "Substantia nigra pars compacta",
+            qc: "Pass",
+            scanDate: "2026-03-05",
+            model: "Leica GT450",
+            reviewer: "Pending pathologist review",
+            updated: "2026-03-10"
+          },
+          {
+            label: "Slide B",
+            meta: "SNpc-02 · Heatmap",
+            tileSource: "slides/roi.dzi",
+            region: "Midbrain",
+            brodmann: "-",
+            structure: "Substantia nigra pars compacta",
+            qc: "Pass",
+            scanDate: "2026-03-05",
+            model: "Leica GT450",
+            reviewer: "Review completed",
+            updated: "2026-03-11"
+          },
+          {
+            label: "Slide C",
+            meta: "SNpc-03 · ROI",
+            tileSource: "slides/roi.dzi",
+            region: "Midbrain",
+            brodmann: "-",
+            structure: "Substantia nigra pars compacta",
+            qc: "Pass",
+            scanDate: "2026-03-05",
+            model: "Leica GT450",
+            reviewer: "Review completed",
+            updated: "2026-03-12"
+          }
+        ],
+        notes: [
+          "High-signal regions detected in pigmented tissue areas.",
+          "AI Model heatmap overlaps with pathology-relevant regions.",
+          "Recommend pathologist review of top-ranked tiles before sign-out."
+        ]
+      },
+      "HD-2017": {
+        diagnosis: "Huntington's disease",
+        age: "38",
+        slidesLinked: "2",
+        sex: "F",
+        reviewCompletion: "50%",
+        reviewWidth: "50%",
+        reviewedSlides: "1 / 2 slides reviewed",
+        qcFlag: "Pass",
+        tissue: "Basal ganglia",
+        model: "Leica GT450",
+        reviewer: "Research review in progress",
+        updated: "March 2026",
+        viewerBase: "Whole-slide image preview placeholder\nHighlighted regions correspond to model-attended neuronal loss patterns.",
+        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: focal neuronal loss regions receive strongest model attention.",
+        slides: [
+          {
+            label: "Slide A",
+            meta: "BA9-11 · H&E",
+            tileSource: "slides/roi.dzi",
+            region: "Frontal cortex",
+            brodmann: "BA9",
+            structure: "Dorsolateral prefrontal cortex",
+            qc: "Pass",
+            scanDate: "2026-03-03",
+            model: "Leica GT450",
+            reviewer: "Research review in progress",
+            updated: "2026-03-09"
+          },
+          {
+            label: "Slide B",
+            meta: "CAU-12 · ROI",
+            tileSource: "slides/roi.dzi",
+            region: "Basal ganglia",
+            brodmann: "-",
+            structure: "Caudate nucleus",
+            qc: "Pass",
+            scanDate: "2026-03-06",
+            model: "Leica GT450",
+            reviewer: "Review completed",
+            updated: "2026-03-12"
+          }
+        ],
+        notes: [
+          "Strong discriminative signal in localized tissue regions.",
+          "Case summary aligns with prior cohort-level trend."
+        ]
+      },
+      "CTRL-087": {
+        diagnosis: "Control",
+        age: "81",
+        slidesLinked: "1",
+        sex: "M",
+        reviewCompletion: "100%",
+        reviewWidth: "100%",
+        reviewedSlides: "1 / 1 slides reviewed",
+        qcFlag: "Pass",
+        tissue: "Control cohort tissue",
+        model: "Leica GT450",
+        reviewer: "Reference sample",
+        updated: "March 2026",
+        viewerBase: "Whole-slide image preview placeholder\nMinimal abnormal signal detected in this control sample.",
+        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: low-intensity attention consistent with control tissue.",
+        slides: [
+          {
+            label: "Slide A",
+            meta: "BA17-01 · H&E",
+            tileSource: "slides/roi.dzi",
+            region: "Occipital cortex",
+            brodmann: "BA17",
+            structure: "Primary visual cortex",
+            qc: "Pass",
+            scanDate: "2026-03-04",
+            model: "Leica GT450",
+            reviewer: "Reference sample",
+            updated: "2026-03-08"
+          }
+        ],
+        notes: [
+          "No major high-attention pathology regions detected.",
+          "Distribution appears consistent with control tissue.",
+          "Case can be retained as baseline comparison sample."
+        ]
+      }
+    };
+
+    let currentCaseId = "PD-1042";
+    let currentSlideIndex = 0;
+    let heatmapOn = false;
+    let recentCases = ["PD-1042"];
+    let osdViewer = null;
+
+    function getTileSourceForCurrentSlide() {
+      const data = caseData[currentCaseId];
+      const slide = data.slides[currentSlideIndex];
+
+      if (slide.tileSource) return slide.tileSource;
+      return "slides/roi.dzi";
+    }
+
+    function initializeViewer() {
+      const tileSource = getTileSourceForCurrentSlide();
+
+      if (osdViewer) {
+        osdViewer.open(tileSource);
+        return;
+      }
+
+      osdViewer = OpenSeadragon({
+        id: "openseadragon-viewer",
+        prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/images/",
+        tileSources: tileSource,
+        showNavigator: true,
+        animationTime: 0.8,
+        blendTime: 0.1,
+        constrainDuringPan: true,
+        maxZoomPixelRatio: 2,
+        minZoomLevel: 0.8,
+        visibilityRatio: 1
+      });
+    }
+
+    function getFilteredCaseIds(query) {
+      const q = (query || "").trim().toLowerCase();
+      if (!q) return Object.keys(caseData);
+      return Object.keys(caseData).filter((caseId) => {
+        const data = caseData[caseId];
+        const slideText = data.slides
+          .map((slide) =>
+            `${slide.label} ${slide.meta} ${slide.region || ""} ${slide.brodmann || ""} ${slide.structure || ""}`.toLowerCase()
+          )
+          .join(" ");
+        return (
+          caseId.toLowerCase().includes(q) ||
+          data.tissue.toLowerCase().includes(q) ||
+          data.diagnosis.toLowerCase().includes(q) ||
+          slideText.includes(q)
+        );
+      });
+    }
+
+    function renderQuickCaseList(caseIds) {
+      const ids = caseIds && caseIds.length ? caseIds : Object.keys(caseData);
+      const quickList = document.getElementById("quickCaseList");
+      if (!ids.length) {
+        quickList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
+        return;
+      }
+      quickList.innerHTML = ids
+        .map((caseId) => {
+          const activeClass = caseId === currentCaseId ? "primary" : "";
+          return `<button class="btn ${activeClass}" type="button" data-case="${caseId}">${caseId}</button>`;
+        })
+        .join("");
+
+      quickList.querySelectorAll("button[data-case]").forEach((btn) => {
+        btn.addEventListener("click", () => selectCase(btn.dataset.case));
+      });
+    }
+
+    function renderRecentCaseList() {
+      const recentList = document.getElementById("recentCaseList");
+      if (!recentCases.length) {
+        recentList.innerHTML = '<div class="empty-text">No recently viewed cases yet.</div>';
+        return;
+      }
+      recentList.innerHTML = recentCases
+        .map((caseId) => {
+          const activeClass = caseId === currentCaseId ? "primary" : "";
+          return `<button class="btn ${activeClass}" type="button" data-recent-case="${caseId}">${caseId}</button>`;
+        })
+        .join("");
+
+      recentList.querySelectorAll("button[data-recent-case]").forEach((btn) => {
+        btn.addEventListener("click", () => selectCase(btn.dataset.recentCase));
+      });
+    }
+
+    function updateRecentCases(caseId) {
+      recentCases = [caseId, ...recentCases.filter((id) => id !== caseId)].slice(0, 5);
+      renderRecentCaseList();
+    }
+
+    function renderSlides(caseId) {
+      const slideThumbs = document.getElementById("slideThumbs");
+      const slides = caseData[caseId].slides;
+      currentSlideIndex = 0;
+      slideThumbs.innerHTML = slides
+        .map((slide, idx) => {
+          const activeClass = idx === 0 ? "active-thumb" : "";
+          return `
+            <div class="thumb-card ${activeClass}" data-slide-index="${idx}">
+              <div class="thumb-image">${slide.label}</div>
+              <div class="thumb-meta">
+                ${slide.meta}<br>
+                ${slide.region || "-"}${slide.brodmann && slide.brodmann !== "-" ? ` · ${slide.brodmann}` : ""}<br>
+                ${slide.structure || "-"}<br>
+                QC: ${slide.qc || "-"}
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      slideThumbs.querySelectorAll(".thumb-card[data-slide-index]").forEach((card) => {
+        card.addEventListener("click", () => selectSlide(Number(card.dataset.slideIndex)));
+      });
+    }
+
+    function updateViewerText() {
+      initializeViewer();
+    }
+
+    function updateSlideDetails() {
+      const data = caseData[currentCaseId];
+      const slide = data.slides[currentSlideIndex];
+
+      document.getElementById("detailSlideId").textContent = slide.label;
+      document.getElementById("detailRegion").textContent = slide.region || "-";
+      document.getElementById("detailBrodmann").textContent = slide.brodmann || "-";
+      document.getElementById("detailStructure").textContent = slide.structure || "-";
+      document.getElementById("detailScanDate").textContent = slide.scanDate || "-";
+      document.getElementById("detailQc").textContent = slide.qc || "-";
+      document.getElementById("detailModel").textContent = slide.model || data.model;
+      document.getElementById("detailReviewer").textContent = slide.reviewer || data.reviewer;
+      document.getElementById("detailUpdated").textContent = slide.updated || data.updated;
+
+      document.getElementById("qcFlag").textContent = slide.qc || data.qcFlag;
+    }
+
+    function selectSlide(index) {
+      currentSlideIndex = index;
+      document.querySelectorAll(".thumb-card").forEach((card, idx) => {
+        card.classList.toggle("active-thumb", idx === index);
+      });
+      updateViewerText();
+      updateSlideDetails();
+    }
+
+    function selectCase(caseId) {
+      currentCaseId = caseId;
+      heatmapOn = false;
+      const data = caseData[caseId];
+
+      document.getElementById("caseTitle").textContent = `Case ${caseId}`;
+      document.getElementById("diagnosis").textContent = data.diagnosis;
+      document.getElementById("age").textContent = data.age;
+      document.getElementById("slidesLinked").textContent = data.slidesLinked;
+      document.getElementById("sex").textContent = data.sex;
+
+      document.getElementById("reviewCompletion").textContent = `${data.reviewCompletion} (${data.reviewedSlides})`;
+      document.getElementById("reviewBar").style.width = data.reviewWidth;
+
+      document.getElementById("reviewNotes").innerHTML = data.notes.map((note) => `<li>${note}</li>`).join("");
+
+      const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
+      renderQuickCaseList(filtered);
+      updateRecentCases(caseId);
+      renderSlides(caseId);
+      updateViewerText();
+      updateSlideDetails();
+    }
+
+    function applySearch() {
+      const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
+      renderQuickCaseList(filtered);
+      if (filtered.length > 0) selectCase(filtered[0]);
+    }
+
+    function liveFilter() {
+      const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
+      renderQuickCaseList(filtered);
+    }
+
+    function toggleHeatmap() {
+      heatmapOn = !heatmapOn;
+      alert("Demo placeholder: heatmap overlay can be added on top of the OpenSeadragon viewer in the next step.");
+    }
+
+    function openIMS() {
+      alert("Demo: this would open the slide in Proscia Concentriq LS using an API deep-link.");
+    }
+
+    function exportReport() {
+      alert("Demo: this would export a case report generated from backend API results.");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("searchBtn").addEventListener("click", applySearch);
+      document.getElementById("caseSearch").addEventListener("input", liveFilter);
+      document.getElementById("caseSearch").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") applySearch();
+      });
+      document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
+      document.getElementById("imsBtn").addEventListener("click", openIMS);
+      document.getElementById("exportBtn").addEventListener("click", exportReport);
+
+      renderQuickCaseList(Object.keys(caseData));
+      renderRecentCaseList();
+      selectCase("PD-1042");
+    });
+  </script>
+</body>
+</html>
