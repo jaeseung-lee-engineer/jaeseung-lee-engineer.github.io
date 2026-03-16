@@ -183,17 +183,68 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: 1.45fr 0.92fr;
+      grid-template-columns: 1.7fr 0.9fr;
       gap: 14px;
     }
 
     .viewer {
+      position: relative;
       border: 1px dashed #b8c4d4;
       border-radius: 8px;
-      height: 340px;
+      aspect-ratio: 1 / 1;
+      width: 100%;
       background: #f8fafc;
       margin-bottom: 12px;
       overflow: hidden;
+    }
+
+    #openseadragon-viewer {
+      width: 100%;
+      height: 100%;
+    }
+    
+    #heatmapOverlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.28);
+      z-index: 20;
+      pointer-events: none;
+      padding: 24px;
+    }
+    
+    #heatmapOverlay.visible {
+      display: flex;
+    }
+    
+    .heatmapMessage {
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(154, 179, 214, 0.95);
+      border-radius: 12px;
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    .heatmapMessage h4 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+    
+    .heatmapMessage p {
+      margin: 0;
+      color: #333;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .heatmapDisclaimer {
+      margin-top: 10px !important;
+      color: #666 !important;
+      font-size: 0.85rem !important;
     }
 
     .viewer-actions {
@@ -311,7 +362,6 @@
       }
     }
   </style>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/openseadragon.min.js"></script>
 </head>
 <body>
@@ -377,8 +427,21 @@
           <div class="main-grid">
             <div>
               <div class="panel">
-                <h4>Slide Viewer / Heatmap Preview</h4>
-                <div class="viewer" id="openseadragon-viewer"></div>
+                <h4>Slide Viewer — TCGA public dataset (demo)</h4>
+                <div class="viewer" id="viewer-wrapper">
+                  <div id="openseadragon-viewer"></div>
+                
+                  <div id="heatmapOverlay" aria-hidden="true">
+                    <div class="heatmapMessage">
+                      <h4>AI Heatmap Visualization</h4>
+                      <p>
+                        This area will display AI-generated heatmap predictions
+                        highlighting regions of interest on the slide.
+                      </p>
+                      <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
+                    </div>
+                  </div>
+                </div>
                 <div class="viewer-actions">
                   <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
@@ -436,9 +499,14 @@
       <h2>What this prototype is meant to show</h2>
       <ul>
         <li>A lightweight review layer on top of an image management workflow.</li>
-        <li>Case-level access to slide metadata, prediction results, and quality-control information.</li>
-        <li>Heatmap-guided review to help users inspect model-attended tissue regions.</li>
-        <li>A clear path from algorithm output to human review rather than a black-box prediction display.</li>
+        <li>Case-level access to slide metadata, diagnosis, and quality-control information.</li>
+        <li>
+        Slide image from the National Cancer Institute (NCI) Genomic Data Commons,
+        The Cancer Genome Atlas (TCGA-BRCA) project. Public open-access dataset.
+        </li>
+        <li>
+        Whole-slide image ID: TCGA-AO-A1KO-01Z-00-DX1.EEB5E0A0-92B2-42CD-9F7A-00E9250B561F
+        </li>
       </ul>
     </section>
   </main>
@@ -464,7 +532,6 @@
           {
             label: "Slide A",
             meta: "SNpc-01 · H&E",
-            tileSource: "slides/roi.dzi",
             region: "Midbrain",
             brodmann: "-",
             structure: "Substantia nigra pars compacta",
@@ -477,7 +544,6 @@
           {
             label: "Slide B",
             meta: "SNpc-02 · Heatmap",
-            tileSource: "slides/roi.dzi",
             region: "Midbrain",
             brodmann: "-",
             structure: "Substantia nigra pars compacta",
@@ -490,7 +556,6 @@
           {
             label: "Slide C",
             meta: "SNpc-03 · ROI",
-            tileSource: "slides/roi.dzi",
             region: "Midbrain",
             brodmann: "-",
             structure: "Substantia nigra pars compacta",
@@ -526,7 +591,6 @@
           {
             label: "Slide A",
             meta: "BA9-11 · H&E",
-            tileSource: "slides/roi.dzi",
             region: "Frontal cortex",
             brodmann: "BA9",
             structure: "Dorsolateral prefrontal cortex",
@@ -539,7 +603,6 @@
           {
             label: "Slide B",
             meta: "CAU-12 · ROI",
-            tileSource: "slides/roi.dzi",
             region: "Basal ganglia",
             brodmann: "-",
             structure: "Caudate nucleus",
@@ -574,7 +637,6 @@
           {
             label: "Slide A",
             meta: "BA17-01 · H&E",
-            tileSource: "slides/roi.dzi",
             region: "Occipital cortex",
             brodmann: "BA17",
             structure: "Primary visual cortex",
@@ -593,28 +655,25 @@
       }
     };
 
-    let currentCaseId = "PD-1042";
-    let currentSlideIndex = 0;
-    let heatmapOn = false;
-    let recentCases = ["PD-1042"];
     let osdViewer = null;
 
     function getTileSourceForCurrentSlide() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
-
+    
       if (slide.tileSource) return slide.tileSource;
+    
       return "slides/roi.dzi";
     }
-
+    
     function initializeViewer() {
       const tileSource = getTileSourceForCurrentSlide();
-
+    
       if (osdViewer) {
         osdViewer.open(tileSource);
         return;
       }
-
+    
       osdViewer = OpenSeadragon({
         id: "openseadragon-viewer",
         prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/images/",
@@ -628,6 +687,11 @@
         visibilityRatio: 1
       });
     }
+    
+    let currentCaseId = "PD-1042";
+    let currentSlideIndex = 0;
+    let heatmapOn = false;
+    let recentCases = ["PD-1042"];
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
@@ -749,6 +813,10 @@
     function selectCase(caseId) {
       currentCaseId = caseId;
       heatmapOn = false;
+
+      const overlay = document.getElementById("heatmapOverlay");
+      if (overlay) overlay.classList.remove("visible");
+      
       const data = caseData[caseId];
 
       document.getElementById("caseTitle").textContent = `Case ${caseId}`;
@@ -783,7 +851,9 @@
 
     function toggleHeatmap() {
       heatmapOn = !heatmapOn;
-      alert("Demo placeholder: heatmap overlay can be added on top of the OpenSeadragon viewer in the next step.");
+    
+      const overlay = document.getElementById("heatmapOverlay");
+      overlay.classList.toggle("visible", heatmapOn);
     }
 
     function openIMS() {
