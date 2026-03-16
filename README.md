@@ -62,6 +62,3 @@ This project is intended as a **concept prototype and portfolio demonstration**,
 - Heatmaps displayed in the interface are illustrative and not intended for medical interpretation.
 - Slide images referenced in the demo are from publicly available datasets where noted.
 
-## Author
-
-Jaeseung Lee
