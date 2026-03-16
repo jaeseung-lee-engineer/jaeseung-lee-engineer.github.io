@@ -26,8 +26,8 @@ The layout reflects a typical pathology case review workflow:
 - **Review Notes Panel**  
   Allows documentation of observations during slide review.
 
-- **Heatmap Toggle**  
-  Displays AI- or pathologist-generated heatmaps highlighting regions of interest.
+- **Annotation Toggle**  
+  Displays AI- or pathologist-generated annotation highlighting regions of interest.
 
 ## IMS Integration Concept
 
@@ -59,6 +59,6 @@ This project is intended as a **concept prototype and portfolio demonstration**,
 
 - This project is a non-clinical demonstration prototype.
 - It is intended for interface and workflow visualization only.
-- Heatmaps displayed in the interface are illustrative and not intended for medical interpretation.
+- Annotation displayed in the interface are illustrative and not intended for medical interpretation.
 - Slide images referenced in the demo are from publicly available datasets where noted.
 
