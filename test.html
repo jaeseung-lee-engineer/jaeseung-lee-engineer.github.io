@@ -28,7 +28,7 @@
     }
 
     .container {
-      max-width: 1800px;
+      max-width: 1520px;
       margin: 0 auto;
       padding: 28px 24px 64px;
     }
@@ -155,7 +155,8 @@
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(3, auto);
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -168,10 +169,6 @@
       padding: 13px;
     }
 
-    .summary-card {
-      min-height: 92px;
-    }
-
     .summary-label {
       color: var(--muted);
       font-size: 0.9rem;
@@ -179,13 +176,18 @@
     }
 
     .summary-value {
-      font-size: 1.05rem;
+      font-size: 1.08rem;
       font-weight: 700;
       line-height: 1.35;
     }
 
+    #diagnosis {
+      font-size: 1.15rem;
+    }
+
     #qcFlag {
       color: var(--success);
+      font-weight: 700;
     }
 
     .main-grid {
@@ -211,8 +213,8 @@
       grid-area: case;
       display: flex;
       flex-direction: column;
-      height: 100%;
       align-self: stretch;
+      height: 100%;
     }
 
     .notes-panel {
@@ -287,14 +289,14 @@
 
     .thumb-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
 
     .thumb-card {
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 7px;
+      padding: 8px;
       background: #fff;
       cursor: pointer;
     }
@@ -305,7 +307,7 @@
     }
 
     .thumb-image {
-      height: 64px;
+      height: 78px;
       border: 1px dashed #c3cad4;
       border-radius: 6px;
       display: flex;
@@ -376,9 +378,9 @@
       font-size: 0.95rem;
     }
 
-    @media (max-width: 1200px) {
-      .summary-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+    @media (max-width: 1100px) {
+      .thumb-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
@@ -389,7 +391,7 @@
       }
 
       .summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
       }
 
       .main-grid {
@@ -406,10 +408,6 @@
     }
 
     @media (max-width: 640px) {
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-
       .prototype-topbar {
         flex-direction: column;
         align-items: flex-start;
@@ -440,7 +438,7 @@
 
       <div class="prototype-layout">
         <aside class="prototype-sidebar">
-          <h3>Cases</h3>
+          <h3>Case</h3>
           <div class="search-row">
             <input class="case-search" id="caseSearch" type="text" placeholder="Search case or slide ID" />
             <button class="btn" type="button" id="searchBtn">Search</button>
@@ -467,24 +465,24 @@
             </div>
 
             <div class="summary-card">
-              <div class="summary-label">Age</div>
-              <div class="summary-value" id="age">94</div>
-            </div>
-
-            <div class="summary-card">
-              <div class="summary-label">Sex</div>
-              <div class="summary-value" id="sex">M</div>
-            </div>
-
-            <div class="summary-card">
               <div class="summary-label">Slides Linked</div>
               <div class="summary-value" id="slidesLinked">3</div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Age</div>
+              <div class="summary-value" id="age">94</div>
             </div>
 
             <div class="summary-card">
               <div class="summary-label">Review completion</div>
               <div class="summary-value" id="reviewCompletion"></div>
               <div class="bar"><span id="reviewBar"></span></div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Sex</div>
+              <div class="summary-value" id="sex">M</div>
             </div>
 
             <div class="summary-card">
@@ -720,7 +718,6 @@
       const slide = data.slides[currentSlideIndex];
 
       if (slide.tileSource) return slide.tileSource;
-
       return "slides/roi.dzi";
     }
 
