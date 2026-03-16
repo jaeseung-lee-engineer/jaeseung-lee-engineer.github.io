@@ -152,32 +152,6 @@
       gap: 8px;
     }
 
-    .case-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .case-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 11px 12px;
-      background: #fff;
-      cursor: pointer;
-    }
-
-    .case-card.active {
-      border-color: var(--accent-border);
-      background: var(--accent);
-    }
-
-    .case-id { font-weight: 700; }
-
-    .case-meta {
-      font-size: 0.92rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -362,7 +336,7 @@
     <div class="intro">
       <p>
         This page is a mock frontend prototype showing how slide metadata, quality control signals, and review notes could be surfaced in a simple portal connected to a digital pathology image management system.
-      </p> 
+      </p>
     </div>
 
     <div class="prototype-demo">
@@ -432,14 +406,9 @@
             <div>
               <div class="metric-stack">
                 <div class="metric-card">
-                  <div class="metric-label">Glial pathology score</div>
-                  <div class="metric-value" id="glialScore"></div>
-                  <div class="bar"><span id="glialBar"></span></div>
-                </div>
-                <div class="metric-card">
-                  <div class="metric-label">T-cell enrichment</div>
-                  <div class="metric-value" id="tcellScore"></div>
-                  <div class="bar"><span id="tcellBar"></span></div>
+                  <div class="metric-label">Review completion</div>
+                  <div class="metric-value" id="reviewCompletion"></div>
+                  <div class="bar"><span id="reviewBar"></span></div>
                 </div>
                 <div class="metric-card">
                   <div class="metric-label">QC flag</div>
@@ -452,7 +421,9 @@
                 <table class="details-table">
                   <tbody>
                     <tr><th>Slide ID</th><td id="detailSlideId"></td></tr>
-                    <tr><th>Primary tissue</th><td id="detailTissue"></td></tr>
+                    <tr><th>Region</th><td id="detailRegion"></td></tr>
+                    <tr><th>Brodmann area</th><td id="detailBrodmann"></td></tr>
+                    <tr><th>Structure</th><td id="detailStructure"></td></tr>
                     <tr><th>Scan date</th><td id="detailScanDate"></td></tr>
                     <tr><th>QC status</th><td id="detailQc"></td></tr>
                     <tr><th>Model version</th><td id="detailModel"></td></tr>
@@ -471,6 +442,7 @@
         </section>
       </div>
     </div>
+
     <section class="details">
       <h2>What this prototype is meant to show</h2>
       <ul>
@@ -480,7 +452,6 @@
         <li>A clear path from algorithm output to human review rather than a black-box prediction display.</li>
       </ul>
     </section>
-    
   </main>
 
   <script>
@@ -490,10 +461,9 @@
         age: "94",
         slidesLinked: "3",
         sex: "M",
-        glialScore: "0.88",
-        glialWidth: "88%",
-        tcellScore: "0.71",
-        tcellWidth: "71%",
+        reviewCompletion: "67%",
+        reviewWidth: "67%",
+        reviewedSlides: "2 / 3 slides reviewed",
         qcFlag: "Pass",
         tissue: "Substantia nigra",
         model: "WSI-Classifier v0.9",
@@ -504,33 +474,39 @@
         slides: [
           {
             label: "Slide A",
-            meta: "SN-01 · H&E",
+            meta: "SNpc-01 · H&E",
+            region: "Midbrain",
+            brodmann: "-",
+            structure: "Substantia nigra pars compacta",
             qc: "Pass",
             scanDate: "2026-03-05",
             model: "WSI-Classifier v0.9",
             reviewer: "Pending pathologist review",
-            updated: "2026-03-10",
-            tissue: "Substantia nigra"
+            updated: "2026-03-10"
           },
           {
             label: "Slide B",
-            meta: "SN-02 · Heatmap",
+            meta: "SNpc-02 · Heatmap",
+            region: "Midbrain",
+            brodmann: "-",
+            structure: "Substantia nigra pars compacta",
             qc: "Review",
             scanDate: "2026-03-07",
             model: "WSI-Classifier v0.9",
             reviewer: "QC review required",
-            updated: "2026-03-11",
-            tissue: "Substantia nigra"
+            updated: "2026-03-11"
           },
           {
             label: "Slide C",
-            meta: "SN-03 · ROI",
+            meta: "SNpc-03 · ROI",
+            region: "Midbrain",
+            brodmann: "-",
+            structure: "Substantia nigra pars compacta",
             qc: "Flagged",
             scanDate: "2026-03-09",
             model: "WSI-Classifier v0.9",
             reviewer: "Flagged for artifact check",
-            updated: "2026-03-12",
-            tissue: "Substantia nigra"
+            updated: "2026-03-12"
           }
         ],
         notes: [
@@ -544,10 +520,9 @@
         age: "38",
         slidesLinked: "2",
         sex: "F",
-        glialScore: "0.76",
-        glialWidth: "76%",
-        tcellScore: "0.33",
-        tcellWidth: "33%",
+        reviewCompletion: "50%",
+        reviewWidth: "50%",
+        reviewedSlides: "1 / 2 slides reviewed",
         qcFlag: "Pass",
         tissue: "Basal ganglia",
         model: "HD-ROI-Net v1.2",
@@ -556,8 +531,30 @@
         viewerBase: "Whole-slide image preview placeholder\nHighlighted regions correspond to model-attended neuronal loss patterns.",
         viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: focal neuronal loss regions receive strongest model attention.",
         slides: [
-          { label: "Slide A", meta: "BG-11 · H&E" },
-          { label: "Slide B", meta: "BG-12 · ROI" }
+          {
+            label: "Slide A",
+            meta: "BA9-11 · H&E",
+            region: "Frontal cortex",
+            brodmann: "BA9",
+            structure: "Dorsolateral prefrontal cortex",
+            qc: "Pass",
+            scanDate: "2026-03-03",
+            model: "HD-ROI-Net v1.2",
+            reviewer: "Research review in progress",
+            updated: "2026-03-09"
+          },
+          {
+            label: "Slide B",
+            meta: "CAU-12 · ROI",
+            region: "Basal ganglia",
+            brodmann: "-",
+            structure: "Caudate nucleus",
+            qc: "Review",
+            scanDate: "2026-03-06",
+            model: "HD-ROI-Net v1.2",
+            reviewer: "Follow-up review requested",
+            updated: "2026-03-12"
+          }
         ],
         notes: [
           "Strong discriminative signal in localized tissue regions.",
@@ -570,10 +567,9 @@
         age: "81",
         slidesLinked: "1",
         sex: "M",
-        glialScore: "0.24",
-        glialWidth: "24%",
-        tcellScore: "0.18",
-        tcellWidth: "18%",
+        reviewCompletion: "100%",
+        reviewWidth: "100%",
+        reviewedSlides: "1 / 1 slides reviewed",
         qcFlag: "Pass",
         tissue: "Control cohort tissue",
         model: "Baseline QC Model v0.5",
@@ -582,7 +578,18 @@
         viewerBase: "Whole-slide image preview placeholder\nMinimal abnormal signal detected in this control sample.",
         viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: low-intensity attention consistent with control tissue.",
         slides: [
-          { label: "Slide A", meta: "CT-01 · H&E" }
+          {
+            label: "Slide A",
+            meta: "BA17-01 · H&E",
+            region: "Occipital cortex",
+            brodmann: "BA17",
+            structure: "Primary visual cortex",
+            qc: "Pass",
+            scanDate: "2026-03-04",
+            model: "Baseline QC Model v0.5",
+            reviewer: "Reference sample",
+            updated: "2026-03-08"
+          }
         ],
         notes: [
           "No major high-attention pathology regions detected.",
@@ -602,7 +609,11 @@
       if (!q) return Object.keys(caseData);
       return Object.keys(caseData).filter((caseId) => {
         const data = caseData[caseId];
-        const slideText = data.slides.map((slide) => `${slide.label} ${slide.meta}`.toLowerCase()).join(" ");
+        const slideText = data.slides
+          .map((slide) =>
+            `${slide.label} ${slide.meta} ${slide.region || ""} ${slide.brodmann || ""} ${slide.structure || ""}`.toLowerCase()
+          )
+          .join(" ");
         return (
           caseId.toLowerCase().includes(q) ||
           data.tissue.toLowerCase().includes(q) ||
@@ -666,7 +677,8 @@
               <div class="thumb-image">${slide.label}</div>
               <div class="thumb-meta">
                 ${slide.meta}<br>
-                Scan: ${slide.scanDate || "-"}<br>
+                ${slide.region || "-"}${slide.brodmann && slide.brodmann !== "-" ? ` · ${slide.brodmann}` : ""}<br>
+                ${slide.structure || "-"}<br>
                 QC: ${slide.qc || "-"}
               </div>
             </div>
@@ -682,24 +694,28 @@
     function updateViewerText() {
       const data = caseData[currentCaseId];
       const baseText = heatmapOn ? data.viewerHeatmap : data.viewerBase;
-      const selectedSlide = data.slides[currentSlideIndex] ? `\nSelected: ${data.slides[currentSlideIndex].meta}` : "";
+      const selectedSlide = data.slides[currentSlideIndex]
+        ? `\nSelected: ${data.slides[currentSlideIndex].meta}`
+        : "";
       document.getElementById("viewerText").textContent = baseText + selectedSlide;
     }
 
     function updateSlideDetails() {
-    const data = caseData[currentCaseId];
-    const slide = data.slides[currentSlideIndex];
-  
-    document.getElementById("detailSlideId").textContent = slide.label;
-    document.getElementById("detailTissue").textContent = slide.tissue || data.tissue;
-    document.getElementById("detailScanDate").textContent = slide.scanDate || "-";
-    document.getElementById("detailQc").textContent = slide.qc || "-";
-    document.getElementById("detailModel").textContent = slide.model || data.model;
-    document.getElementById("detailReviewer").textContent = slide.reviewer || data.reviewer;
-    document.getElementById("detailUpdated").textContent = slide.updated || data.updated;
-  
-    document.getElementById("qcFlag").textContent = slide.qc || data.qcFlag;
-  }
+      const data = caseData[currentCaseId];
+      const slide = data.slides[currentSlideIndex];
+
+      document.getElementById("detailSlideId").textContent = slide.label;
+      document.getElementById("detailRegion").textContent = slide.region || "-";
+      document.getElementById("detailBrodmann").textContent = slide.brodmann || "-";
+      document.getElementById("detailStructure").textContent = slide.structure || "-";
+      document.getElementById("detailScanDate").textContent = slide.scanDate || "-";
+      document.getElementById("detailQc").textContent = slide.qc || "-";
+      document.getElementById("detailModel").textContent = slide.model || data.model;
+      document.getElementById("detailReviewer").textContent = slide.reviewer || data.reviewer;
+      document.getElementById("detailUpdated").textContent = slide.updated || data.updated;
+
+      document.getElementById("qcFlag").textContent = slide.qc || data.qcFlag;
+    }
 
     function selectSlide(index) {
       currentSlideIndex = index;
@@ -708,21 +724,22 @@
       });
       updateViewerText();
       updateSlideDetails();
-}
+    }
 
     function selectCase(caseId) {
       currentCaseId = caseId;
       heatmapOn = false;
       const data = caseData[caseId];
+
       document.getElementById("caseTitle").textContent = `Case ${caseId}`;
       document.getElementById("diagnosis").textContent = data.diagnosis;
       document.getElementById("age").textContent = data.age;
       document.getElementById("slidesLinked").textContent = data.slidesLinked;
       document.getElementById("sex").textContent = data.sex;
-      document.getElementById("glialScore").textContent = data.glialScore;
-      document.getElementById("tcellScore").textContent = data.tcellScore;
-      document.getElementById("glialBar").style.width = data.glialWidth;
-      document.getElementById("tcellBar").style.width = data.tcellWidth;
+
+      document.getElementById("reviewCompletion").textContent = `${data.reviewCompletion} (${data.reviewedSlides})`;
+      document.getElementById("reviewBar").style.width = data.reviewWidth;
+
       document.getElementById("reviewNotes").innerHTML = data.notes.map((note) => `<li>${note}</li>`).join("");
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
