@@ -161,8 +161,7 @@
 
     .hero-card,
     .summary-card,
-    .panel,
-    .metric-card {
+    .panel {
       border: 1px solid var(--border);
       border-radius: 8px;
       background: #fff;
@@ -188,27 +187,32 @@
       margin: 0;
     }
 
-    .summary-label,
-    .metric-label {
+    .summary-label {
       color: var(--muted);
       font-size: 0.9rem;
       margin-bottom: 6px;
     }
 
-    .summary-value,
-    .metric-value {
+    .summary-value {
       font-size: 1.08rem;
       font-weight: 700;
     }
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.95fr) minmax(340px, 0.95fr);
+      grid-template-columns: minmax(0, 1.65fr) minmax(360px, 1fr) minmax(340px, 1fr);
       grid-template-areas:
-        "viewer righttop"
-        "linked notes";
+        "linked linked linked"
+        "viewer casepanel notes";
       gap: 14px;
       align-items: stretch;
+    }
+
+    .linked-panel {
+      grid-area: linked;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .viewer-panel {
@@ -218,16 +222,8 @@
       height: 100%;
     }
 
-    .right-top {
-      grid-area: righttop;
-      display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 12px;
-      height: 100%;
-    }
-
-    .linked-panel {
-      grid-area: linked;
+    .case-panel {
+      grid-area: casepanel;
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -312,15 +308,9 @@
       gap: 10px;
     }
 
-    .metric-stack {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 0;
-    }
-
     .thumb-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -338,7 +328,7 @@
     }
 
     .thumb-image {
-      height: 92px;
+      height: 82px;
       border: 1px solid #d5dbe3;
       border-radius: 6px;
       overflow: hidden;
@@ -369,9 +359,9 @@
     }
 
     .thumb-meta {
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       color: var(--muted);
-      line-height: 1.45;
+      line-height: 1.35;
     }
 
     .status-tag {
@@ -470,7 +460,7 @@
       font-size: 0.94rem;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1200px) {
       .case-hero {
         grid-template-columns: 1fr 1fr;
       }
@@ -478,14 +468,14 @@
       .main-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
-          "viewer"
-          "righttop"
           "linked"
+          "viewer"
+          "casepanel"
           "notes";
       }
 
       .thumb-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
@@ -572,6 +562,11 @@
           </div>
 
           <div class="main-grid">
+            <div class="panel linked-panel">
+              <h4>Linked Slides</h4>
+              <div class="thumb-grid" id="slideThumbs"></div>
+            </div>
+
             <div class="panel viewer-panel">
               <h4>Slide Viewer — TCGA open-access dataset (demo)</h4>
               <div class="viewer">
@@ -594,45 +589,26 @@
               </div>
             </div>
 
-            <div class="right-top">
-              <div class="metric-stack">
-                <div class="metric-card">
-                  <div class="metric-label">Current Slide</div>
-                  <div class="metric-value" id="currentSlideLabel">Slide A</div>
-                </div>
-
-                <div class="metric-card">
-                  <div class="metric-label">Quantitative Data</div>
-                  <div class="metric-value" id="quantAvailability">Available</div>
-                </div>
-              </div>
-
-              <div class="panel">
-                <h4>Case Details</h4>
-                <table class="details-table">
-                  <tbody>
-                    <tr><th>Project</th><td id="detailProject"></td></tr>
-                    <tr><th>Disease Type</th><td id="detailDiseaseType"></td></tr>
-                    <tr><th>Primary Diagnosis</th><td id="detailDiagnosis"></td></tr>
-                    <tr><th>Tumor Grade</th><td id="detailGrade"></td></tr>
-                    <tr><th>Primary Site</th><td id="detailPrimarySite"></td></tr>
-                    <tr><th>Tissue of Origin</th><td id="detailTissueOrigin"></td></tr>
-                    <tr><th>Site of Resection</th><td id="detailResectionSite"></td></tr>
-                    <tr><th>Morphology</th><td id="detailMorphology"></td></tr>
-                    <tr><th>Follow-up</th><td id="detailFollowup"></td></tr>
-                    <tr><th>Race / Ethnicity</th><td id="detailRaceEthnicity"></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="panel linked-panel">
-              <h4>Linked Slides</h4>
-              <div class="thumb-grid" id="slideThumbs"></div>
+            <div class="panel case-panel">
+              <h4>Case Details</h4>
+              <table class="details-table">
+                <tbody>
+                  <tr><th>Project</th><td id="detailProject"></td></tr>
+                  <tr><th>Disease Type</th><td id="detailDiseaseType"></td></tr>
+                  <tr><th>Primary Diagnosis</th><td id="detailDiagnosis"></td></tr>
+                  <tr><th>Tumor Grade</th><td id="detailGrade"></td></tr>
+                  <tr><th>Primary Site</th><td id="detailPrimarySite"></td></tr>
+                  <tr><th>Tissue of Origin</th><td id="detailTissueOrigin"></td></tr>
+                  <tr><th>Site of Resection</th><td id="detailResectionSite"></td></tr>
+                  <tr><th>Morphology</th><td id="detailMorphology"></td></tr>
+                  <tr><th>Follow-up</th><td id="detailFollowup"></td></tr>
+                  <tr><th>Race / Ethnicity</th><td id="detailRaceEthnicity"></td></tr>
+                </tbody>
+              </table>
             </div>
 
             <div class="panel notes notes-panel">
-              <h4>Slide Summary</h4>
+              <h4>Selected Slide Summary</h4>
 
               <div class="section-block">
                 <h5>Slide Metadata</h5>
@@ -694,7 +670,6 @@
         race: "White",
         ethnicity: "Not Hispanic or Latino",
         description: "Primary brain glioma case from the TCGA-LGG cohort with two linked slides.",
-    
         slides: [
           {
             label: "Slide A",
@@ -738,7 +713,7 @@
           }
         ]
       },
-    
+
       "TCGA-DU-6407": {
         diagnosis: "Oligodendroglioma, NOS",
         grade: "G2",
@@ -759,7 +734,6 @@
         race: "White",
         ethnicity: "Not Hispanic or Latino",
         description: "Primary oligodendroglioma case from TCGA-LGG with four linked slides and mixed metadata completeness.",
-    
         slides: [
           {
             label: "Slide A",
@@ -849,7 +823,7 @@
           }
         ]
       },
-    
+
       "TCGA-S9-A6TU": {
         diagnosis: "Astrocytoma, NOS",
         grade: "G2",
@@ -870,7 +844,6 @@
         race: "White",
         ethnicity: "Not Hispanic or Latino",
         description: "Primary astrocytoma case from TCGA-LGG with one quantified slide and one linked diagnostic slide.",
-    
         slides: [
           {
             label: "Slide A",
@@ -1010,7 +983,6 @@
             </div>
             <div class="thumb-meta">
               <strong>${slide.label}</strong><br>
-              ${slide.submitterId}<br>
               ${slide.section || "Unknown"} · ${slide.stain || "H&E"}<br>
               <span class="status-tag">${quantTag}</span>
             </div>
@@ -1063,9 +1035,6 @@
     function renderSlideDetails() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
-
-      document.getElementById("currentSlideLabel").textContent = slide.label;
-      document.getElementById("quantAvailability").textContent = slide.hasQuant ? "Available" : "Not available";
 
       document.getElementById("slideMetaLabel").textContent = slide.label || "-";
       document.getElementById("slideMetaSubmitter").textContent = slide.submitterId || "-";
