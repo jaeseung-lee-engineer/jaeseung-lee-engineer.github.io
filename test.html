@@ -55,7 +55,7 @@
     }
 
     .intro {
-      max-width: 860px;
+      max-width: 900px;
       margin-bottom: 22px;
     }
 
@@ -152,13 +152,14 @@
       gap: 8px;
     }
 
-    .summary-grid {
+    .case-hero {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: 1.35fr repeat(4, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
 
+    .hero-card,
     .summary-card,
     .panel,
     .metric-card {
@@ -166,6 +167,25 @@
       border-radius: 8px;
       background: #fff;
       padding: 13px;
+    }
+
+    .hero-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      font-size: 0.96rem;
+      margin-bottom: 8px;
+    }
+
+    .hero-desc {
+      color: #333;
+      font-size: 0.95rem;
+      margin: 0;
     }
 
     .summary-label,
@@ -183,12 +203,41 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.95fr) minmax(320px, 0.9fr);
+      grid-template-columns: minmax(0, 1.95fr) minmax(340px, 0.95fr);
       grid-template-areas:
         "viewer righttop"
         "linked notes";
       gap: 14px;
       align-items: stretch;
+    }
+
+    .viewer-panel {
+      grid-area: viewer;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .right-top {
+      grid-area: righttop;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .linked-panel {
+      grid-area: linked;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .notes-panel {
+      grid-area: notes;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .viewer {
@@ -200,13 +249,19 @@
       background: #f8fafc;
       margin-bottom: 12px;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    #openseadragon-viewer {
+    #slidePreview {
       width: 100%;
       height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #f5f5f5;
     }
-    
+
     #heatmapOverlay {
       position: absolute;
       inset: 0;
@@ -218,11 +273,11 @@
       pointer-events: none;
       padding: 24px;
     }
-    
+
     #heatmapOverlay.visible {
       display: flex;
     }
-    
+
     .heatmapMessage {
       max-width: 420px;
       background: rgba(255, 255, 255, 0.92);
@@ -232,19 +287,19 @@
       text-align: center;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
-    
+
     .heatmapMessage h4 {
       margin: 0 0 10px;
       font-size: 1.05rem;
     }
-    
+
     .heatmapMessage p {
       margin: 0;
       color: #333;
       font-size: 0.95rem;
       line-height: 1.5;
     }
-    
+
     .heatmapDisclaimer {
       margin-top: 10px !important;
       color: #666 !important;
@@ -255,6 +310,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 0;
     }
 
     .thumb-grid {
@@ -277,81 +338,51 @@
     }
 
     .thumb-image {
-      height: 78px;
-      border: 1px dashed #c3cad4;
+      height: 92px;
+      border: 1px solid #d5dbe3;
       border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      background: #f3f5f7;
+    }
+
+    .thumb-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.92rem;
-      color: #555;
+      color: #666;
+      font-size: 0.9rem;
       background:
-        linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+        linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
         radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
         radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
         #efe5f3;
-      margin-bottom: 8px;
     }
 
     .thumb-meta {
       font-size: 0.88rem;
       color: var(--muted);
+      line-height: 1.45;
     }
 
-    .viewer-panel {
-      grid-area: viewer;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    
-    .right-top {
-      grid-area: righttop;
-      display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 12px;
-      height: 100%;
-    }
-    
-    .linked-panel {
-      grid-area: linked;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    
-    .notes-panel {
-      grid-area: notes;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    
-    .case-panel {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    
-    .metric-stack {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 0;
-    }
-
-    .bar {
-      height: 10px;
-      background: #edf1f5;
+    .status-tag {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 7px;
+      border: 1px solid #cbd5e1;
       border-radius: 999px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-
-    .bar > span {
-      display: block;
-      height: 100%;
-      background: #9ab3d6;
-      border-radius: 999px;
+      font-size: 0.78rem;
+      color: #334155;
+      background: #fff;
     }
 
     .details-table {
@@ -369,9 +400,44 @@
     }
 
     .details-table th {
-      width: 34%;
+      width: 38%;
       color: var(--muted);
       font-weight: 600;
+    }
+
+    .composition-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .composition-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 12px;
+    }
+
+    .composition-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+
+    .bar {
+      height: 10px;
+      background: #edf1f5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: #9ab3d6;
+      border-radius: 999px;
     }
 
     .notes ul {
@@ -381,7 +447,7 @@
 
     .details {
       margin-top: 22px;
-      max-width: 900px;
+      max-width: 980px;
     }
 
     .empty-text {
@@ -389,12 +455,26 @@
       font-size: 0.95rem;
     }
 
-    @media (max-width: 900px) {
-      .prototype-layout,
-      .summary-grid {
-        grid-template-columns: 1fr;
+    .section-block {
+      margin-top: 12px;
+    }
+
+    .section-block h5 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .composition-note {
+      margin-top: 10px;
+      color: #333;
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 1100px) {
+      .case-hero {
+        grid-template-columns: 1fr 1fr;
       }
-    
+
       .main-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -403,25 +483,35 @@
           "linked"
           "notes";
       }
-    
+
+      .thumb-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .prototype-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .case-hero,
       .thumb-grid {
         grid-template-columns: 1fr;
       }
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/openseadragon.min.js"></script>
 </head>
 <body>
   <main class="container">
     <header class="page-header">
       <a class="back-link" href="index.html">← Back to home</a>
       <h1>Demo: Digital Pathology Review Portal</h1>
-      <p class="subtitle">Concept demo for Digital pathology review alongside Proscia Concentriq LS</p>
+      <p class="subtitle">Concept demo for digital pathology case review with slide-level metadata and quantitative image-analysis summaries</p>
     </header>
 
     <div class="intro">
       <p>
-        This page is a mock frontend prototype showing how slide metadata, quality control signals, and review notes could be surfaced in a simple portal connected to a digital pathology image management system.
+        This prototype shows how case-level clinical context and slide-level quantitative summaries could be surfaced in a lightweight review portal connected to a digital pathology image management system.
       </p>
     </div>
 
@@ -433,9 +523,9 @@
 
       <div class="prototype-layout">
         <aside class="prototype-sidebar">
-          <h3>Case</h3>
+          <h3>Search Case or Slide ID</h3>
           <div class="search-row">
-            <input class="case-search" id="caseSearch" type="text" placeholder="Search case or slide ID" />
+            <input class="case-search" id="caseSearch" type="text" placeholder="TCGA-DU-A7T8" />
             <button class="btn" type="button" id="searchBtn">Search</button>
           </div>
 
@@ -451,90 +541,121 @@
         </aside>
 
         <section class="prototype-main">
-          <h3 id="caseTitle">Case ID: PD-1042</h3>
-          <div class="summary-grid">
-            <div class="summary-card">
-              <div class="summary-label">Diagnosis</div>
-              <div class="summary-value" id="diagnosis">Parkinson's disease</div>
+          <h3 id="caseTitle">Case ID: TCGA-DU-A7T8</h3>
+
+          <div class="case-hero">
+            <div class="hero-card">
+              <div class="hero-title" id="heroDiagnosis">Mixed Glioma (G3)</div>
+              <div class="hero-subtitle" id="heroSite">Brain (Cerebrum)</div>
+              <p class="hero-desc" id="heroDescription">Primary brain glioma from TCGA-LGG cohort with long-term follow-up.</p>
             </div>
+
             <div class="summary-card">
-              <div class="summary-label">Age</div>
-              <div class="summary-value" id="age">94</div>
+              <div class="summary-label">Age / Sex</div>
+              <div class="summary-value" id="ageSex">35 / Male</div>
             </div>
+
             <div class="summary-card">
-              <div class="summary-label">Sex</div>
-              <div class="summary-value" id="sex">M</div>
+              <div class="summary-label">Vital Status</div>
+              <div class="summary-value" id="vitalStatus">Deceased</div>
             </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Tumor Context</div>
+              <div class="summary-value" id="tumorContext">Primary</div>
+            </div>
+
             <div class="summary-card">
               <div class="summary-label">Slides Linked</div>
-              <div class="summary-value" id="slidesLinked">3</div>
+              <div class="summary-value" id="slidesLinked">2</div>
             </div>
           </div>
 
           <div class="main-grid">
             <div class="panel viewer-panel">
-              <h4>Slide Viewer — TCGA public dataset (demo)</h4>
-              <div class="viewer" id="viewer-wrapper">
-                <div id="openseadragon-viewer"></div>
-          
+              <h4>Slide Viewer — TCGA open-access dataset (demo)</h4>
+              <div class="viewer">
+                <img id="slidePreview" src="" alt="Slide preview" />
                 <div id="heatmapOverlay" aria-hidden="true">
                   <div class="heatmapMessage">
-                    <h4>AI Heatmap Visualization</h4>
+                    <h4>Annotation Visualization</h4>
                     <p>
-                      This area will display AI-generated heatmap predictions
-                      highlighting regions of interest on the slide.
+                      Annotation generated by pathologists or AI would appear here to highlight regions of interest on the slide.
                     </p>
                     <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
                   </div>
                 </div>
               </div>
-          
+
               <div class="viewer-actions">
-                <button class="btn primary" type="button" id="heatmapBtn">Toggle Heatmap</button>
+                <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
                 <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
                 <button class="btn" type="button" id="exportBtn">Export Report</button>
               </div>
             </div>
-          
+
             <div class="right-top">
               <div class="metric-stack">
                 <div class="metric-card">
-                  <div class="metric-label">Review completion</div>
-                  <div class="metric-value" id="reviewCompletion"></div>
-                  <div class="bar"><span id="reviewBar"></span></div>
+                  <div class="metric-label">Current Slide</div>
+                  <div class="metric-value" id="currentSlideLabel">Slide A</div>
                 </div>
+
                 <div class="metric-card">
-                  <div class="metric-label">QC flag</div>
-                  <div class="metric-value" id="qcFlag"></div>
+                  <div class="metric-label">Quantitative Data</div>
+                  <div class="metric-value" id="quantAvailability">Available</div>
                 </div>
               </div>
-          
-              <div class="panel case-panel">
+
+              <div class="panel">
                 <h4>Case Details</h4>
                 <table class="details-table">
                   <tbody>
-                    <tr><th>Slide ID</th><td id="detailSlideId"></td></tr>
-                    <tr><th>Region</th><td id="detailRegion"></td></tr>
-                    <tr><th>Brodmann area</th><td id="detailBrodmann"></td></tr>
-                    <tr><th>Structure</th><td id="detailStructure"></td></tr>
-                    <tr><th>Scan date</th><td id="detailScanDate"></td></tr>
-                    <tr><th>QC status</th><td id="detailQc"></td></tr>
-                    <tr><th>Scanner</th><td id="detailModel"></td></tr>
-                    <tr><th>Reviewer status</th><td id="detailReviewer"></td></tr>
-                    <tr><th>Last updated</th><td id="detailUpdated"></td></tr>
+                    <tr><th>Project</th><td id="detailProject"></td></tr>
+                    <tr><th>Disease Type</th><td id="detailDiseaseType"></td></tr>
+                    <tr><th>Primary Diagnosis</th><td id="detailDiagnosis"></td></tr>
+                    <tr><th>Tumor Grade</th><td id="detailGrade"></td></tr>
+                    <tr><th>Primary Site</th><td id="detailPrimarySite"></td></tr>
+                    <tr><th>Tissue of Origin</th><td id="detailTissueOrigin"></td></tr>
+                    <tr><th>Site of Resection</th><td id="detailResectionSite"></td></tr>
+                    <tr><th>Morphology</th><td id="detailMorphology"></td></tr>
+                    <tr><th>Follow-up</th><td id="detailFollowup"></td></tr>
+                    <tr><th>Race / Ethnicity</th><td id="detailRaceEthnicity"></td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
-          
+
             <div class="panel linked-panel">
               <h4>Linked Slides</h4>
               <div class="thumb-grid" id="slideThumbs"></div>
             </div>
-          
+
             <div class="panel notes notes-panel">
-              <h4>Review Notes</h4>
-              <ul id="reviewNotes"></ul>
+              <h4>Slide Summary</h4>
+
+              <div class="section-block">
+                <h5>Slide Metadata</h5>
+                <table class="details-table">
+                  <tbody>
+                    <tr><th>Slide Label</th><td id="slideMetaLabel"></td></tr>
+                    <tr><th>Submitter ID</th><td id="slideMetaSubmitter"></td></tr>
+                    <tr><th>Slide ID</th><td id="slideMetaId"></td></tr>
+                    <tr><th>Section Location</th><td id="slideMetaSection"></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="section-block">
+                <h5>Tissue Composition</h5>
+                <div id="compositionContainer"></div>
+                <div class="composition-note" id="compositionInterpretation"></div>
+              </div>
+
+              <div class="section-block">
+                <h5>Notes</h5>
+                <ul id="reviewNotes"></ul>
+              </div>
             </div>
           </div>
         </section>
@@ -542,217 +663,281 @@
     </div>
 
     <section class="details">
-      <h2>What this prototype is meant to show</h2>
+      <h2>Note</h2>
       <ul>
-        <li>A lightweight review layer on top of an image management workflow.</li>
-        <li>Case-level access to slide metadata, diagnosis, and quality-control information.</li>
-        <li>
-        Slide image from the National Cancer Institute (NCI) Genomic Data Commons,
-        The Cancer Genome Atlas (TCGA-BRCA) project. Public open-access dataset.
-        </li>
-        <li>
-        Whole-slide image ID: TCGA-AO-A1KO-01Z-00-DX1.EEB5E0A0-92B2-42CD-9F7A-00E9250B561F
-        </li>
+        <li>This prototype is intended to demonstrate how clinical context and slide-level image-derived metrics may be organized in a pathology review interface.</li>
+        <li>TCGA whole-slide images and associated metadata can vary in completeness across cases and slides.</li>
+        <li>Quantitative metrics shown here are for demo presentation only and are not for medical use.</li>
       </ul>
     </section>
   </main>
 
   <script>
     const caseData = {
-      "PD-1042": {
-        diagnosis: "Parkinson's disease",
-        age: "94",
-        slidesLinked: "3",
-        sex: "M",
-        reviewCompletion: "67%",
-        reviewWidth: "67%",
-        reviewedSlides: "2 / 3 slides reviewed",
-        qcFlag: "Pass",
-        tissue: "Substantia nigra",
-        model: "Leica GT450",
-        reviewer: "Pending pathologist review",
-        updated: "March 2026",
-        viewerBase: "Whole-slide image preview placeholder\nTissue regions and attention heatmap overlay would appear here.",
-        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: top-ranked tissue regions highlighted for reviewer inspection.",
+      "TCGA-DU-A7T8": {
+        diagnosis: "Mixed glioma",
+        grade: "G3",
+        site: "Brain (Cerebrum)",
+        age: "35",
+        sex: "Male",
+        status: "Deceased",
+        tumorContext: "Primary",
+        slidesLinked: 2,
+        project: "TCGA-LGG",
+        projectName: "Brain Lower Grade Glioma",
+        diseaseType: "Gliomas",
+        primarySite: "Brain",
+        tissueOrigin: "Cerebrum",
+        resectionSite: "Nervous system, NOS",
+        morphology: "9382/3",
+        followup: "11 years 212 days",
+        race: "White",
+        ethnicity: "Not Hispanic or Latino",
+        description: "Primary brain glioma case from the TCGA-LGG cohort with two linked slides.",
+    
         slides: [
           {
             label: "Slide A",
-            meta: "SNpc-01 · H&E",
-            region: "Midbrain",
-            brodmann: "-",
-            structure: "Substantia nigra pars compacta",
-            qc: "Pass",
-            scanDate: "2026-03-05",
-            model: "Leica GT450",
-            reviewer: "Pending pathologist review",
-            updated: "2026-03-10"
+            submitterId: "TCGA-DU-A7T8-01A-02-TS2",
+            slideId: "776c92c7-e515-4890-88da-9de91b41e981",
+            fileId: "bf7e8f61-44c8-4040-afc8-42cb687f2c12",
+            section: "TOP",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-DU-A7T8-slideA.jpg",
+            preview: "images/slides/TCGA-DU-A7T8-slideA.jpg",
+            hasQuant: true,
+            composition: {
+              tumorCells: 50,
+              tumorNuclei: 60,
+              stromalCells: 40,
+              normalCells: 10
+            },
+            interpretation: "Tumor-dominant slide with moderate stromal content and low normal tissue.",
+            notes: [
+              "Tumor-rich region identified.",
+              "High tumor nuclei proportion is consistent with dense neoplastic involvement.",
+              "Quantitative metrics derived from image analysis."
+            ]
           },
           {
             label: "Slide B",
-            meta: "SNpc-02 · Heatmap",
-            region: "Midbrain",
-            brodmann: "-",
-            structure: "Substantia nigra pars compacta",
-            qc: "Pass",
-            scanDate: "2026-03-05",
-            model: "Leica GT450",
-            reviewer: "Review completed",
-            updated: "2026-03-11"
+            submitterId: "TCGA-DU-A7T8-01Z-00-DX1",
+            slideId: "f3365952-0bc6-4464-bd66-b78a078dc787",
+            fileId: "a26d6758-564e-4b15-9300-dce25e6ccf55",
+            section: "Not Reported",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-DU-A7T8-slideB.jpg",
+            preview: "images/slides/TCGA-DU-A7T8-slideB.jpg",
+            hasQuant: false,
+            composition: null,
+            interpretation: "Quantitative composition data not available for this slide.",
+            notes: [
+              "Linked diagnostic slide without quantitative composition fields.",
+              "Annotation coverage can vary across slides in public datasets."
+            ]
+          }
+        ]
+      },
+    
+      "TCGA-DU-6407": {
+        diagnosis: "Oligodendroglioma, NOS",
+        grade: "G2",
+        site: "Brain (Cerebrum)",
+        age: "35",
+        sex: "Female",
+        status: "Deceased",
+        tumorContext: "Primary",
+        slidesLinked: 4,
+        project: "TCGA-LGG",
+        projectName: "Brain Lower Grade Glioma",
+        diseaseType: "Gliomas",
+        primarySite: "Brain",
+        tissueOrigin: "Cerebrum",
+        resectionSite: "Nervous system, NOS",
+        morphology: "9450/3",
+        followup: "7 years 319 days",
+        race: "White",
+        ethnicity: "Not Hispanic or Latino",
+        description: "Primary oligodendroglioma case from TCGA-LGG with four linked slides and mixed metadata completeness.",
+    
+        slides: [
+          {
+            label: "Slide A",
+            submitterId: "TCGA-DU-6407-01A-01-TS1",
+            slideId: "bc2f10ec-3b78-4d0f-8866-6aa26a107503",
+            fileId: "d9232b3c-60b9-4039-b5d7-2a550f3da0fb",
+            section: "TOP",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-DU-6407-slideA.jpg",
+            preview: "images/slides/TCGA-DU-6407-slideA.jpg",
+            hasQuant: true,
+            composition: {
+              tumorCells: 100,
+              tumorNuclei: 75,
+              stromalCells: null,
+              normalCells: null
+            },
+            interpretation: "Highly tumor-dominant slide with very limited reported non-tumor composition.",
+            notes: [
+              "Tumor cell fraction is reported as very high.",
+              "This slide may represent a concentrated tumor region.",
+              "Quantitative metrics derived from image analysis."
+            ]
+          },
+          {
+            label: "Slide B",
+            submitterId: "TCGA-DU-6407-02A-01-TS1",
+            slideId: "ddca3fbe-94b2-4791-b4db-144e172b45ef",
+            fileId: "1e67b2c1-febc-403c-9c7d-d9d643df7f13",
+            section: "TOP",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-DU-6407-slideB.jpg",
+            preview: "images/slides/TCGA-DU-6407-slideB.jpg",
+            hasQuant: true,
+            composition: {
+              tumorCells: 45,
+              tumorNuclei: 70,
+              stromalCells: 45,
+              normalCells: 10
+            },
+            interpretation: "Tumor-rich slide with substantial stromal content and a small normal tissue component.",
+            notes: [
+              "Tumor and stromal proportions are both appreciable.",
+              "This slide shows more mixed composition than Slide A.",
+              "Quantitative metrics derived from image analysis."
+            ]
           },
           {
             label: "Slide C",
-            meta: "SNpc-03 · ROI",
-            region: "Midbrain",
-            brodmann: "-",
-            structure: "Substantia nigra pars compacta",
-            qc: "Pass",
-            scanDate: "2026-03-05",
-            model: "Leica GT450",
-            reviewer: "Review completed",
-            updated: "2026-03-12"
+            submitterId: "TCGA-DU-6407-02B-01-TS1",
+            slideId: "90e66b88-254f-4cad-8415-662a50022438",
+            fileId: "192d7a02-aa71-45d4-a2fb-6f9da0651e1f",
+            section: "TOP",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-DU-6407-slideC.jpg",
+            preview: "images/slides/TCGA-DU-6407-slideC.jpg",
+            hasQuant: true,
+            composition: {
+              tumorCells: 50,
+              tumorNuclei: 85,
+              stromalCells: 45,
+              normalCells: 5
+            },
+            interpretation: "Tumor-rich slide with high tumor nuclei proportion, substantial stromal content, and very little normal tissue.",
+            notes: [
+              "High tumor nuclei proportion suggests dense neoplastic cellularity.",
+              "Stromal content remains appreciable in this region.",
+              "Quantitative metrics derived from image analysis."
+            ]
+          },
+          {
+            label: "Slide D",
+            submitterId: "TCGA-DU-6407-01Z-00-DX1",
+            slideId: "7407f327-85d1-42ef-adca-ca08328c0ee4",
+            fileId: "b78b3e94-2427-4c48-a0d6-0741f55bc333",
+            section: "Not Reported",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-DU-6407-slideD.jpg",
+            preview: "images/slides/TCGA-DU-6407-slideD.jpg",
+            hasQuant: false,
+            composition: null,
+            interpretation: "Quantitative composition data not available for this slide.",
+            notes: [
+              "Linked slide without quantitative composition metrics.",
+              "Public-case metadata coverage is incomplete for some slides."
+            ]
           }
-        ],
-        notes: [
-          "High-signal regions detected in pigmented tissue areas.",
-          "AI Model heatmap overlaps with pathology-relevant regions.",
-          "Recommend pathologist review of top-ranked tiles before sign-out."
         ]
       },
-      "HD-2017": {
-        diagnosis: "Huntington's disease",
+    
+      "TCGA-S9-A6TU": {
+        diagnosis: "Astrocytoma, NOS",
+        grade: "G2",
+        site: "Brain (Cerebrum)",
         age: "38",
-        slidesLinked: "2",
-        sex: "F",
-        reviewCompletion: "50%",
-        reviewWidth: "50%",
-        reviewedSlides: "1 / 2 slides reviewed",
-        qcFlag: "Pass",
-        tissue: "Basal ganglia",
-        model: "Leica GT450",
-        reviewer: "Research review in progress",
-        updated: "March 2026",
-        viewerBase: "Whole-slide image preview placeholder\nHighlighted regions correspond to model-attended neuronal loss patterns.",
-        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: focal neuronal loss regions receive strongest model attention.",
+        sex: "Male",
+        status: "Alive",
+        tumorContext: "Primary",
+        slidesLinked: 2,
+        project: "TCGA-LGG",
+        projectName: "Brain Lower Grade Glioma",
+        diseaseType: "Gliomas",
+        primarySite: "Brain",
+        tissueOrigin: "Cerebrum",
+        resectionSite: "Nervous system, NOS",
+        morphology: "9400/3",
+        followup: "7 years 94 days",
+        race: "White",
+        ethnicity: "Not Hispanic or Latino",
+        description: "Primary astrocytoma case from TCGA-LGG with one quantified slide and one linked diagnostic slide.",
+    
         slides: [
           {
             label: "Slide A",
-            meta: "BA9-11 · H&E",
-            region: "Frontal cortex",
-            brodmann: "BA9",
-            structure: "Dorsolateral prefrontal cortex",
-            qc: "Pass",
-            scanDate: "2026-03-03",
-            model: "Leica GT450",
-            reviewer: "Research review in progress",
-            updated: "2026-03-09"
+            submitterId: "TCGA-S9-A6TU-01A-01-TSA",
+            slideId: "8764c48f-59ec-42c5-a537-235e08e8db18",
+            fileId: "2c889b79-4c65-4629-98c9-0b87842ddfa8",
+            section: "TOP",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-S9-A6TU-slideA.jpg",
+            preview: "images/slides/TCGA-S9-A6TU-slideA.jpg",
+            hasQuant: true,
+            composition: {
+              tumorCells: 40,
+              tumorNuclei: 80,
+              stromalCells: 50,
+              normalCells: 10
+            },
+            interpretation: "Mixed tissue slide with high tumor nuclei proportion and substantial stromal content.",
+            notes: [
+              "Tumor nuclei proportion is high despite a more mixed overall tissue composition.",
+              "This slide is useful for demonstrating heterogeneous tissue structure.",
+              "Quantitative metrics derived from image analysis."
+            ]
           },
           {
             label: "Slide B",
-            meta: "CAU-12 · ROI",
-            region: "Basal ganglia",
-            brodmann: "-",
-            structure: "Caudate nucleus",
-            qc: "Pass",
-            scanDate: "2026-03-06",
-            model: "Leica GT450",
-            reviewer: "Review completed",
-            updated: "2026-03-12"
+            submitterId: "TCGA-S9-A6TU-01Z-00-DX1",
+            slideId: "7c02fd8c-52d2-425a-980d-d008b28d775a",
+            fileId: "4c118ab5-56b5-4835-bccc-129c8b33b852",
+            section: "Not Reported",
+            stain: "H&E",
+            thumbnail: "images/thumbs/TCGA-S9-A6TU-slideB.jpg",
+            preview: "images/slides/TCGA-S9-A6TU-slideB.jpg",
+            hasQuant: false,
+            composition: null,
+            interpretation: "Quantitative composition data not available for this slide.",
+            notes: [
+              "Linked diagnostic slide without composition metrics.",
+              "Slide remains useful for visual review and case context."
+            ]
           }
-        ],
-        notes: [
-          "Strong discriminative signal in localized tissue regions.",
-          "Case summary aligns with prior cohort-level trend."
-        ]
-      },
-      "CTRL-087": {
-        diagnosis: "Control",
-        age: "81",
-        slidesLinked: "1",
-        sex: "M",
-        reviewCompletion: "100%",
-        reviewWidth: "100%",
-        reviewedSlides: "1 / 1 slides reviewed",
-        qcFlag: "Pass",
-        tissue: "Control cohort tissue",
-        model: "Leica GT450",
-        reviewer: "Reference sample",
-        updated: "March 2026",
-        viewerBase: "Whole-slide image preview placeholder\nMinimal abnormal signal detected in this control sample.",
-        viewerHeatmap: "Whole-slide image preview placeholder\nHeatmap enabled: low-intensity attention consistent with control tissue.",
-        slides: [
-          {
-            label: "Slide A",
-            meta: "BA17-01 · H&E",
-            region: "Occipital cortex",
-            brodmann: "BA17",
-            structure: "Primary visual cortex",
-            qc: "Pass",
-            scanDate: "2026-03-04",
-            model: "Leica GT450",
-            reviewer: "Reference sample",
-            updated: "2026-03-08"
-          }
-        ],
-        notes: [
-          "No major high-attention pathology regions detected.",
-          "Distribution appears consistent with control tissue.",
-          "Case can be retained as baseline comparison sample."
         ]
       }
     };
 
-    let osdViewer = null;
-
-    function getTileSourceForCurrentSlide() {
-      const data = caseData[currentCaseId];
-      const slide = data.slides[currentSlideIndex];
-    
-      if (slide.tileSource) return slide.tileSource;
-    
-      return "slides/roi.dzi";
-    }
-    
-    function initializeViewer() {
-      const tileSource = getTileSourceForCurrentSlide();
-    
-      if (osdViewer) {
-        osdViewer.open(tileSource);
-        return;
-      }
-    
-      osdViewer = OpenSeadragon({
-        id: "openseadragon-viewer",
-        prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/images/",
-        tileSources: tileSource,
-        showNavigator: true,
-        animationTime: 0.8,
-        blendTime: 0.1,
-        constrainDuringPan: true,
-        maxZoomPixelRatio: 2,
-        minZoomLevel: 0.8,
-        visibilityRatio: 1
-      });
-    }
-    
-    let currentCaseId = "PD-1042";
+    let currentCaseId = "TCGA-DU-A7T8";
     let currentSlideIndex = 0;
     let heatmapOn = false;
-    let recentCases = ["PD-1042"];
+    let recentCases = ["TCGA-DU-A7T8"];
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
       if (!q) return Object.keys(caseData);
+
       return Object.keys(caseData).filter((caseId) => {
         const data = caseData[caseId];
         const slideText = data.slides
           .map((slide) =>
-            `${slide.label} ${slide.meta} ${slide.region || ""} ${slide.brodmann || ""} ${slide.structure || ""}`.toLowerCase()
+            `${slide.label} ${slide.submitterId} ${slide.slideId} ${slide.section || ""} ${slide.stain || ""}`.toLowerCase()
           )
           .join(" ");
+
         return (
           caseId.toLowerCase().includes(q) ||
-          data.tissue.toLowerCase().includes(q) ||
           data.diagnosis.toLowerCase().includes(q) ||
+          data.site.toLowerCase().includes(q) ||
+          data.project.toLowerCase().includes(q) ||
           slideText.includes(q)
         );
       });
@@ -761,10 +946,12 @@
     function renderQuickCaseList(caseIds) {
       const ids = caseIds && caseIds.length ? caseIds : Object.keys(caseData);
       const quickList = document.getElementById("quickCaseList");
+
       if (!ids.length) {
         quickList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
         return;
       }
+
       quickList.innerHTML = ids
         .map((caseId) => {
           const activeClass = caseId === currentCaseId ? "primary" : "";
@@ -779,10 +966,12 @@
 
     function renderRecentCaseList() {
       const recentList = document.getElementById("recentCaseList");
+
       if (!recentCases.length) {
         recentList.innerHTML = '<div class="empty-text">No recently viewed cases yet.</div>';
         return;
       }
+
       recentList.innerHTML = recentCases
         .map((caseId) => {
           const activeClass = caseId === currentCaseId ? "primary" : "";
@@ -803,85 +992,139 @@
     function renderSlides(caseId) {
       const slideThumbs = document.getElementById("slideThumbs");
       const slides = caseData[caseId].slides;
+
       currentSlideIndex = 0;
-      slideThumbs.innerHTML = slides
-        .map((slide, idx) => {
-          const activeClass = idx === 0 ? "active-thumb" : "";
-          return `
-            <div class="thumb-card ${activeClass}" data-slide-index="${idx}">
-              <div class="thumb-image">${slide.label}</div>
-              <div class="thumb-meta">
-                ${slide.meta}<br>
-                ${slide.region || "-"}${slide.brodmann && slide.brodmann !== "-" ? ` · ${slide.brodmann}` : ""}<br>
-                ${slide.structure || "-"}<br>
-                QC: ${slide.qc || "-"}
-              </div>
+
+      slideThumbs.innerHTML = slides.map((slide, idx) => {
+        const activeClass = idx === 0 ? "active-thumb" : "";
+        const quantTag = slide.hasQuant ? "Quant data" : "No data";
+
+        return `
+          <div class="thumb-card ${activeClass}" data-slide-index="${idx}">
+            <div class="thumb-image">
+              ${
+                slide.thumbnail
+                  ? `<img src="${slide.thumbnail}" alt="${slide.label} thumbnail" onerror="this.parentElement.innerHTML='<div class=&quot;thumb-placeholder&quot;>Thumbnail</div>';">`
+                  : `<div class="thumb-placeholder">Thumbnail</div>`
+              }
             </div>
-          `;
-        })
-        .join("");
+            <div class="thumb-meta">
+              <strong>${slide.label}</strong><br>
+              ${slide.submitterId}<br>
+              ${slide.section || "Unknown"} · ${slide.stain || "H&E"}<br>
+              <span class="status-tag">${quantTag}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
 
       slideThumbs.querySelectorAll(".thumb-card[data-slide-index]").forEach((card) => {
         card.addEventListener("click", () => selectSlide(Number(card.dataset.slideIndex)));
       });
     }
 
-    function updateViewerText() {
-      initializeViewer();
+    function renderCaseHeader(data) {
+      document.getElementById("caseTitle").textContent = `Case ID: ${currentCaseId}`;
+      document.getElementById("heroDiagnosis").textContent = `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
+      document.getElementById("heroSite").textContent = data.site;
+      document.getElementById("heroDescription").textContent = data.description;
+      document.getElementById("ageSex").textContent = `${data.age} / ${data.sex}`;
+      document.getElementById("vitalStatus").textContent = data.status;
+      document.getElementById("tumorContext").textContent = data.tumorContext;
+      document.getElementById("slidesLinked").textContent = data.slidesLinked;
     }
 
-    function updateSlideDetails() {
+    function renderCaseDetails(data) {
+      document.getElementById("detailProject").textContent = data.project || "-";
+      document.getElementById("detailDiseaseType").textContent = data.diseaseType || "-";
+      document.getElementById("detailDiagnosis").textContent = data.diagnosis || "-";
+      document.getElementById("detailGrade").textContent = data.grade || "-";
+      document.getElementById("detailPrimarySite").textContent = data.primarySite || "-";
+      document.getElementById("detailTissueOrigin").textContent = data.tissueOrigin || "-";
+      document.getElementById("detailResectionSite").textContent = data.resectionSite || "-";
+      document.getElementById("detailMorphology").textContent = data.morphology || "-";
+      document.getElementById("detailFollowup").textContent = data.followup || "-";
+      document.getElementById("detailRaceEthnicity").textContent = `${data.race || "-"} / ${data.ethnicity || "-"}`;
+    }
+
+    function buildCompositionRow(label, value) {
+      if (value === null || value === undefined || value === "--") return "";
+      return `
+        <div class="composition-row">
+          <div class="composition-head">
+            <span>${label}</span>
+            <strong>${value}%</strong>
+          </div>
+          <div class="bar"><span style="width:${value}%"></span></div>
+        </div>
+      `;
+    }
+
+    function renderSlideDetails() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
 
-      document.getElementById("detailSlideId").textContent = slide.label;
-      document.getElementById("detailRegion").textContent = slide.region || "-";
-      document.getElementById("detailBrodmann").textContent = slide.brodmann || "-";
-      document.getElementById("detailStructure").textContent = slide.structure || "-";
-      document.getElementById("detailScanDate").textContent = slide.scanDate || "-";
-      document.getElementById("detailQc").textContent = slide.qc || "-";
-      document.getElementById("detailModel").textContent = slide.model || data.model;
-      document.getElementById("detailReviewer").textContent = slide.reviewer || data.reviewer;
-      document.getElementById("detailUpdated").textContent = slide.updated || data.updated;
+      document.getElementById("currentSlideLabel").textContent = slide.label;
+      document.getElementById("quantAvailability").textContent = slide.hasQuant ? "Available" : "Not available";
 
-      document.getElementById("qcFlag").textContent = slide.qc || data.qcFlag;
+      document.getElementById("slideMetaLabel").textContent = slide.label || "-";
+      document.getElementById("slideMetaSubmitter").textContent = slide.submitterId || "-";
+      document.getElementById("slideMetaId").textContent = slide.slideId || "-";
+      document.getElementById("slideMetaSection").textContent = slide.section || "-";
+
+      const preview = document.getElementById("slidePreview");
+      preview.src = slide.preview || "";
+      preview.alt = `${slide.label} preview`;
+
+      const compositionContainer = document.getElementById("compositionContainer");
+      const interpretation = document.getElementById("compositionInterpretation");
+
+      if (slide.hasQuant && slide.composition) {
+        compositionContainer.innerHTML = `
+          <div class="composition-grid">
+            ${buildCompositionRow("Tumor cells", slide.composition.tumorCells)}
+            ${buildCompositionRow("Tumor nuclei", slide.composition.tumorNuclei)}
+            ${buildCompositionRow("Stromal cells", slide.composition.stromalCells)}
+            ${buildCompositionRow("Normal cells", slide.composition.normalCells)}
+          </div>
+        `;
+        interpretation.textContent = slide.interpretation || "";
+      } else {
+        compositionContainer.innerHTML = `
+          <div class="empty-text">Quantitative composition data not available for this slide.</div>
+        `;
+        interpretation.textContent = slide.interpretation || "";
+      }
+
+      document.getElementById("reviewNotes").innerHTML = (slide.notes || [])
+        .map((note) => `<li>${note}</li>`)
+        .join("");
     }
 
     function selectSlide(index) {
       currentSlideIndex = index;
+
       document.querySelectorAll(".thumb-card").forEach((card, idx) => {
         card.classList.toggle("active-thumb", idx === index);
       });
-      updateViewerText();
-      updateSlideDetails();
+
+      renderSlideDetails();
     }
 
     function selectCase(caseId) {
       currentCaseId = caseId;
       heatmapOn = false;
+      document.getElementById("heatmapOverlay").classList.remove("visible");
 
-      const overlay = document.getElementById("heatmapOverlay");
-      if (overlay) overlay.classList.remove("visible");
-      
       const data = caseData[caseId];
-
-      document.getElementById("caseTitle").textContent = `Case ID: ${caseId}`;
-      document.getElementById("diagnosis").textContent = data.diagnosis;
-      document.getElementById("age").textContent = data.age;
-      document.getElementById("slidesLinked").textContent = data.slidesLinked;
-      document.getElementById("sex").textContent = data.sex;
-
-      document.getElementById("reviewCompletion").textContent = `${data.reviewCompletion} (${data.reviewedSlides})`;
-      document.getElementById("reviewBar").style.width = data.reviewWidth;
-
-      document.getElementById("reviewNotes").innerHTML = data.notes.map((note) => `<li>${note}</li>`).join("");
+      renderCaseHeader(data);
+      renderCaseDetails(data);
+      renderSlides(caseId);
+      renderSlideDetails();
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
       updateRecentCases(caseId);
-      renderSlides(caseId);
-      updateViewerText();
-      updateSlideDetails();
     }
 
     function applySearch() {
@@ -897,17 +1140,15 @@
 
     function toggleHeatmap() {
       heatmapOn = !heatmapOn;
-    
-      const overlay = document.getElementById("heatmapOverlay");
-      overlay.classList.toggle("visible", heatmapOn);
+      document.getElementById("heatmapOverlay").classList.toggle("visible", heatmapOn);
     }
 
     function openIMS() {
-      alert("Demo: this would open the slide in Proscia Concentriq LS using an API deep-link.");
+      alert("Demo: this would open the selected slide in Proscia Concentriq LS using an API deep-link.");
     }
 
     function exportReport() {
-      alert("Demo: this would export a case report generated from backend API results.");
+      alert("Demo: this would export a case report summarizing case-level details and slide-level image-derived metrics.");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -922,7 +1163,7 @@
 
       renderQuickCaseList(Object.keys(caseData));
       renderRecentCaseList();
-      selectCase("PD-1042");
+      selectCase("TCGA-DU-A7T8");
     });
   </script>
 </body>
