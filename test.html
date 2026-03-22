@@ -161,7 +161,8 @@
 
     .hero-card,
     .summary-card,
-    .panel {
+    .panel,
+    .tab-panel {
       border: 1px solid var(--border);
       border-radius: 8px;
       background: #fff;
@@ -200,10 +201,10 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.65fr) minmax(360px, 1fr) minmax(340px, 1fr);
+      grid-template-columns: minmax(0, 2.15fr) minmax(340px, 0.95fr);
       grid-template-areas:
-        "linked linked linked"
-        "viewer casepanel notes";
+        "linked linked"
+        "viewer sidepanel";
       gap: 14px;
       align-items: stretch;
     }
@@ -222,18 +223,12 @@
       height: 100%;
     }
 
-    .case-panel {
-      grid-area: casepanel;
+    .side-panel {
+      grid-area: sidepanel;
       display: flex;
       flex-direction: column;
       height: 100%;
-    }
-
-    .notes-panel {
-      grid-area: notes;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
+      min-width: 0;
     }
 
     .viewer {
@@ -375,6 +370,37 @@
       background: #fff;
     }
 
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      border: 1px solid #b8c4d4;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font: inherit;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .tab-button.active {
+      background: var(--accent);
+      border-color: var(--accent-border);
+      font-weight: 700;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     .details-table {
       width: 100%;
       border-collapse: collapse;
@@ -470,8 +496,7 @@
         grid-template-areas:
           "linked"
           "viewer"
-          "casepanel"
-          "notes";
+          "sidepanel";
       }
 
       .thumb-grid {
@@ -589,48 +614,55 @@
               </div>
             </div>
 
-            <div class="panel case-panel">
-              <h4>Case Details</h4>
-              <table class="details-table">
-                <tbody>
-                  <tr><th>Project</th><td id="detailProject"></td></tr>
-                  <tr><th>Disease Type</th><td id="detailDiseaseType"></td></tr>
-                  <tr><th>Primary Diagnosis</th><td id="detailDiagnosis"></td></tr>
-                  <tr><th>Tumor Grade</th><td id="detailGrade"></td></tr>
-                  <tr><th>Primary Site</th><td id="detailPrimarySite"></td></tr>
-                  <tr><th>Tissue of Origin</th><td id="detailTissueOrigin"></td></tr>
-                  <tr><th>Site of Resection</th><td id="detailResectionSite"></td></tr>
-                  <tr><th>Morphology</th><td id="detailMorphology"></td></tr>
-                  <tr><th>Follow-up</th><td id="detailFollowup"></td></tr>
-                  <tr><th>Race / Ethnicity</th><td id="detailRaceEthnicity"></td></tr>
-                </tbody>
-              </table>
-            </div>
+            <div class="panel side-panel">
+              <div class="tabs">
+                <button class="tab-button active" type="button" data-tab="caseTab">Case Details</button>
+                <button class="tab-button" type="button" data-tab="slideTab">Slide Summary</button>
+              </div>
 
-            <div class="panel notes notes-panel">
-              <h4>Selected Slide Summary</h4>
-
-              <div class="section-block">
-                <h5>Slide Metadata</h5>
+              <div id="caseTab" class="tab-content active">
+                <h4>Case Details</h4>
                 <table class="details-table">
                   <tbody>
-                    <tr><th>Slide Label</th><td id="slideMetaLabel"></td></tr>
-                    <tr><th>Submitter ID</th><td id="slideMetaSubmitter"></td></tr>
-                    <tr><th>Slide ID</th><td id="slideMetaId"></td></tr>
-                    <tr><th>Section Location</th><td id="slideMetaSection"></td></tr>
+                    <tr><th>Project</th><td id="detailProject"></td></tr>
+                    <tr><th>Disease Type</th><td id="detailDiseaseType"></td></tr>
+                    <tr><th>Primary Diagnosis</th><td id="detailDiagnosis"></td></tr>
+                    <tr><th>Tumor Grade</th><td id="detailGrade"></td></tr>
+                    <tr><th>Primary Site</th><td id="detailPrimarySite"></td></tr>
+                    <tr><th>Tissue of Origin</th><td id="detailTissueOrigin"></td></tr>
+                    <tr><th>Site of Resection</th><td id="detailResectionSite"></td></tr>
+                    <tr><th>Morphology</th><td id="detailMorphology"></td></tr>
+                    <tr><th>Follow-up</th><td id="detailFollowup"></td></tr>
+                    <tr><th>Race / Ethnicity</th><td id="detailRaceEthnicity"></td></tr>
                   </tbody>
                 </table>
               </div>
 
-              <div class="section-block">
-                <h5>Tissue Composition</h5>
-                <div id="compositionContainer"></div>
-                <div class="composition-note" id="compositionInterpretation"></div>
-              </div>
+              <div id="slideTab" class="tab-content notes">
+                <h4>Selected Slide Summary</h4>
 
-              <div class="section-block">
-                <h5>Notes</h5>
-                <ul id="reviewNotes"></ul>
+                <div class="section-block">
+                  <h5>Slide Metadata</h5>
+                  <table class="details-table">
+                    <tbody>
+                      <tr><th>Slide Label</th><td id="slideMetaLabel"></td></tr>
+                      <tr><th>Submitter ID</th><td id="slideMetaSubmitter"></td></tr>
+                      <tr><th>Slide ID</th><td id="slideMetaId"></td></tr>
+                      <tr><th>Section Location</th><td id="slideMetaSection"></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="section-block">
+                  <h5>Tissue Composition</h5>
+                  <div id="compositionContainer"></div>
+                  <div class="composition-note" id="compositionInterpretation"></div>
+                </div>
+
+                <div class="section-block">
+                  <h5>Notes</h5>
+                  <ul id="reviewNotes"></ul>
+                </div>
               </div>
             </div>
           </div>
@@ -893,6 +925,7 @@
     let currentSlideIndex = 0;
     let heatmapOn = false;
     let recentCases = ["TCGA-DU-A7T8"];
+    let activeTab = "caseTab";
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
@@ -1120,6 +1153,18 @@
       alert("Demo: this would export a case report summarizing case-level details and slide-level image-derived metrics.");
     }
 
+    function switchTab(tabId) {
+      activeTab = tabId;
+
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === tabId);
+      });
+
+      document.querySelectorAll(".tab-content").forEach((content) => {
+        content.classList.toggle("active", content.id === tabId);
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("searchBtn").addEventListener("click", applySearch);
       document.getElementById("caseSearch").addEventListener("input", liveFilter);
@@ -1130,9 +1175,14 @@
       document.getElementById("imsBtn").addEventListener("click", openIMS);
       document.getElementById("exportBtn").addEventListener("click", exportReport);
 
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.addEventListener("click", () => switchTab(button.dataset.tab));
+      });
+
       renderQuickCaseList(Object.keys(caseData));
       renderRecentCaseList();
       selectCase("TCGA-DU-A7T8");
+      switchTab("caseTab");
     });
   </script>
 </body>
