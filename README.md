@@ -1,7 +1,6 @@
 # Digital Pathology Web Portal Demo
 
 Front-end prototype demonstrating a digital pathology case review interface integrated with an Image Management System (IMS).
-
 <a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank">
 Open the Digital Pathology Demo Portal
 </a>
