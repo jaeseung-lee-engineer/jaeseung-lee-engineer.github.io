@@ -1033,7 +1033,7 @@
       document.getElementById("caseTitle").textContent = `Case ID: ${currentCaseId}`;
       document.getElementById("heroDiagnosis").textContent = `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
       document.getElementById("heroSite").textContent = data.site;
-      document.getElementById("heroDescription").textContent = data.description;
+      <!-- document.getElementById("heroDescription").textContent = data.description; -->
       document.getElementById("ageSex").textContent = `${data.age} / ${data.sex}`;
       document.getElementById("vitalStatus").textContent = data.status;
       document.getElementById("tumorContext").textContent = data.tumorContext;
