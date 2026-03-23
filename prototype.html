@@ -170,6 +170,14 @@
       padding: 13px;
     }
 
+    .hero-label {
+      font-size: 11px;
+      color: #777;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    
     .hero-title {
       font-size: 1.4rem;
       font-weight: 700;
@@ -553,11 +561,10 @@
         <section class="prototype-main">
           <h3 id="caseTitle">Case ID: TCGA-DU-A7T8</h3>
 
-          <div class="case-hero">
-            <div class="hero-card">
-              <div class="hero-title" id="heroDiagnosis">Mixed Glioma (G3)</div>
-              <div class="hero-subtitle" id="heroSite">Brain (Cerebrum)</div>
-            </div>
+          <div class="hero-card">
+            <div class="hero-label">Primary Diagnosis</div>
+            <div class="hero-title" id="heroDiagnosis">Mixed Glioma (G3)</div>
+          </div>
 
             <div class="summary-card">
               <div class="summary-label">Age / Sex</div>
@@ -1019,7 +1026,6 @@
     function renderCaseHeader(data) {
       document.getElementById("caseTitle").textContent = `Case ID: ${currentCaseId}`;
       document.getElementById("heroDiagnosis").textContent = `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
-      document.getElementById("heroSite").textContent = data.site;
       document.getElementById("ageSex").textContent = `${data.age} / ${data.sex}`;
       document.getElementById("vitalStatus").textContent = data.status;
       document.getElementById("tumorContext").textContent = data.tumorContext;
