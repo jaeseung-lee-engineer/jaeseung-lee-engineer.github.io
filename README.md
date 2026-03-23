@@ -38,6 +38,7 @@ This prototype demonstrates how these elements could be organized in a streamlin
 
 ## Disclaimer
 
+- Demo uses publicly available TCGA data
 - Non-clinical demonstration
 - For interface and workflow illustration only
 - Not for medical use
