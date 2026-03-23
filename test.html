@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Demo: Digital Pathology Review Portal | Jaeseung Lee</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <style>
     :root {
       --text: #111;
@@ -240,16 +241,11 @@
       background: #f8fafc;
       margin-bottom: 12px;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     #slidePreview {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      display: block;
       background: #f5f5f5;
     }
 
@@ -595,7 +591,7 @@
             <div class="panel viewer-panel">
               <h4>Slide Viewer — TCGA open-access dataset (demo)</h4>
               <div class="viewer">
-                <img id="slidePreview" src="" alt="Slide preview" />
+                <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
                   <div class="heatmapMessage">
                     <h4>Annotation Visualization</h4>
@@ -711,7 +707,7 @@
             section: "TOP",
             stain: "H&E",
             thumbnail: "images/TCGA-DU-A7T8/thumb.png",
-            preview: "images/TCGA-DU-A7T8/thumb.png",
+            preview: "images/TCGA-DU-A7T8/roi.dzi",
             hasQuant: true,
             composition: {
               tumorCells: 50,
@@ -734,7 +730,7 @@
             section: "Not Reported",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-DU-A7T8-slideB.jpg",
-            preview: "images/slides/TCGA-DU-A7T8-slideB.jpg",
+            preview: "images/TCGA-DU-A7T8/roi.dzi",
             hasQuant: false,
             composition: null,
             interpretation: "Quantitative composition data not available for this slide.",
@@ -775,7 +771,7 @@
             section: "TOP",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-DU-6407-slideA.jpg",
-            preview: "images/slides/TCGA-DU-6407-slideA.jpg",
+            preview: "images/TCGA-DU-6407/slideA/roi.dzi",
             hasQuant: true,
             composition: {
               tumorCells: 100,
@@ -798,7 +794,7 @@
             section: "TOP",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-DU-6407-slideB.jpg",
-            preview: "images/slides/TCGA-DU-6407-slideB.jpg",
+            preview: "images/TCGA-DU-6407/slideB/roi.dzi",
             hasQuant: true,
             composition: {
               tumorCells: 45,
@@ -821,7 +817,7 @@
             section: "TOP",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-DU-6407-slideC.jpg",
-            preview: "images/slides/TCGA-DU-6407-slideC.jpg",
+            preview: "images/TCGA-DU-6407/slideC/roi.dzi",
             hasQuant: true,
             composition: {
               tumorCells: 50,
@@ -844,7 +840,7 @@
             section: "Not Reported",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-DU-6407-slideD.jpg",
-            preview: "images/slides/TCGA-DU-6407-slideD.jpg",
+            preview: "images/TCGA-DU-6407/slideD/roi.dzi",
             hasQuant: false,
             composition: null,
             interpretation: "Quantitative composition data not available for this slide.",
@@ -885,7 +881,7 @@
             section: "TOP",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-S9-A6TU-slideA.jpg",
-            preview: "images/slides/TCGA-S9-A6TU-slideA.jpg",
+            preview: "images/TCGA-S9-A6TU/slideA/roi.dzi",
             hasQuant: true,
             composition: {
               tumorCells: 40,
@@ -908,7 +904,7 @@
             section: "Not Reported",
             stain: "H&E",
             thumbnail: "images/thumbs/TCGA-S9-A6TU-slideB.jpg",
-            preview: "images/slides/TCGA-S9-A6TU-slideB.jpg",
+            preview: "images/TCGA-S9-A6TU/slideB/roi.dzi",
             hasQuant: false,
             composition: null,
             interpretation: "Quantitative composition data not available for this slide.",
@@ -925,7 +921,7 @@
     let currentSlideIndex = 0;
     let heatmapOn = false;
     let recentCases = ["TCGA-DU-A7T8"];
-    let activeTab = "caseTab";
+    let viewer = null;
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
@@ -1065,6 +1061,29 @@
       `;
     }
 
+    function initViewer(dziPath) {
+      const viewerElement = document.getElementById("slidePreview");
+      viewerElement.innerHTML = "";
+
+      if (viewer) {
+        viewer.destroy();
+        viewer = null;
+      }
+
+      viewer = OpenSeadragon({
+        id: "slidePreview",
+        prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+        tileSources: dziPath,
+        showNavigator: true,
+        animationTime: 0.8,
+        blendTime: 0.1,
+        constrainDuringPan: true,
+        maxZoomPixelRatio: 2,
+        minZoomLevel: 0.5,
+        visibilityRatio: 1.0
+      });
+    }
+
     function renderSlideDetails() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
@@ -1074,9 +1093,7 @@
       document.getElementById("slideMetaId").textContent = slide.slideId || "-";
       document.getElementById("slideMetaSection").textContent = slide.section || "-";
 
-      const preview = document.getElementById("slidePreview");
-      preview.src = slide.preview || "";
-      preview.alt = `${slide.label} preview`;
+      initViewer(slide.preview);
 
       const compositionContainer = document.getElementById("compositionContainer");
       const interpretation = document.getElementById("compositionInterpretation");
@@ -1154,8 +1171,6 @@
     }
 
     function switchTab(tabId) {
-      activeTab = tabId;
-
       document.querySelectorAll(".tab-button").forEach((button) => {
         button.classList.toggle("active", button.dataset.tab === tabId);
       });
