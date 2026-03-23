@@ -170,17 +170,21 @@
       padding: 13px;
     }
 
-    .hero-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      line-height: 1.2;
+    .hero-label {
+      color: var(--muted);
+      font-size: 0.9rem;
       margin-bottom: 6px;
+    }
+    
+    .hero-title {
+      font-size: 1.08rem;
+      font-weight: 700;
     }
 
     .hero-subtitle {
       color: var(--muted);
       font-size: 0.96rem;
-      margin-bottom: 8px;
+      margin-bottom: 0;
     }
 
     .summary-label {
@@ -516,12 +520,14 @@
     <header class="page-header">
       <a class="back-link" href="index.html">← Back to home</a>
       <h1>Demo: Digital Pathology Review Portal</h1>
-      <p class="subtitle">Concept demo for digital pathology case review with slide-level metadata and quantitative image-analysis summaries</p>
+      <p class="subtitle">Concept demo for digital pathology case review portal connected to a digital pathology image management system.</p>
     </header>
 
     <div class="intro">
-      <p>
-        This prototype shows how case-level clinical context and slide-level quantitative summaries could be surfaced in a lightweight review portal connected to a digital pathology image management system.
+      <p class="repo-link">
+        Implementation details and system design available on 
+        <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank"> [GitHub Repository]
+        </a>
       </p>
     </div>
 
@@ -552,12 +558,11 @@
 
         <section class="prototype-main">
           <h3 id="caseTitle">Case ID: TCGA-DU-A7T8</h3>
-
-          <div class="case-hero">
-            <div class="hero-card">
-              <div class="hero-title" id="heroDiagnosis">Mixed Glioma (G3)</div>
-              <div class="hero-subtitle" id="heroSite">Brain (Cerebrum)</div>
-            </div>
+        <div class="case-hero">
+          <div class="summary-card">
+            <div class="summary-label">Primary Diagnosis</div>
+            <div class="summary-value" id="heroDiagnosis">Mixed Glioma (G3)</div>
+          </div>
 
             <div class="summary-card">
               <div class="summary-label">Age / Sex</div>
@@ -615,7 +620,6 @@
               </div>
 
               <div id="caseTab" class="tab-content active">
-
                 <table class="details-table">
                   <tbody>
                     <tr><th>Project</th><td id="detailProject"></td></tr>
@@ -633,8 +637,6 @@
               </div>
 
               <div id="slideTab" class="tab-content notes">
-
-
                 <div class="section-block">
                   <h5>Slide Metadata</h5>
                   <table class="details-table">
@@ -664,14 +666,7 @@
       </div>
     </div>
 
-    <section class="details">
-      <h2>Note</h2>
-      <ul>
-        <li>This prototype is intended to demonstrate how clinical context and slide-level image-derived metrics may be organized in a pathology review interface.</li>
-        <li>TCGA whole-slide images and associated metadata can vary in completeness across cases and slides.</li>
-        <li>Quantitative metrics shown here are for demo presentation only and are not for medical use.</li>
-      </ul>
-    </section>
+
   </main>
 
   <script>
@@ -712,11 +707,11 @@
               stromalCells: 40,
               normalCells: 10
             },
-            interpretation: "Tumor-dominant slide with moderate stromal content and low normal tissue.",
             notes: [
-              "Tumor-rich region identified.",
-              "High tumor nuclei proportion is consistent with dense neoplastic involvement.",
-              "Quantitative metrics derived from image analysis."
+              "High tumor nuclei proportion observed.",
+              "Mixed tissue composition present.",
+              "Quantitative metrics derived from image analysis.",
+              "For research/demo purposes only."
             ]
           },
           {
@@ -730,10 +725,10 @@
             preview: "images/TCGA-DU-A7T8/01Z-00-DX1/roi.dzi",
             hasQuant: false,
             composition: null,
-            interpretation: "Quantitative composition data not available for this slide.",
             notes: [
-              "Linked diagnostic slide without quantitative composition fields.",
-              "Annotation coverage can vary across slides in public datasets."
+              "No quantitative composition data available.",
+              "Annotation not available for this slide.",
+              "For research/demo purposes only."
             ]
           }
         ]
@@ -775,11 +770,11 @@
               stromalCells: null,
               normalCells: null
             },
-            interpretation: "Highly tumor-dominant slide with very limited reported non-tumor composition.",
             notes: [
-              "Tumor cell fraction is reported as very high.",
-              "This slide may represent a concentrated tumor region.",
-              "Quantitative metrics derived from image analysis."
+              "Tumor cell fraction: high",
+              "Tumor-dominant region observed.",
+              "Quantitative metrics derived from image analysis.",
+              "For research/demo purposes only."
             ]
           },
           {
@@ -798,11 +793,11 @@
               stromalCells: 45,
               normalCells: 10
             },
-            interpretation: "Tumor-rich slide with substantial stromal content and a small normal tissue component.",
             notes: [
-              "Tumor and stromal proportions are both appreciable.",
-              "This slide shows more mixed composition than Slide A.",
-              "Quantitative metrics derived from image analysis."
+              "Tumor and stromal proportions: both present",
+              "Tissue composition: mixed",
+              "Quantitative metrics derived from image analysis.",
+              "For research/demo purposes only."
             ]
           },
           {
@@ -821,11 +816,11 @@
               stromalCells: 45,
               normalCells: 5
             },
-            interpretation: "Tumor-rich slide with high tumor nuclei proportion, substantial stromal content, and very little normal tissue.",
             notes: [
-              "High tumor nuclei proportion suggests dense neoplastic cellularity.",
-              "Stromal content remains appreciable in this region.",
-              "Quantitative metrics derived from image analysis."
+              "Tumor nuclei proportion: high",
+              "Stromal content: present",
+              "Quantitative metrics derived from image analysis.",
+              "For research/demo purposes only."
             ]
           },
           {
@@ -839,10 +834,10 @@
             preview: "images/TCGA-DU-6407/01Z-00-DX1/roi.dzi",
             hasQuant: false,
             composition: null,
-            interpretation: "Quantitative composition data not available for this slide.",
             notes: [
-              "Linked slide without quantitative composition metrics.",
-              "Public-case metadata coverage is incomplete for some slides."
+              "Quantitative composition: not available",
+              "Annotation: not available.",
+              "For research/demo purposes only."
             ]
           }
         ]
@@ -884,11 +879,11 @@
               stromalCells: 50,
               normalCells: 10
             },
-            interpretation: "Mixed tissue slide with high tumor nuclei proportion and substantial stromal content.",
             notes: [
-              "Tumor nuclei proportion is high despite a more mixed overall tissue composition.",
-              "This slide is useful for demonstrating heterogeneous tissue structure.",
-              "Quantitative metrics derived from image analysis."
+              "Tumor nuclei proportion: high",
+              "Tissue composition: mixed",
+              "Quantitative metrics derived from image analysis.",
+              "For research/demo purposes only."
             ]
           },
           {
@@ -902,10 +897,10 @@
             preview: "images/TCGA-S9-A6TU/01Z-00-DX1/roi.dzi",
             hasQuant: false,
             composition: null,
-            interpretation: "Quantitative composition data not available for this slide.",
             notes: [
-              "Linked diagnostic slide without composition metrics.",
-              "Slide remains useful for visual review and case context."
+              "Quantitative composition: not available",
+              "Annotation: not available",
+              "For research/demo purposes only."
             ]
           }
         ]
@@ -1022,7 +1017,6 @@
     function renderCaseHeader(data) {
       document.getElementById("caseTitle").textContent = `Case ID: ${currentCaseId}`;
       document.getElementById("heroDiagnosis").textContent = `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
-      document.getElementById("heroSite").textContent = data.site;
       document.getElementById("ageSex").textContent = `${data.age} / ${data.sex}`;
       document.getElementById("vitalStatus").textContent = data.status;
       document.getElementById("tumorContext").textContent = data.tumorContext;
