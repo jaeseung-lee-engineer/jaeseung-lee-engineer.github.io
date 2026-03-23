@@ -25,7 +25,7 @@ Designed to conceptually integrate with a digital pathology IMS.
 Designed to retrieve:
 - Whole-slide images (WSI)
 - Case metadata
-- Slide relationships
+- Slide details
 - Annotation layers
 
 This prototype demonstrates how these elements could be organized in a streamlined review interface.
