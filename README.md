@@ -17,7 +17,7 @@ Designed to conceptually integrate with a digital pathology IMS.
 - Slide Viewer — Whole-slide image visualization  
 - Case Details — Clinical metadata  
 - Linked Slides — Navigation across slides  
-- Slide Summary — Quantitative metrics & notes  
+- Slide Details — Quantitative metrics & notes  
 - Annotation Toggle — Region highlighting (AI/pathologist)
 
 ## IMS Integration
