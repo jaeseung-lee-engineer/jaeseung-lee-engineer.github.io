@@ -18,7 +18,7 @@ Designed to conceptually integrate with a digital pathology IMS.
 - Case Details — Clinical metadata  
 - Linked Slides — Navigation across slides  
 - Slide Details — Quantitative metrics & notes  
-- Annotation Toggle — Region highlighting (by Pathologists)
+- Annotation Toggle — Region highlighting (by Pathologists or AI software)
 
 ## IMS Integration
 
