@@ -358,6 +358,12 @@
       line-height: 1.35;
     }
 
+    .viewer-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
     .status-tag {
       display: inline-block;
       margin-top: 6px;
@@ -593,6 +599,9 @@
 
             <div class="panel viewer-panel">
               <h4>Slide Viewer — TCGA open-access dataset</h4>
+              <div class="viewer-note">
+                Case-level context and slide-level observations are presented together for review.
+              </div>
               <div class="viewer">
                 <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
@@ -708,9 +717,9 @@
               normalCells: 10
             },
             notes: [
-              "High tumor nuclei proportion observed.",
+              "Higher tumor nuclei proportion observed.",
               "Mixed tissue composition present.",
-              "Quantitative metrics derived from image analysis.",
+              "Quantitative values included for demonstration purposes.",
               "For demo purposes only."
             ]
           },
@@ -726,9 +735,10 @@
             hasQuant: false,
             composition: null,
             notes: [
-              "No quantitative composition data available.",
+              "Quantitative composition data not available.",
               "Annotation not available for this slide.",
               "For demo purposes only."
+
             ]
           }
         ]
@@ -771,8 +781,8 @@
               normalCells: null
             },
             notes: [
-              "Tumor cell fraction: high",
-              "Quantitative metrics derived from image analysis.",
+              "High tumor cell content observed.",
+              "Quantitative values included for demonstration purposes.",
               "For demo purposes only."
             ]
           },
@@ -793,9 +803,9 @@
               normalCells: 10
             },
             notes: [
-              "Tumor and stromal proportions: both present",
-              "Tissue composition: mixed",
-              "Quantitative metrics derived from image analysis.",
+              "Tumor and stromal components both present.",
+              "Overall tissue composition appears mixed.",
+              "Quantitative values included for demonstration purposes.",
               "For demo purposes only."
             ]
           },
@@ -816,9 +826,9 @@
               normalCells: 5
             },
             notes: [
-              "Tumor nuclei proportion: high",
-              "Stromal cells: present",
-              "Quantitative metrics derived from image analysis.",
+              "Higher tumor nuclei proportion observed.",
+              "Stromal component present.",
+              "Quantitative values included for demonstration purposes.",
               "For demo purposes only."
             ]
           },
@@ -834,8 +844,8 @@
             hasQuant: false,
             composition: null,
             notes: [
-              "Quantitative composition: not available",
-              "Annotation: not available",
+              "Quantitative composition data not available.",
+              "Annotation not available for this slide.",
               "For demo purposes only."
             ]
           }
@@ -879,9 +889,9 @@
               normalCells: 10
             },
             notes: [
-              "Tumor nuclei proportion: high",
-              "Tissue composition: mixed",
-              "Quantitative metrics derived from image analysis.",
+              "Higher tumor nuclei proportion observed.",
+              "Mixed tissue composition present.",
+              "Quantitative values included for demonstration purposes.",
               "For demo purposes only."
             ]
           },
@@ -897,8 +907,8 @@
             hasQuant: false,
             composition: null,
             notes: [
-              "Quantitative composition: not available",
-              "Annotation: not available",
+              "Quantitative composition data not available.",
+              "Annotation not available for this slide.",
               "For demo purposes only."
             ]
           }
