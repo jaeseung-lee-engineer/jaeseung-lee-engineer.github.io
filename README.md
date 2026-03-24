@@ -6,7 +6,7 @@ Open the Digital Pathology Demo Portal
 </a>
 
 ## Project Overview
-This project explores how case-level clinical data and slide-level image-derived metrics can be presented in a unified pathology review interface.
+This project explores how case-level clinical meta-data and slide-level information can be presented in a unified pathology review interface.
 
 Designed to conceptually integrate with a digital pathology IMS.
 
@@ -18,7 +18,7 @@ Designed to conceptually integrate with a digital pathology IMS.
 - Case Details — Clinical metadata  
 - Linked Slides — Navigation across slides  
 - Slide Details — Quantitative metrics & notes  
-- Annotation Toggle — Region highlighting (AI/pathologist)
+- Annotation Toggle — Region highlighting (by Pathologists)
 
 ## IMS Integration
 
