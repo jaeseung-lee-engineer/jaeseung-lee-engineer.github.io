@@ -358,6 +358,19 @@
       line-height: 1.35;
     }
 
+    .viewer-status {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin: -4px 0 8px;
+      min-height: 1.2em;
+    }
+
+    .viewer-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
     .status-tag {
       display: inline-block;
       margin-top: 6px;
@@ -593,6 +606,7 @@
 
             <div class="panel viewer-panel">
               <h4>Slide Viewer — TCGA open-access dataset</h4>
+              <div id="viewerStatus" class="viewer-status">Ready</div>
               <div class="viewer">
                 <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
@@ -708,10 +722,10 @@
               normalCells: 10
             },
             notes: [
-              "High tumor nuclei proportion observed.",
+              "Higher tumor nuclei proportion observed.",
               "Mixed tissue composition present.",
-              "Quantitative metrics derived from image analysis.",
-              "For research/demo purposes only."
+              "Quantitative values included for demonstration purposes.",
+              "For demo purposes only."
             ]
           },
           {
@@ -726,9 +740,10 @@
             hasQuant: false,
             composition: null,
             notes: [
-              "No quantitative composition data available.",
+              "Quantitative composition data not available.",
               "Annotation not available for this slide.",
-              "For research/demo purposes only."
+              "For demo purposes only."
+
             ]
           }
         ]
@@ -771,10 +786,9 @@
               normalCells: null
             },
             notes: [
-              "Tumor cell fraction: high",
-              "Tumor-dominant region observed.",
-              "Quantitative metrics derived from image analysis.",
-              "For research/demo purposes only."
+              "High tumor cell content observed.",
+              "Quantitative values included for demonstration purposes.",
+              "For demo purposes only."
             ]
           },
           {
@@ -794,10 +808,10 @@
               normalCells: 10
             },
             notes: [
-              "Tumor and stromal proportions: both present",
-              "Tissue composition: mixed",
-              "Quantitative metrics derived from image analysis.",
-              "For research/demo purposes only."
+              "Tumor and stromal components both present.",
+              "Overall tissue composition appears mixed.",
+              "Quantitative values included for demonstration purposes.",
+              "For demo purposes only."
             ]
           },
           {
@@ -817,10 +831,10 @@
               normalCells: 5
             },
             notes: [
-              "Tumor nuclei proportion: high",
-              "Stromal content: present",
-              "Quantitative metrics derived from image analysis.",
-              "For research/demo purposes only."
+              "Higher tumor nuclei proportion observed.",
+              "Stromal component present.",
+              "Quantitative values included for demonstration purposes.",
+              "For demo purposes only."
             ]
           },
           {
@@ -835,9 +849,9 @@
             hasQuant: false,
             composition: null,
             notes: [
-              "Quantitative composition: not available",
-              "Annotation: not available.",
-              "For research/demo purposes only."
+              "Quantitative composition data not available.",
+              "Annotation not available for this slide.",
+              "For demo purposes only."
             ]
           }
         ]
@@ -880,10 +894,10 @@
               normalCells: 10
             },
             notes: [
-              "Tumor nuclei proportion: high",
-              "Tissue composition: mixed",
-              "Quantitative metrics derived from image analysis.",
-              "For research/demo purposes only."
+              "Higher tumor nuclei proportion observed.",
+              "Mixed tissue composition present.",
+              "Quantitative values included for demonstration purposes.",
+              "For demo purposes only."
             ]
           },
           {
@@ -898,9 +912,9 @@
             hasQuant: false,
             composition: null,
             notes: [
-              "Quantitative composition: not available",
-              "Annotation: not available",
-              "For research/demo purposes only."
+              "Quantitative composition data not available.",
+              "Annotation not available for this slide.",
+              "For demo purposes only."
             ]
           }
         ]
@@ -1036,6 +1050,15 @@
       document.getElementById("detailRaceEthnicity").textContent = `${data.race || "-"} / ${data.ethnicity || "-"}`;
     }
 
+    function setViewerStatus(message) {
+      document.getElementById("viewerStatus").textContent = message;
+    }
+    
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    
     function buildCompositionRow(label, value) {
       if (value === null || value === undefined || value === "--") return "";
       return `
@@ -1072,7 +1095,7 @@
       });
     }
 
-    function renderSlideDetails() {
+    async function renderSlideDetails() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
 
@@ -1081,7 +1104,17 @@
       document.getElementById("slideMetaId").textContent = slide.slideId || "-";
       document.getElementById("slideMetaSection").textContent = slide.section || "-";
 
+      setViewerStatus("Fetching slide data...");
+      await delay(250);
+      
       initViewer(slide.preview);
+
+      setViewerStatus("Slide data loaded");
+      setTimeout(() => {
+        if (document.getElementById("viewerStatus").textContent === "Slide data loaded") {
+          setViewerStatus("Ready");
+        }
+      }, 800);
 
       const compositionContainer = document.getElementById("compositionContainer");
       const interpretation = document.getElementById("compositionInterpretation");
@@ -1108,17 +1141,17 @@
         .join("");
     }
 
-    function selectSlide(index) {
+    async function selectSlide(index) {
       currentSlideIndex = index;
 
       document.querySelectorAll(".thumb-card").forEach((card, idx) => {
         card.classList.toggle("active-thumb", idx === index);
       });
 
-      renderSlideDetails();
+      await renderSlideDetails();
     }
 
-    function selectCase(caseId) {
+    async function selectCase(caseId) {
       currentCaseId = caseId;
       heatmapOn = false;
       document.getElementById("heatmapOverlay").classList.remove("visible");
@@ -1127,7 +1160,7 @@
       renderCaseHeader(data);
       renderCaseDetails(data);
       renderSlides(caseId);
-      renderSlideDetails();
+      await renderSlideDetails();
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
