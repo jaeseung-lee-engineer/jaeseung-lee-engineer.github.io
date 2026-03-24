@@ -358,6 +358,13 @@
       line-height: 1.35;
     }
 
+    .viewer-status {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin: -4px 0 8px;
+      min-height: 1.2em;
+    }
+
     .viewer-note {
       font-size: 0.85rem;
       color: var(--muted);
@@ -599,6 +606,7 @@
 
             <div class="panel viewer-panel">
               <h4>Slide Viewer — TCGA open-access dataset</h4>
+              <div id="viewerStatus" class="viewer-status">Ready</div>
               <div class="viewer">
                 <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
@@ -1042,6 +1050,15 @@
       document.getElementById("detailRaceEthnicity").textContent = `${data.race || "-"} / ${data.ethnicity || "-"}`;
     }
 
+    function setViewerStatus(message) {
+      document.getElementById("viewerStatus").textContent = message;
+    }
+    
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    
     function buildCompositionRow(label, value) {
       if (value === null || value === undefined || value === "--") return "";
       return `
@@ -1078,7 +1095,7 @@
       });
     }
 
-    function renderSlideDetails() {
+    async function renderSlideDetails() {
       const data = caseData[currentCaseId];
       const slide = data.slides[currentSlideIndex];
 
@@ -1087,7 +1104,17 @@
       document.getElementById("slideMetaId").textContent = slide.slideId || "-";
       document.getElementById("slideMetaSection").textContent = slide.section || "-";
 
+      setViewerStatus("Fetching slide data...");
+      await delay(250);
+      
       initViewer(slide.preview);
+
+      setViewerStatus("Slide data loaded");
+      setTimeout(() => {
+        if (document.getElementById("viewerStatus").textContent === "Slide data loaded") {
+          setViewerStatus("Ready");
+        }
+      }, 800);
 
       const compositionContainer = document.getElementById("compositionContainer");
       const interpretation = document.getElementById("compositionInterpretation");
@@ -1114,17 +1141,17 @@
         .join("");
     }
 
-    function selectSlide(index) {
+    async function selectSlide(index) {
       currentSlideIndex = index;
 
       document.querySelectorAll(".thumb-card").forEach((card, idx) => {
         card.classList.toggle("active-thumb", idx === index);
       });
 
-      renderSlideDetails();
+      await renderSlideDetails();
     }
 
-    function selectCase(caseId) {
+    async function selectCase(caseId) {
       currentCaseId = caseId;
       heatmapOn = false;
       document.getElementById("heatmapOverlay").classList.remove("visible");
@@ -1133,7 +1160,7 @@
       renderCaseHeader(data);
       renderCaseDetails(data);
       renderSlides(caseId);
-      renderSlideDetails();
+      await renderSlideDetails();
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
