@@ -35,6 +35,22 @@
 
     .page-header { margin-bottom: 24px; }
 
+
+    .footer {
+        margin-top: 60px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+    
     .back-link,
     a {
       color: var(--link);
@@ -547,7 +563,7 @@
     <div class="prototype-demo">
       <div class="prototype-topbar">
         <div><strong>Demo: Digital Pathology Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
-        <div>Connected IMS: <strong>Proscia Concentriq LS</strong></div>
+        <div>IMS Integration (Concept): <strong>Proscia Concentriq LS</strong></div>
       </div>
 
       <div class="prototype-layout">
@@ -1221,5 +1237,15 @@
       switchTab("caseTab");
     });
   </script>
+<footer class="footer">
+    <div class="footer-inner">
+      <span>
+        Data source: TCGA (The Cancer Genome Atlas) via The Cancer Imaging Archive (TCIA).
+      </span>
+      <span>
+        For demonstration purposes only.
+      </span>
+    </div>
+  </footer>
 </body>
 </html>
