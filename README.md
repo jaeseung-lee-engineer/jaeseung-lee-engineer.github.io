@@ -1,16 +1,22 @@
 # Digital Pathology Web Portal Demo
 
-Front-end prototype demonstrating a digital pathology case review interface integrated with an Image Management System (IMS).
+This demo explores how case-level clinical meta-data and slide-level information can be presented in a unified pathology review interface.
 <a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank">
 Open the Digital Pathology Demo Portal
 </a>
 
-## Project Overview
-This project explores how case-level clinical meta-data and slide-level information can be presented in a unified pathology review interface.
+## System Design (Conceptual)
 
-Designed to conceptually integrate with a digital pathology IMS.
+This system design demonstrates a conceptual integration with an Image Management System (IMS) such as Proscia Concentriq LS.
 
 <img src="images/digital_pathology_workflow.png" width="850">
+
+While no backend is implemented, the following API structure illustrates how case-level data and slide details could be accessed in a real-world deployment:
+
+GET /api/cases  
+GET /api/cases/{id}  
+GET /api/slides/{slide_id}  
+POST /api/annotations  
 
 ## Interface
 
