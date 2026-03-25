@@ -35,6 +35,22 @@
 
     .page-header { margin-bottom: 24px; }
 
+
+    .footer {
+        margin-top: 60px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+    
     .back-link,
     a {
       color: var(--link);
@@ -533,7 +549,7 @@
     <header class="page-header">
       <a class="back-link" href="index.html">← Back to home</a>
       <h1>Demo: Digital Pathology Review Portal</h1>
-      <p class="subtitle">Concept demo for digital pathology case review portal connected to a digital pathology image management system.</p>
+      <p class="subtitle">A prototype exploring a case-centric digital pathology workflow integrating slide review, metadata, and IMS connectivity.</p>
     </header>
 
     <div class="intro">
@@ -1221,5 +1237,15 @@
       switchTab("caseTab");
     });
   </script>
+<footer class="footer">
+    <div class="footer-inner">
+      <span>
+        Data source: TCGA (The Cancer Genome Atlas) via The Cancer Imaging Archive (TCIA).
+      </span>
+      <span>
+        For demonstration purposes only.
+      </span>
+    </div>
+  </footer>
 </body>
 </html>
