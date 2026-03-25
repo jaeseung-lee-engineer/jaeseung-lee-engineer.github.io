@@ -12,7 +12,7 @@ This system design demonstrates a conceptual integration with an Image Managemen
 High-level architecture of the proposed workflow:
 <img src="images/digital_pathology_workflow.png" width="850">
 
-While no backend is implemented, the following API structure illustrates how case-level data and slide details could be accessed in a real-world deployment:
+While this demo does not include a backend, the following API structure illustrates how case-level data and slide details could be accessed in a real-world deployment:
 
 GET /api/cases  
 GET /api/cases/{id}  
