@@ -12,7 +12,7 @@
       --link: #1d4ed8;
       --border: #e5e7eb;
       --border-strong: #d1d5db;
-      --bg: #f8fafc;
+      --bg: #ffffff;
       --surface: #ffffff;
       --surface-subtle: #f9fafb;
       --surface-muted: #f3f4f6;
@@ -518,11 +518,16 @@
       font-size: 11px !important;
     }
 
+    .viewer-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
     .viewer-actions {
       display: flex;
-      flex-wrap: wrap;
       gap: 6px;
-      margin-top: 8px;
+      flex-wrap: wrap;
     }
 
     .tabs {
@@ -801,8 +806,16 @@
 
             <div class="panel viewer-panel">
               <div class="viewer-header">
-                <h4>Slide Viewer</h4>
-                <div class="viewer-header-meta">Whole-slide preview from TCGA dataset</div>
+                <div class="viewer-header-left">
+                  <h4>Slide Viewer</h4>
+                  <div class="viewer-header-meta">Whole-slide preview from TCGA dataset</div>
+                </div>
+              
+                <div class="viewer-actions">
+                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
+                  <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+                  <button class="btn" type="button" id="exportBtn">Export Report</button>
+                </div>
               </div>
 
               <div id="viewerStatus" class="viewer-status">Ready</div>
@@ -818,12 +831,6 @@
                     <p class="heatmapDisclaimer">Prototype visualization only. Not for clinical use.</p>
                   </div>
                 </div>
-              </div>
-
-              <div class="viewer-actions">
-                <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
-                <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-                <button class="btn" type="button" id="exportBtn">Export Report</button>
               </div>
             </div>
 
