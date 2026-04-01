@@ -3,84 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo: Digital Pathology Review Portal | Jaeseung Lee</title>
+  <title>Digital Pathology Review Portal | Jaeseung Lee</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <style>
     :root {
-      --text: #111;
-      --muted: #555;
-      --link: #1a56b3;
-      --border: #d9d9d9;
-      --bg: #ffffff;
-      --panel: #fafafa;
-      --accent: #eef5ff;
-      --accent-border: #9ab3d6;
+      --text: #111827;
+      --muted: #6b7280;
+      --link: #1d4ed8;
+      --border: #e5e7eb;
+      --border-strong: #d1d5db;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-subtle: #f9fafb;
+      --surface-muted: #f3f4f6;
+      --accent: #eff6ff;
+      --accent-border: #bfdbfe;
+      --accent-text: #1d4ed8;
+      --success: #065f46;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
 
     body {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 28px 24px 64px;
-    }
-
-    .page-header { margin-bottom: 24px; }
-
-
-    .footer {
-        margin-top: 60px;
-        padding-top: 16px;
-        border-top: 1px solid var(--border);
-        font-size: 12px;
-        color: var(--muted);
-      }
-      
-      .footer-inner {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-    
-    .back-link,
     a {
       color: var(--link);
       text-decoration: none;
     }
 
-    .back-link:hover,
-    a:hover { text-decoration: underline; }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 18px 28px;
+    }
+
+    .page-header {
+      margin-bottom: 12px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      text-decoration: none;
+    }
 
     h1 {
-      font-size: 2.15rem;
+      font-size: 1.4rem;
       line-height: 1.2;
-      margin: 0 0 8px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      letter-spacing: -0.01em;
     }
 
     .subtitle {
+      margin: 0;
       color: var(--muted);
-      margin: 0 0 10px;
+      font-size: 13px;
+      max-width: 900px;
     }
 
     .intro {
-      max-width: 900px;
-      margin-bottom: 22px;
+      margin-bottom: 12px;
+    }
+
+    .repo-link {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .prototype-demo {
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 8px;
       overflow: hidden;
-      background: var(--panel);
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
 
     .prototype-topbar {
@@ -88,172 +111,360 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 14px 16px;
+      padding: 10px 14px;
       border-bottom: 1px solid var(--border);
-      background: #f2f4f7;
-      font-size: 0.95rem;
+      background: var(--surface-subtle);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .topbar-title strong {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     .prototype-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border: 1px solid #c9d4e5;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border: 1px solid var(--border-strong);
       border-radius: 999px;
-      background: #fff;
-      font-size: 0.84rem;
-      margin-left: 8px;
+      background: var(--surface);
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .topbar-meta {
+      white-space: nowrap;
     }
 
     .prototype-layout {
       display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 640px;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: 700px;
     }
 
     .prototype-sidebar {
       border-right: 1px solid var(--border);
-      background: #fff;
-      padding: 16px;
+      background: var(--surface);
+      padding: 12px;
     }
 
-    .prototype-main {
-      padding: 18px;
-      background: #fcfcfc;
+    .sidebar-section + .sidebar-section {
+      margin-top: 10px;
     }
 
-    .prototype-sidebar h3,
-    .prototype-main h3,
-    .prototype-main h4 {
-      margin-top: 0;
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     .search-row {
       display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
+      gap: 6px;
+      margin-bottom: 10px;
     }
 
     .case-search {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
       font: inherit;
-      background: #fff;
+      outline: none;
+    }
+
+    .case-search:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
     }
 
     .btn {
-      border: 1px solid #b8c4d4;
-      background: #fff;
-      border-radius: 8px;
-      padding: 8px 12px;
+      height: 32px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 0 10px;
       font: inherit;
+      font-size: 12px;
+      color: var(--text);
       cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--surface-subtle);
     }
 
     .btn.primary {
       background: var(--accent);
       border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .btn.primary:hover {
+      background: #dbeafe;
     }
 
     .quick-cases {
       border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      padding: 12px;
-      margin-bottom: 14px;
+      border-radius: 6px;
+      background: var(--surface-subtle);
+      padding: 8px;
     }
 
     .quick-case-buttons {
       display: grid;
-      gap: 8px;
+      gap: 6px;
+    }
+
+    .quick-case-buttons .btn {
+      justify-content: flex-start;
+      text-align: left;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prototype-main {
+      padding: 12px;
+      background: var(--bg);
+    }
+
+    .content-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .content-head h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .content-head-meta {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
     }
 
     .case-hero {
       display: grid;
-      grid-template-columns: 1.35fr repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
-    .hero-card,
     .summary-card,
-    .panel,
-    .tab-panel {
+    .panel {
       border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      padding: 13px;
+      border-radius: 6px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
 
-    .hero-label {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-    }
-    
-    .hero-title {
-      font-size: 1.08rem;
-      font-weight: 700;
-    }
-
-    .hero-subtitle {
-      color: var(--muted);
-      font-size: 0.96rem;
-      margin-bottom: 0;
+    .summary-card {
+      padding: 10px;
+      min-height: 70px;
     }
 
     .summary-label {
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
       margin-bottom: 6px;
     }
 
     .summary-value {
-      font-size: 1.08rem;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--text);
     }
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 2.15fr) minmax(340px, 0.95fr);
+      grid-template-columns: minmax(0, 2fr) minmax(300px, 0.95fr);
       grid-template-areas:
         "linked linked"
         "viewer sidepanel";
-      gap: 14px;
+      gap: 10px;
       align-items: stretch;
     }
 
     .linked-panel {
       grid-area: linked;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
     }
 
     .viewer-panel {
       grid-area: viewer;
       display: flex;
       flex-direction: column;
-      height: 100%;
+      min-width: 0;
     }
 
     .side-panel {
       grid-area: sidepanel;
       display: flex;
       flex-direction: column;
-      height: 100%;
       min-width: 0;
+    }
+
+    .panel {
+      padding: 10px;
+    }
+
+    .panel h4,
+    .panel h5 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .thumb-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .thumb-card:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-subtle);
+    }
+
+    .thumb-card.active-thumb {
+      border-color: var(--accent-border);
+      background: #f8fbff;
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.08);
+    }
+
+    .thumb-image {
+      height: 72px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      background: #f3f5f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 11px;
+      background:
+        linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
+        radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
+        radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
+        #efe5f3;
+    }
+
+    .thumb-meta {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .thumb-meta strong {
+      display: inline-block;
+      color: var(--text);
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 5px;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #374151;
+      background: var(--surface);
+    }
+
+    .viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .viewer-header h4 {
+      margin: 0;
+    }
+
+    .viewer-header-meta {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .viewer-status {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      min-height: 1.2em;
     }
 
     .viewer {
       position: relative;
-      border: 1px dashed #b8c4d4;
-      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       aspect-ratio: 1 / 1;
       width: 100%;
       background: #f8fafc;
-      margin-bottom: 12px;
       overflow: hidden;
     }
 
@@ -269,10 +480,10 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(15, 23, 42, 0.28);
+      background: rgba(15, 23, 42, 0.24);
       z-index: 20;
       pointer-events: none;
-      padding: 24px;
+      padding: 20px;
     }
 
     #heatmapOverlay.visible {
@@ -280,157 +491,55 @@
     }
 
     .heatmapMessage {
-      max-width: 420px;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(154, 179, 214, 0.95);
-      border-radius: 12px;
-      padding: 18px 20px;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      max-width: 360px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-align: left;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
     }
 
     .heatmapMessage h4 {
-      margin: 0 0 10px;
-      font-size: 1.05rem;
+      margin: 0 0 6px;
+      font-size: 13px;
     }
 
     .heatmapMessage p {
       margin: 0;
-      color: #333;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      color: #374151;
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     .heatmapDisclaimer {
-      margin-top: 10px !important;
-      color: #666 !important;
-      font-size: 0.85rem !important;
+      margin-top: 8px !important;
+      color: var(--muted) !important;
+      font-size: 11px !important;
     }
 
     .viewer-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .thumb-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .thumb-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px;
-      background: #fff;
-      cursor: pointer;
-    }
-
-    .thumb-card.active-thumb {
-      border-color: var(--accent-border);
-      background: var(--accent);
-    }
-
-    .thumb-image {
-      height: 82px;
-      border: 1px solid #d5dbe3;
-      border-radius: 6px;
-      overflow: hidden;
-      margin-bottom: 8px;
-      background: #f3f5f7;
-    
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .thumb-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-    }
-
-    .thumb-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
-      font-size: 0.9rem;
-      background:
-        linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
-        radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
-        radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
-        #efe5f3;
-    }
-
-    .thumb-meta {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .viewer-status {
-      font-size: 0.84rem;
-      color: var(--muted);
-      margin: -4px 0 8px;
-      min-height: 1.2em;
-    }
-
-    .viewer-note {
-      font-size: 0.85rem;
-      color: var(--muted);
+      gap: 6px;
       margin-top: 8px;
-    }
-
-    .review-panel {
-      margin-top: 12px;
-    }
-    
-    #caseReviewNotes {
-      margin: 10px 0 0;
-      padding-left: 20px;
-    }
-    
-    #caseReviewNotes li {
-      margin-bottom: 6px;
-      color: #333;
-    }
-    
-    .note-disclaimer {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #94a3b8;
-    }
-
-    .status-tag {
-      display: inline-block;
-      margin-top: 6px;
-      padding: 2px 7px;
-      border: 1px solid #cbd5e1;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      color: #334155;
-      background: #fff;
     }
 
     .tabs {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 6px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
     .tab-button {
-      border: 1px solid #b8c4d4;
-      background: #fff;
-      border-radius: 8px;
-      padding: 8px 12px;
+      height: 30px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 0 10px;
       font: inherit;
+      font-size: 12px;
       cursor: pointer;
       color: var(--text);
     }
@@ -438,7 +547,8 @@
     .tab-button.active {
       background: var(--accent);
       border-color: var(--accent-border);
-      font-weight: 700;
+      color: var(--accent-text);
+      font-weight: 600;
     }
 
     .tab-content {
@@ -452,91 +562,103 @@
     .details-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.96rem;
+      font-size: 12px;
     }
 
     .details-table th,
     .details-table td {
       border-bottom: 1px solid var(--border);
-      padding: 8px 6px;
+      padding: 8px 4px;
       text-align: left;
       vertical-align: top;
     }
 
     .details-table th {
-      width: 38%;
+      width: 40%;
       color: var(--muted);
       font-weight: 600;
     }
 
+    .section-block + .section-block {
+      margin-top: 12px;
+    }
+
     .composition-grid {
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
 
     .composition-row {
       border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      padding: 10px 12px;
+      border-radius: 6px;
+      background: var(--surface-subtle);
+      padding: 8px 10px;
     }
 
     .composition-head {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
-      font-size: 0.95rem;
+      font-size: 12px;
+      color: var(--text);
     }
 
     .bar {
-      height: 10px;
-      background: #edf1f5;
+      height: 8px;
+      background: #e5e7eb;
       border-radius: 999px;
       overflow: hidden;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .bar > span {
       display: block;
       height: 100%;
-      background: #9ab3d6;
+      background: #93c5fd;
       border-radius: 999px;
     }
 
-    .notes ul {
+    .composition-note {
       margin-top: 8px;
-      padding-left: 22px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
-    .details {
-      margin-top: 22px;
-      max-width: 980px;
+    .notes ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .notes li {
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--text);
     }
 
     .empty-text {
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 12px;
     }
 
-    .section-block {
+    .footer {
       margin-top: 12px;
+      padding: 10px 0 0;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
     }
 
-    .section-block h5 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-
-    .composition-note {
-      margin-top: 10px;
-      color: #333;
-      font-size: 0.94rem;
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     @media (max-width: 1200px) {
       .case-hero {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .main-grid {
@@ -557,9 +679,30 @@
         grid-template-columns: 1fr;
       }
 
-      .case-hero,
+      .prototype-sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .case-hero {
+        grid-template-columns: 1fr;
+      }
+
       .thumb-grid {
         grid-template-columns: 1fr;
+      }
+
+      .prototype-topbar,
+      .content-head,
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .topbar-meta,
+      .content-head-meta,
+      .viewer-header-meta {
+        white-space: normal;
       }
     }
   </style>
@@ -568,50 +711,66 @@
   <main class="container">
     <header class="page-header">
       <a class="back-link" href="index.html">← Back to home</a>
-      <h1>Demo: Digital Pathology Review Portal</h1>
-      <p class="subtitle">A prototype exploring a case-centric digital pathology workflow integrating slide review, metadata, and IMS connectivity.</p>
+      <h1>Digital Pathology Review Portal</h1>
+      <p class="subtitle">
+        Prototype interface for case-level review integrating whole-slide viewing, metadata context, and conceptual IMS connectivity.
+      </p>
     </header>
 
     <div class="intro">
       <p class="repo-link">
-        Implementation details and system design available on 
-        <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank"> [GitHub Repository]
-        </a>
+        Implementation details and system design available on
+        <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank">GitHub Repository</a>
       </p>
     </div>
 
     <div class="prototype-demo">
       <div class="prototype-topbar">
-        <div><strong>Demo: Digital Pathology Review Portal</strong><span class="prototype-badge">Concept Demo</span></div>
-        <div>IMS Integration (Concept): <strong>Proscia Concentriq LS</strong></div>
+        <div class="topbar-title">
+          <strong>Digital Pathology Review Portal</strong>
+          <span class="prototype-badge">Prototype</span>
+        </div>
+        <div class="topbar-meta">
+          IMS Integration Concept: <strong style="color: var(--text); font-weight: 600;">Proscia Concentriq LS</strong>
+        </div>
       </div>
 
       <div class="prototype-layout">
         <aside class="prototype-sidebar">
-          <h3>Search Case or Slide ID</h3>
-          <div class="search-row">
-            <input class="case-search" id="caseSearch" type="text" placeholder="TCGA-DU-A7T8" />
-            <button class="btn" type="button" id="searchBtn">Search</button>
+          <div class="sidebar-section">
+            <h3 class="section-title">Search</h3>
+            <div class="search-row">
+              <input class="case-search" id="caseSearch" type="text" placeholder="Search case ID, slide ID, diagnosis..." />
+              <button class="btn" type="button" id="searchBtn">Search</button>
+            </div>
           </div>
 
-          <div class="quick-cases">
-            <h4 style="margin:0 0 10px;">Available Cases</h4>
-            <div class="quick-case-buttons" id="quickCaseList"></div>
+          <div class="sidebar-section">
+            <h3 class="section-title">Available Cases</h3>
+            <div class="quick-cases">
+              <div class="quick-case-buttons" id="quickCaseList"></div>
+            </div>
           </div>
 
-          <div class="quick-cases">
-            <h4 style="margin:0 0 10px;">Recently Viewed</h4>
-            <div class="quick-case-buttons" id="recentCaseList"></div>
+          <div class="sidebar-section">
+            <h3 class="section-title">Recently Viewed</h3>
+            <div class="quick-cases">
+              <div class="quick-case-buttons" id="recentCaseList"></div>
+            </div>
           </div>
         </aside>
 
         <section class="prototype-main">
-          <h3 id="caseTitle">Case ID: TCGA-DU-A7T8</h3>
-        <div class="case-hero">
-          <div class="summary-card">
-            <div class="summary-label">Primary Diagnosis</div>
-            <div class="summary-value" id="heroDiagnosis">Mixed Glioma (G3)</div>
+          <div class="content-head">
+            <h3 id="caseTitle">Case ID: TCGA-DU-A7T8</h3>
+            <div class="content-head-meta">TCGA open-access data for interface demonstration</div>
           </div>
+
+          <div class="case-hero">
+            <div class="summary-card">
+              <div class="summary-label">Primary Diagnosis</div>
+              <div class="summary-value" id="heroDiagnosis">Mixed Glioma (G3)</div>
+            </div>
 
             <div class="summary-card">
               <div class="summary-label">Age / Sex</div>
@@ -641,17 +800,22 @@
             </div>
 
             <div class="panel viewer-panel">
-              <h4>Slide Viewer — TCGA open-access dataset</h4>
+              <div class="viewer-header">
+                <h4>Slide Viewer</h4>
+                <div class="viewer-header-meta">Whole-slide preview from TCGA dataset</div>
+              </div>
+
               <div id="viewerStatus" class="viewer-status">Ready</div>
+
               <div class="viewer">
                 <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
                   <div class="heatmapMessage">
                     <h4>Annotation Visualization</h4>
                     <p>
-                      Annotation generated by pathologists or AI would appear here to highlight regions of interest on the slide.
+                      Pathologist- or AI-generated overlays could be rendered here to highlight regions of interest.
                     </p>
-                    <p class="heatmapDisclaimer">Demo interface – not for medical use.</p>
+                    <p class="heatmapDisclaimer">Prototype visualization only. Not for clinical use.</p>
                   </div>
                 </div>
               </div>
@@ -660,28 +824,6 @@
                 <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
                 <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
                 <button class="btn" type="button" id="exportBtn">Export Report</button>
-              </div>
-
-              <div class="panel review-panel">
-                <h4>Case Review Notes</h4>
-              
-                <div class="search-row">
-                  <input
-                    class="case-search"
-                    id="noteInput"
-                    type="text"
-                    placeholder="Add a review note..."
-                  />
-                  <button class="btn primary" type="button" id="addNoteBtn">Add Note</button>
-                </div>
-              
-                <ul id="caseReviewNotes">
-
-                </ul>
-              
-                <p class="note-disclaimer">
-                  Notes are for demonstration purposes and are not persisted.
-                </p>
               </div>
             </div>
 
@@ -734,11 +876,16 @@
               </div>
             </div>
           </div>
+
+          <footer class="footer">
+            <div class="footer-inner">
+              <span>Data source: TCGA via The Cancer Imaging Archive (TCIA).</span>
+              <span>For interface demonstration only.</span>
+            </div>
+          </footer>
         </section>
       </div>
     </div>
-
-
   </main>
 
   <script>
@@ -801,7 +948,6 @@
               "Quantitative composition data not available.",
               "Annotation not available for this slide.",
               "For demo purposes only."
-
             ]
           }
         ]
@@ -1088,7 +1234,8 @@
 
     function renderCaseHeader(data) {
       document.getElementById("caseTitle").textContent = `Case ID: ${currentCaseId}`;
-      document.getElementById("heroDiagnosis").textContent = `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
+      document.getElementById("heroDiagnosis").textContent =
+        `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
       document.getElementById("ageSex").textContent = `${data.age} / ${data.sex}`;
       document.getElementById("vitalStatus").textContent = data.status;
       document.getElementById("tumorContext").textContent = data.tumorContext;
@@ -1111,12 +1258,11 @@
     function setViewerStatus(message) {
       document.getElementById("viewerStatus").textContent = message;
     }
-    
+
     function delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    
     function buildCompositionRow(label, value) {
       if (value === null || value === undefined || value === "--") return "";
       return `
@@ -1164,7 +1310,7 @@
 
       setViewerStatus("Fetching slide data...");
       await delay(250);
-      
+
       initViewer(slide.preview);
 
       setViewerStatus("Slide data loaded");
@@ -1242,11 +1388,11 @@
     }
 
     function openIMS() {
-      alert("Demo: this would open the selected slide in Proscia Concentriq LS using an API deep-link.");
+      alert("Prototype action: this would open the selected slide in Proscia Concentriq LS using an API deep-link.");
     }
 
     function exportReport() {
-      alert("Demo: this would export a case report summarizing case-level details and slide-level image-derived metrics.");
+      alert("Prototype action: this would export a case summary including case-level details and slide-level metrics.");
     }
 
     function switchTab(tabId) {
@@ -1259,22 +1405,6 @@
       });
     }
 
-    function addReviewNote() {
-      const input = document.getElementById("noteInput");
-      const list = document.getElementById("caseReviewNotes");
-    
-      if (!input || !list) return;
-    
-      const text = input.value.trim();
-      if (!text) return;
-    
-      const li = document.createElement("li");
-      li.textContent = `Reviewer note: ${text}`;
-      list.appendChild(li);
-    
-      input.value = "";
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("searchBtn").addEventListener("click", applySearch);
       document.getElementById("caseSearch").addEventListener("input", liveFilter);
@@ -1285,11 +1415,6 @@
       document.getElementById("imsBtn").addEventListener("click", openIMS);
       document.getElementById("exportBtn").addEventListener("click", exportReport);
 
-      document.getElementById("addNoteBtn").addEventListener("click", addReviewNote);
-      document.getElementById("noteInput").addEventListener("keydown", (event) => {
-        if (event.key === "Enter") addReviewNote();
-      });
-      
       document.querySelectorAll(".tab-button").forEach((button) => {
         button.addEventListener("click", () => switchTab(button.dataset.tab));
       });
@@ -1300,15 +1425,5 @@
       switchTab("caseTab");
     });
   </script>
-<footer class="footer">
-    <div class="footer-inner">
-      <span>
-        Data source: TCGA (The Cancer Genome Atlas) via The Cancer Imaging Archive (TCIA).
-      </span>
-      <span>
-        For demonstration purposes only.
-      </span>
-    </div>
-  </footer>
 </body>
 </html>
