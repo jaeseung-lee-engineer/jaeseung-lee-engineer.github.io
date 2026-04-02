@@ -19,7 +19,6 @@
       --accent: #eff6ff;
       --accent-border: #bfdbfe;
       --accent-text: #1d4ed8;
-      --success: #065f46;
       --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
 
@@ -150,7 +149,7 @@
 
     .prototype-layout {
       display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-columns: 280px minmax(0, 1fr);
       min-height: 700px;
     }
 
@@ -224,7 +223,8 @@
       background: #dbeafe;
     }
 
-    .quick-cases {
+    .quick-cases,
+    .slide-list-panel {
       border: 1px solid var(--border);
       border-radius: 6px;
       background: var(--surface-subtle);
@@ -243,6 +243,107 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .slide-list {
+      display: grid;
+      gap: 8px;
+    }
+
+
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 10px;
+      background:
+        linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
+        radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
+        radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
+        #efe5f3;
+    }
+
+      .slide-list-card {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        padding: 6px;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      }
+      
+      .slide-list-card:hover {
+        border-color: var(--border-strong);
+        background: #fcfcfd;
+      }
+      
+      .slide-list-card.active-thumb {
+        border-color: var(--accent-border);
+        background: #f8fbff;
+        box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.08);
+      }
+      
+      .slide-list-thumb {
+        width: 100%;
+        height: 72px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f3f5f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 6px;
+      }
+      
+      .slide-list-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      
+      .slide-list-meta {
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+      
+      .slide-list-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2px;
+      }
+      
+      .slide-list-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .slide-list-subtext {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      
+      .status-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #374151;
+        background: var(--surface);
+        flex-shrink: 0;
+      }
 
     .prototype-main {
       padding: 12px;
@@ -308,16 +409,10 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(300px, 0.95fr);
-      grid-template-areas:
-        "linked linked"
-        "viewer sidepanel";
+      grid-template-columns: minmax(0, 2fr) minmax(320px, 0.95fr);
+      grid-template-areas: "viewer sidepanel";
       gap: 10px;
       align-items: stretch;
-    }
-
-    .linked-panel {
-      grid-area: linked;
     }
 
     .viewer-panel {
@@ -346,99 +441,18 @@
       color: var(--text);
     }
 
-    .thumb-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .thumb-card {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px;
-      background: var(--surface);
-      cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .thumb-card:hover {
-      border-color: var(--border-strong);
-      background: var(--surface-subtle);
-    }
-
-    .thumb-card.active-thumb {
-      border-color: var(--accent-border);
-      background: #f8fbff;
-      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.08);
-    }
-
-    .thumb-image {
-      height: 72px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 6px;
-      background: #f3f5f7;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .thumb-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-    }
-
-    .thumb-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 11px;
-      background:
-        linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
-        radial-gradient(circle at 25% 35%, #dcc4e2 0, #dcc4e2 13%, transparent 14%),
-        radial-gradient(circle at 65% 60%, #ceb7dd 0, #ceb7dd 10%, transparent 11%),
-        #efe5f3;
-    }
-
-    .thumb-meta {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .thumb-meta strong {
-      display: inline-block;
-      color: var(--text);
-      font-size: 12px;
-      margin-bottom: 2px;
-    }
-
-    .status-tag {
-      display: inline-flex;
-      align-items: center;
-      margin-top: 5px;
-      padding: 2px 6px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 600;
-      color: #374151;
-      background: var(--surface);
-    }
-
     .viewer-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 6px;
+    }
+
+    .viewer-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .viewer-header h4 {
@@ -449,6 +463,18 @@
       font-size: 11px;
       color: var(--muted);
       white-space: nowrap;
+    }
+
+    .viewer-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .viewer-actions .btn {
+      height: 30px;
+      padding: 0 8px;
+      font-size: 11px;
     }
 
     .viewer-status {
@@ -516,18 +542,6 @@
       margin-top: 8px !important;
       color: var(--muted) !important;
       font-size: 11px !important;
-    }
-
-    .viewer-header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    
-    .viewer-actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
     }
 
     .tabs {
@@ -669,13 +683,8 @@
       .main-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
-          "linked"
           "viewer"
           "sidepanel";
-      }
-
-      .thumb-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
@@ -693,13 +702,10 @@
         grid-template-columns: 1fr;
       }
 
-      .thumb-grid {
-        grid-template-columns: 1fr;
-      }
-
       .prototype-topbar,
       .content-head,
-      .footer-inner {
+      .footer-inner,
+      .viewer-header {
         flex-direction: column;
         align-items: flex-start;
       }
@@ -708,6 +714,10 @@
       .content-head-meta,
       .viewer-header-meta {
         white-space: normal;
+      }
+
+      .viewer-actions {
+        flex-wrap: wrap;
       }
     }
   </style>
@@ -758,9 +768,9 @@
           </div>
 
           <div class="sidebar-section">
-            <h3 class="section-title">Recently Viewed</h3>
-            <div class="quick-cases">
-              <div class="quick-case-buttons" id="recentCaseList"></div>
+            <h3 class="section-title">Linked Slides</h3>
+            <div class="slide-list-panel">
+              <div class="slide-list" id="slideThumbs"></div>
             </div>
           </div>
         </aside>
@@ -799,18 +809,12 @@
           </div>
 
           <div class="main-grid">
-            <div class="panel linked-panel">
-              <h4>Linked Slides</h4>
-              <div class="thumb-grid" id="slideThumbs"></div>
-            </div>
-
             <div class="panel viewer-panel">
               <div class="viewer-header">
                 <div class="viewer-header-left">
                   <h4>Slide Viewer</h4>
-                  <div class="viewer-header-meta">Whole-slide preview from TCGA dataset</div>
                 </div>
-              
+
                 <div class="viewer-actions">
                   <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
@@ -1135,7 +1139,6 @@
     let currentCaseId = "TCGA-DU-A7T8";
     let currentSlideIndex = 0;
     let heatmapOn = false;
-    let recentCases = ["TCGA-DU-A7T8"];
     let viewer = null;
 
     function getFilteredCaseIds(query) {
@@ -1181,31 +1184,6 @@
       });
     }
 
-    function renderRecentCaseList() {
-      const recentList = document.getElementById("recentCaseList");
-
-      if (!recentCases.length) {
-        recentList.innerHTML = '<div class="empty-text">No recently viewed cases yet.</div>';
-        return;
-      }
-
-      recentList.innerHTML = recentCases
-        .map((caseId) => {
-          const activeClass = caseId === currentCaseId ? "primary" : "";
-          return `<button class="btn ${activeClass}" type="button" data-recent-case="${caseId}">${caseId}</button>`;
-        })
-        .join("");
-
-      recentList.querySelectorAll("button[data-recent-case]").forEach((btn) => {
-        btn.addEventListener("click", () => selectCase(btn.dataset.recentCase));
-      });
-    }
-
-    function updateRecentCases(caseId) {
-      recentCases = [caseId, ...recentCases.filter((id) => id !== caseId)].slice(0, 5);
-      renderRecentCaseList();
-    }
-
     function renderSlides(caseId) {
       const slideThumbs = document.getElementById("slideThumbs");
       const slides = caseData[caseId].slides;
@@ -1215,26 +1193,34 @@
       slideThumbs.innerHTML = slides.map((slide, idx) => {
         const activeClass = idx === 0 ? "active-thumb" : "";
         const quantTag = slide.hasQuant ? "Quant data" : "No data";
-
+      
         return `
-          <div class="thumb-card ${activeClass}" data-slide-index="${idx}">
-            <div class="thumb-image">
+          <div class="slide-list-card ${activeClass}" data-slide-index="${idx}">
+            
+            <div class="slide-list-thumb">
               ${
                 slide.thumbnail
                   ? `<img src="${slide.thumbnail}" alt="${slide.label} thumbnail" onerror="this.parentElement.innerHTML='<div class=&quot;thumb-placeholder&quot;>Thumbnail</div>';">`
                   : `<div class="thumb-placeholder">Thumbnail</div>`
               }
             </div>
-            <div class="thumb-meta">
-              <strong>${slide.label}</strong><br>
-              ${slide.section || "Unknown"} · ${slide.stain || "H&E"}<br>
-              <span class="status-tag">${quantTag}</span>
+      
+            <div class="slide-list-meta">
+              <div class="slide-list-top">
+                <div class="slide-list-label">${slide.label}</div>
+                <span class="status-tag">${quantTag}</span>
+              </div>
+      
+              <div class="slide-list-subtext">
+                ${slide.section || "Unknown"} · ${slide.stain || "H&E"}
+              </div>
             </div>
+      
           </div>
         `;
       }).join("");
 
-      slideThumbs.querySelectorAll(".thumb-card[data-slide-index]").forEach((card) => {
+      slideThumbs.querySelectorAll(".slide-list-card[data-slide-index]").forEach((card) => {
         card.addEventListener("click", () => selectSlide(Number(card.dataset.slideIndex)));
       });
     }
@@ -1355,7 +1341,7 @@
     async function selectSlide(index) {
       currentSlideIndex = index;
 
-      document.querySelectorAll(".thumb-card").forEach((card, idx) => {
+      document.querySelectorAll(".slide-list-card").forEach((card, idx) => {
         card.classList.toggle("active-thumb", idx === index);
       });
 
@@ -1375,7 +1361,6 @@
 
       const filtered = getFilteredCaseIds(document.getElementById("caseSearch").value);
       renderQuickCaseList(filtered);
-      updateRecentCases(caseId);
     }
 
     function applySearch() {
@@ -1427,7 +1412,6 @@
       });
 
       renderQuickCaseList(Object.keys(caseData));
-      renderRecentCaseList();
       selectCase("TCGA-DU-A7T8");
       switchTab("caseTab");
     });
