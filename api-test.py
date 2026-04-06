@@ -1,3 +1,9 @@
+"""
+Prototype FastAPI backend for the Digital Pathology Web Portal.
+This API demonstrates how case, slide, and annotation data could be served.
+For local testing and demonstration purposes only.
+"""
+
 from fastapi import FastAPI
 
 app = FastAPI()
