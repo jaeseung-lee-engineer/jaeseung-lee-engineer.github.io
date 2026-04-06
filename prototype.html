@@ -543,7 +543,43 @@
       color: var(--muted) !important;
       font-size: 11px !important;
     }
+    
+    .case-status-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    
+    .case-status-note {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    
+    .badge-green {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+    
+    .badge-blue {
+      background: #eff6ff;
+      color: #1e3a8a;
+      border-color: #bfdbfe;
+    }
 
+    
     .tabs {
       display: flex;
       gap: 6px;
@@ -839,6 +875,16 @@
             </div>
 
             <div class="panel side-panel">
+              <div class="case-status-bar">
+                <span class="badge badge-green">Reviewed</span>
+                <span class="badge badge-green">QC Passed</span>
+                <span class="badge badge-blue">Annotation Available</span>
+              </div>
+            
+              <div class="case-status-note">
+                Simulated workflow status for demonstration
+              </div>
+            
               <div class="tabs">
                 <button class="tab-button active" type="button" data-tab="caseTab">Case Details</button>
                 <button class="tab-button" type="button" data-tab="slideTab">Slide Details</button>
