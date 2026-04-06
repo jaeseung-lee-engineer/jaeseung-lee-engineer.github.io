@@ -1,0 +1,32 @@
+name: Web App CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Validate required files
+        run: |
+          if [ ! -f index.html ]; then
+            echo "Error: index.html not found"
+            exit 1
+          fi
+          echo "All required files are present"
+
+      - name: Basic HTML validation
+        run: |
+          echo "Running basic validation..."
+          grep -q "<html" index.html && echo "HTML structure looks valid"
+
+      - name: Run lint checks (placeholder)
+        run: echo "No linting configured - placeholder step"
+
+      - name: Deployment (GitHub Pages)
+        run: echo "Deployment triggered via GitHub Pages"
