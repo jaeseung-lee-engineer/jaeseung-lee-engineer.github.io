@@ -1,7 +1,7 @@
 """
 Prototype FastAPI backend for the Digital Pathology Web Portal.
 This API demonstrates how case, slide, and annotation data could be served.
-For local testing and demonstration purposes only.
+The implementation is partial and intended for conceptual demonstration only (not functional or production-ready).
 """
 
 from fastapi import FastAPI
