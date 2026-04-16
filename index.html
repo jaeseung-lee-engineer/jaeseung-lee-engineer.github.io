@@ -4,13 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jaeseung Lee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --text: #111;
-      --muted: #444;
-      --link: #1a56b3;
-      --border: #d9d9d9;
-      --bg: #ffffff;
+      --bg: #f3f4f6;
+      --paper: #fcfcfd;
+      --paper-strong: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --line-strong: #d1d5db;
+      --accent: #355c7d;
+      --accent-soft: #eef2f7;
+      --shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
     }
 
     * {
@@ -23,68 +31,15 @@
 
     body {
       margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
+      min-height: 100vh;
+      font-family: "Source Sans 3", Arial, sans-serif;
       color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 40px 24px 72px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 28px;
-      align-items: start;
-      margin-bottom: 28px;
-    }
-
-    .portrait {
-      width: 258px;
-      height: 278px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #f3f3f3;
-      object-fit: cover;
-      display: block;
-      margin-top: 50px;
-    }
-
-    .hero-text h1 {
-      font-size: 2.2rem;
-      line-height: 1.15;
-      margin: 0 0 8px;
-      font-weight: 700;
-    }
-
-    .hero-text .subtitle {
-      font-size: 1.05rem;
-      margin: 0 0 12px;
-      color: var(--muted);
-    }
-
-    .hero-text .affiliation {
-      margin: 0 0 14px;
-    }
-
-    .hero-text p {
-      margin: 0 0 12px;
-      font-size: 1rem;
-    }
-
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 10px;
+      background: linear-gradient(180deg, #f9fafb 0%, #f1f5f9 100%);
+      line-height: 1.7;
     }
 
     a {
-      color: var(--link);
+      color: var(--accent);
       text-decoration: none;
     }
 
@@ -92,194 +47,386 @@
       text-decoration: underline;
     }
 
-    nav {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 0;
-      margin: 28px 0 34px;
+    .site-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 24px 64px;
     }
 
-    nav .nav-links {
+    .site-nav {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 0 18px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid rgba(209, 213, 219, 0.85);
+    }
+
+    .nav-links {
       display: flex;
       flex-wrap: wrap;
       gap: 18px;
-      font-size: 0.98rem;
+      font-size: 1rem;
     }
 
-    section {
-      margin-bottom: 34px;
+    .layout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 44px;
+      align-items: start;
     }
 
-    h2 {
-      font-size: 1.45rem;
-      margin: 0 0 14px;
+    .sidebar {
+      position: sticky;
+      top: 24px;
+    }
+
+    .profile-card {
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .portrait-frame {
+      width: min(220px, 100%);
+      margin: 0 auto 22px;
+      padding: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .portrait {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 14%;
+      background: #e5e7eb;
+    }
+
+    .profile-card h1 {
+      margin: 0 0 4px;
+      font-family: "Crimson Text", Georgia, serif;
+      font-size: 2.2rem;
+      line-height: 1.05;
       font-weight: 700;
     }
 
-    .item {
-      margin-bottom: 18px;
+    .role {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      color: var(--muted);
+    }
+
+    .location,
+    .contact {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .profile-links {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 1rem;
+    }
+
+    .profile-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .intro-panel,
+    section {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(229, 231, 235, 0.95);
+      padding: 26px 28px;
+      margin-bottom: 20px;
+    }
+
+    .intro-panel p:last-child,
+    section p:last-child,
+    section ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-family: "Crimson Text", Georgia, serif;
+      font-size: 2rem;
+      line-height: 1.05;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 14px;
+      font-size: 1.04rem;
+    }
+
+    .section-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .item + .item {
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
     }
 
     .item-title {
+      font-size: 1.08rem;
       font-weight: 700;
     }
 
     .item-meta {
       color: var(--muted);
+      margin-bottom: 8px;
     }
 
     ul {
-      margin: 10px 0 0 22px;
+      margin: 10px 0 0 20px;
       padding: 0;
     }
 
     li {
       margin-bottom: 8px;
+      font-size: 1.02rem;
     }
 
-    .compact-list li {
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 24px;
+    }
+
+    .skill-card {
+      padding: 14px 16px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+
+    .skill-card strong {
+      display: block;
       margin-bottom: 6px;
+      font-size: 1rem;
     }
 
-    .pub li {
-      margin-bottom: 12px;
+    .publication-list {
+      margin-left: 20px;
+    }
+
+    .publication-list li {
+      margin-bottom: 16px;
     }
 
     footer {
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
+      padding: 10px 2px 0;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.96rem;
     }
 
-    @media (max-width: 700px) {
-      .container {
-        padding: 28px 18px 56px;
+    @media (max-width: 940px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 26px;
       }
 
-      .hero {
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .site-shell {
+        padding: 20px 16px 42px;
+      }
+
+      .site-nav {
+        justify-content: flex-start;
+      }
+
+      .profile-card,
+      .intro-panel,
+      section {
+        padding: 22px 18px;
+      }
+
+      .skill-grid {
         grid-template-columns: 1fr;
       }
 
-      .portrait {
-        width: 150px;
-        height: 150px;
+      .profile-card h1 {
+        font-size: 2rem;
       }
 
-      .hero-text h1 {
-        font-size: 1.85rem;
+      h2 {
+        font-size: 1.8rem;
       }
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <header class="hero" id="top">
-      <img class="portrait" src="images/profile.png" />
-      <div class="hero-text">
-        <h1>Jaeseung Lee</h1>
-        <p class="subtitle">Research Engineer</p>
-        <p class="affiliation">
-          Digital Pathology · Machine Learning<br />
-          New York, NY
-        </p>
-        <p>
-          I develop machine learning and data analysis pipelines for digital pathology and translational biomedical research. My work includes machine learning, whole-slide image (WSI) analysis and spatial transcriptomics.
-        </p>
-        <p>
-          I am interested in building practical tools that connect computational methods with pathology and improve clinical research workflows.
-        </p>
-        <p>
-          Email: jaeseunglee124 [at] gmail [dot] com
-        </p>
+  <main class="site-shell">
+    <nav class="site-nav" aria-label="Primary">
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#publications">Publications</a>
+        <a href="#education">Education</a>
       </div>
-    </header>
-    <nav>
-      <div class="links">
-          <a href="https://github.com/jaeseung-lee-engineer/" target="_blank" rel="noopener noreferrer">[GitHub]</a>
-          <a href="https://www.linkedin.com/in/jaeseung-lee-49097318a/" target="_blank" rel="noopener noreferrer">[LinkedIn]</a>
-          <a href="https://scholar.google.com/citations?hl=en&user=Kg4R5SQAAAAJ" target="_blank" rel="noopener noreferrer">[Google Scholar]</a>
-          <a href="https://jaeseung-lee-engineer.github.io/prototype.html" rel="noopener noreferrer">[Web Prototype]</a>
-        </div>
     </nav>
 
-    <section id="about">
-      <h2>About</h2>
-      <p>
-        My background is in electrical engineering and machine learning. I have worked on computational pathology projects involving deep learning-based whole-slide image (WSI) classification, tissue segmentation, and spatial analysis of transcriptomics data.
-      </p>
-      <p>
-        Previously, I contributed to research at Columbia University Irving Medical Center and Korea University of Technology and Education, where I developed machine learning models and scalable analysis pipelines.
-      </p>
-    </section>
+    <div class="layout" id="top">
+      <aside class="sidebar">
+        <div class="profile-card">
+          <div class="portrait-frame">
+            <img class="portrait" src="images/profile.png" alt="Portrait of Jaeseung Lee" />
+          </div>
 
-    <section id="experience">
-      <h2>Professional Experience</h2>
+          <h1>Jaeseung Lee</h1>
+          <p class="role">Research Engineer</p>
+          <p class="location">Digital Pathology · Machine Learning<br />New York, NY</p>
+          <p class="contact">jaeseunglee124 [at] gmail [dot] com</p>
 
-      <div class="item">
-        <div class="item-title">Columbia University Irving Medical Center, New York, NY</div>
-        <div class="item-meta">Staff Associate I · Nov 2023 – Jun 2024</div>
-        <ul>
-          <li>Developed a GPU-accelerated analysis pipeline for spatial transcriptomics to quantify cell–cell interactions, achieving up to 1200× speedup; co-authored a publication and released the code on GitHub.</li>
-          <li>Built a deep learning framework for WSI analysis to classify Huntington’s disease vs controls in a 66-case cohort, achieving 95% accuracy and generating attention heatmaps for interpretable feature localization.</li>
-        </ul>
+          <div class="profile-links">
+            <a href="https://github.com/jaeseung-lee-engineer/" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/jaeseung-lee-49097318a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://scholar.google.com/citations?hl=en&user=Kg4R5SQAAAAJ" target="_blank" rel="noopener noreferrer">Google Scholar</a>
+            <a href="https://jaeseung-lee-engineer.github.io/prototype.html" rel="noopener noreferrer">Web Prototype</a>
+          </div>
+        </div>
+      </aside>
+
+      <div class="content">
+        <section class="intro-panel" aria-label="Introduction">
+          <span class="eyebrow">Home</span>
+          <p>
+            I develop machine learning and data analysis pipelines for digital pathology and biomedical research, with a focus on whole-slide image analysis, spatial transcriptomics, and practical clinical research workflows.
+          </p>
+          <p>
+            My work centers on turning computational methods into usable research tools, from deep learning-based tissue analysis to scalable pipelines that help connect pathology data with biological and clinical questions.
+          </p>
+        </section>
+
+        <section id="about">
+          <span class="eyebrow">About</span>
+          <p>
+            My background is in electrical engineering and machine learning. I have worked on computational pathology projects involving deep learning-based whole-slide image classification, tissue segmentation, and spatial analysis of transcriptomics data.
+          </p>
+          <p>
+            Previously, I contributed to research at Columbia University Irving Medical Center and Korea University of Technology and Education, where I developed machine learning models and scalable analysis pipelines for biomedical and sensor-based data.
+          </p>
+        </section>
+
+        <section id="experience">
+          <span class="eyebrow">Experience</span>
+          <div class="section-list">
+            <div class="item">
+              <div class="item-title">Columbia University Irving Medical Center, New York, NY</div>
+              <div class="item-meta">Staff Associate I · Nov 2023 – Jun 2024</div>
+              <ul>
+                <li>Developed a GPU-accelerated analysis pipeline for spatial transcriptomics to quantify cell-cell interactions, achieving up to 1200x speedup; co-authored a publication and released the code on GitHub.</li>
+                <li>Built a deep learning framework for whole-slide image analysis to classify Huntington's disease vs controls in a 66-case cohort, achieving 95% accuracy and generating attention heatmaps for interpretable feature localization.</li>
+              </ul>
+            </div>
+
+            <div class="item">
+              <div class="item-title">Columbia University Irving Medical Center, New York, NY</div>
+              <div class="item-meta">Visiting Researcher · Apr 2023 – Jun 2023</div>
+              <ul>
+                <li>Developed a tissue segmentation pipeline using Reinhard normalization to reduce stain variation, achieving 97% accuracy in multi-class tissue classification.</li>
+                <li>Maintained RNA-seq and spatial transcriptomics processing workflows, including preprocessing, alignment, and quality control.</li>
+              </ul>
+            </div>
+
+            <div class="item">
+              <div class="item-title">Korea University of Technology and Education, South Korea</div>
+              <div class="item-meta">Research Assistant · Mar 2021 – Dec 2022</div>
+              <ul>
+                <li>Developed a machine learning system to detect physiological responses to music using wearable sensor data and deployed trained models in a mobile application, achieving 81% prediction accuracy and contributing to a peer-reviewed publication.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="skills">
+          <span class="eyebrow">Skills</span>
+          <div class="skill-grid">
+            <div class="skill-card">
+              <strong>Programming</strong>
+              Python, C/C++, Bash, Linux, Git/GitHub
+            </div>
+            <div class="skill-card">
+              <strong>Machine Learning</strong>
+              PyTorch, TensorFlow, Scikit-learn
+            </div>
+            <div class="skill-card">
+              <strong>Data &amp; Web</strong>
+              MongoDB, Neo4j, HTML/CSS, JavaScript
+            </div>
+            <div class="skill-card">
+              <strong>Digital Pathology</strong>
+              OpenSlide, QuPath, ImageJ/Fiji
+            </div>
+          </div>
+        </section>
+
+        <section id="publications">
+          <span class="eyebrow">Publications</span>
+          <ol class="publication-list">
+            <li>
+              Ma, M., Paryani, F., Jakubiak, K., Xia, S., Antoku, S., Kannan, A., <strong>Lee, J.</strong>, Madden, N., Kumar, S. S., Li, J., Chen, D., Hargus, G., Mahajan, A., Flowers, X., Harms, A. S., Sulzer, D., Goldman, J. E., Sims, P.A. &amp; Al-Dalahmah, O.<br />
+              <em>The spatial landscape of glial pathology and T cell response in Parkinson's disease substantia nigra.</em><br />
+              <em>Nature Communications</em>. 2025; 16:7146.
+              [<a href="https://doi.org/10.1038/s41467-025-62478-3" target="_blank" rel="noopener noreferrer">Paper</a>]
+              [<a href="https://github.com/jaeseung-lee-engineer/T-cell_and_glial_pathology_in_PD" target="_blank" rel="noopener noreferrer">GitHub</a>]
+            </li>
+            <li>
+              Lee, E., Min, C., <strong>Lee, J.</strong>, Yu, J. and Kang, S.<br />
+              <em>Groovemeter: Enabling music engagement-aware apps by detecting reactions to daily music listening via Earable sensing.</em><br />
+              <em>Proceedings of the 31st ACM International Conference on Multimedia</em>. 2023.
+              [<a href="https://doi.org/10.1145/3581783.3611968" target="_blank" rel="noopener noreferrer">Paper</a>]
+            </li>
+          </ol>
+        </section>
+
+        <section id="education">
+          <span class="eyebrow">Education</span>
+          <div class="item">
+            <div class="item-title">Korea University of Technology and Education, South Korea</div>
+            <div class="item-meta">B.S. in Electrical Engineering · Feb 2021</div>
+          </div>
+        </section>
+
+        <footer>
+          Last updated: April 2026
+        </footer>
       </div>
-      <div class="item">
-        <div class="item-meta">Visiting Researcher · Apr 2023 – Jun 2023</div>
-        <ul>
-          <li>Developed a tissue segmentation pipeline using Reinhard normalization to reduce stain variation, achieving 97% accuracy in multi-class tissue classification.</li>
-          <li>Maintained RNA-seq data processing workflows for RNA-seq and spatial transcriptomics, including preprocessing, alignment, and quality control.</li>
-        </ul>
-      </div>
-
-      <div class="item">
-        <div class="item-title">Korea University of Technology and Education, South Korea</div>
-        <div class="item-meta">Research Assistant · Mar 2021 – Dec 2022</div>
-        <ul>
-          <li>Developed a machine learning system to detect physiological responses to music using wearable sensor data and deployed trained models in a mobile application and achieved 81% prediction accuracy; Co-authored a peer-reviewed publication based on this work.</li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="skills">
-      <h2>Skill</h2>
-      <ul class="compact-list">
-        <li><strong>Programming:</strong> Python, C/C++, Bash, Linux, Git/GitHub</li>
-        <li><strong>Machine Learning:</strong> PyTorch, TensorFlow, Scikit-learn</li>
-        <li><strong>Databases & Web App:</strong> MongoDB, Neo4j, HTML/CSS, JavaScript</li>
-        <li><strong>Digital Pathology:</strong> OpenSlide, QuPath, ImageJ/Fiji</li>
-      </ul>
-    </section>
-
-    <section id="publications">
-      <h2>Publication</h2>
-      <ul class="pub">
-        <li>
-          Ma, M., Paryani, F., Jakubiak, K., Xia, S., Antoku, S., Kannan, A., <strong>Lee, J.</strong>, ... , Sims, P. &amp; Al-Dalahmah, O.<br />
-          <em>The spatial landscape of glial pathology and T cell response in Parkinson’s disease substantia nigra.</em><br />
-          <em>Nature Communications</em>. 2025; 16:7146.
-          [<a href="https://doi.org/10.1038/s41467-025-62478-3" target="_blank">Paper</a>] [<a href="https://github.com/jaeseung-lee-engineer/T-cell_and_glial_pathology_in_PD" target="_blank">GitHub</a>]
-        </li>
-        <li>
-          Lee, E., Min, C., <strong>Lee, J.</strong>, Yu, J. and Kang, S.<br />
-          <em>Groovemeter: Enabling music engagement-aware apps by detecting reactions to daily music listening via Earable sensing.</em><br />
-          <em>Proceedings of the 31st ACM International Conference on Multimedia</em>. 2023.
-          [<a href="https://doi.org/10.1145/3581783.3611968" target="_blank">Paper</a>]
-        </li>
-      </ul>
-    </section>
-
-    <section id="education">
-      <h2>Education</h2>
-      <div class="item">
-        <div class="item-title">Korea University of Technology and Education, South Korea</div>
-        <div class="item-meta">B.S. in Electrical Engineering · Feb 2021</div>
-      </div>
-    </section>
-
-    <footer>
-      Last updated: March 2026
-    </footer>
+    </div>
   </main>
 </body>
 </html>
