@@ -110,10 +110,11 @@
 
     .profile-card h1 {
       margin: 0 0 4px;
-      font-family: "Crimson Text", Georgia, serif;
-      font-size: 2.2rem;
+      font-family: "Source Sans 3", Arial, sans-serif;
+      font-size: 1.5rem;
       line-height: 1.05;
       font-weight: 700;
+      color: #000000;
     }
 
     .role {
@@ -149,7 +150,6 @@
       min-width: 0;
     }
 
-    .intro-panel,
     section {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(229, 231, 235, 0.95);
@@ -157,7 +157,6 @@
       margin-bottom: 20px;
     }
 
-    .intro-panel p:last-child,
     section p:last-child,
     section ul:last-child {
       margin-bottom: 0;
@@ -236,11 +235,14 @@
     }
 
     .publication-list {
-      margin-left: 20px;
+      margin: 10px 0 0;
+      padding-left: 24px;
+      list-style-position: outside;
     }
 
     .publication-list li {
       margin-bottom: 16px;
+      padding-left: 6px;
     }
 
     footer {
@@ -270,7 +272,6 @@
       }
 
       .profile-card,
-      .intro-panel,
       section {
         padding: 22px 18px;
       }
@@ -322,20 +323,10 @@
       </aside>
 
       <div class="content">
-        <section class="intro-panel" aria-label="Introduction">
-          <span class="eyebrow">Home</span>
-          <p>
-            I develop machine learning and data analysis pipelines for digital pathology and biomedical research, with a focus on whole-slide image analysis, spatial transcriptomics, and practical clinical research workflows.
-          </p>
-          <p>
-            My work centers on turning computational methods into usable research tools, from deep learning-based tissue analysis to scalable pipelines that help connect pathology data with biological and clinical questions.
-          </p>
-        </section>
-
         <section id="about">
           <span class="eyebrow">About</span>
           <p>
-            My background is in electrical engineering and machine learning. I have worked on computational pathology projects involving deep learning-based whole-slide image classification, tissue segmentation, and spatial analysis of transcriptomics data.
+            I develop machine learning and data analysis pipelines for digital pathology and biomedical research, with a focus on whole-slide image analysis, spatial transcriptomics, and practical clinical research workflows.
           </p>
           <p>
             Previously, I contributed to research at Columbia University Irving Medical Center and Korea University of Technology and Education, where I developed machine learning models and scalable analysis pipelines for biomedical and sensor-based data.
