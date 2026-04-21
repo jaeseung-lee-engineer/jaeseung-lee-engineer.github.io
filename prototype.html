@@ -970,7 +970,6 @@
                 </div>
 
                 <div class="viewer-actions">
-                  <button class="btn" type="button" id="addRoiBtn">Add ROI</button>
                   <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
                   <button class="btn" type="button" id="packageBtn">Download QuPath Package</button>
                   <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
@@ -2008,7 +2007,6 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         if (event.key === "Enter") applySearch();
       });
       document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
-      document.getElementById("addRoiBtn").addEventListener("click", saveCurrentViewAsRoi);
       document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
       document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
       document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
