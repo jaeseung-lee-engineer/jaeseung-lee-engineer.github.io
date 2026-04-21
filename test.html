@@ -971,10 +971,10 @@
 
                 <div class="viewer-actions">
                   <button class="btn" type="button" id="addRoiBtn">Add ROI</button>
+                  <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
                   <button class="btn" type="button" id="packageBtn">Download QuPath Package</button>
-                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
+                  <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-                  <button class="btn" type="button" id="exportBtn">Export Report</button>
                 </div>
               </div>
 
@@ -1631,6 +1631,18 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       ].join("\n");
     }
 
+    function downloadCurrentSvs() {
+      const slide = getCurrentSlide();
+
+      if (!slide.svsUrl) {
+        setViewerStatus("SVS source URL is not configured for this slide.");
+        return;
+      }
+
+      triggerUrlDownload(slide.svsUrl);
+      setViewerStatus(`Started SVS download for ${slide.label}`);
+    }
+
     async function downloadQuPathPackage() {
       const slide = getCurrentSlide();
       const caseInfo = caseData[currentCaseId];
@@ -1649,9 +1661,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
       packageButton.disabled = true;
       packageButton.textContent = "Packaging...";
-      setViewerStatus("Starting SVS download and building the QuPath package...");
-
-      triggerUrlDownload(slide.svsUrl);
+      setViewerStatus("Building the QuPath package...");
 
       const zip = new JSZip();
       const safeBaseName = sanitizeFilename(slide.submitterId || slide.label);
@@ -1693,7 +1703,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       try {
         const blob = await zip.generateAsync({ type: "blob" });
         triggerFileDownload(`${safeBaseName}_qupath_package.zip`, blob);
-        setViewerStatus(`Downloaded SVS and QuPath package for ${slide.label}`);
+        setViewerStatus(`Downloaded QuPath package for ${slide.label}`);
       } catch (error) {
         setViewerStatus("Unable to build the QuPath package in this browser.");
       } finally {
@@ -2000,9 +2010,9 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
       document.getElementById("addRoiBtn").addEventListener("click", saveCurrentViewAsRoi);
       document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
+      document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
       document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
       document.getElementById("imsBtn").addEventListener("click", openIMS);
-      document.getElementById("exportBtn").addEventListener("click", exportReport);
 
       document.querySelectorAll(".tab-button").forEach((button) => {
         button.addEventListener("click", () => switchTab(button.dataset.tab));
