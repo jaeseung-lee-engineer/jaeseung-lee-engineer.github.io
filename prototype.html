@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Digital Pathology Review Portal | Jaeseung Lee</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     :root {
       --text: #111827;
@@ -680,6 +681,119 @@
       font-size: 12px;
     }
 
+    .roi-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .roi-helper-text {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .roi-form {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-subtle);
+    }
+
+    .roi-form-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+      align-items: center;
+    }
+
+    .roi-form-row .btn {
+      height: 38px;
+      padding: 0 12px;
+    }
+
+    .roi-input,
+    .roi-textarea {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      padding: 8px 10px;
+      outline: none;
+    }
+
+    .roi-input:focus,
+    .roi-textarea:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .roi-textarea {
+      min-height: 74px;
+      resize: vertical;
+    }
+
+    .roi-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .roi-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-subtle);
+      padding: 8px 10px;
+    }
+
+    .roi-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .roi-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .roi-card-meta,
+    .roi-card-coords {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .roi-card-coords {
+      margin-top: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .roi-card-note {
+      margin-top: 6px;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .roi-card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
     .notes ul {
       margin: 0;
       padding-left: 18px;
@@ -754,6 +868,10 @@
 
       .viewer-actions {
         flex-wrap: wrap;
+      }
+
+      .roi-form-row {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -852,9 +970,11 @@
                 </div>
 
                 <div class="viewer-actions">
-                  <button class="btn primary" type="button" id="heatmapBtn">Toggle Annotation</button>
+                  <button class="btn" type="button" id="addRoiBtn">Add ROI</button>
+                  <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
+                  <button class="btn" type="button" id="packageBtn">Download QuPath Package</button>
+                  <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-                  <button class="btn" type="button" id="exportBtn">Export Report</button>
                 </div>
               </div>
 
@@ -870,6 +990,21 @@
                     </p>
                     <p class="heatmapDisclaimer">Prototype visualization only. Not for clinical use.</p>
                   </div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <h5>Saved ROI Views</h5>
+                <div class="roi-form">
+                  <div class="roi-form-row">
+                    <input class="roi-input" id="roiNameInput" type="text" placeholder="ROI name (optional)" />
+                    <input class="roi-input" id="roiNoteInput" type="text" placeholder="ROI note for QuPath handoff (optional)" />
+                    <button class="btn" type="button" id="addRoiSecondaryBtn">Save Current View</button>
+                  </div>
+                  <div class="roi-helper-text">Save the current zoomed region as a reusable ROI bookmark.</div>
+                </div>
+                <div id="roiList" class="roi-list">
+                  <div class="empty-text">No ROI views saved for this slide yet.</div>
                 </div>
               </div>
             </div>
@@ -976,6 +1111,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-DU-A7T8/01A-02-TS2/thumb.png",
             preview: "images/TCGA-DU-A7T8/01A-02-TS2/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-A7T8-01A-02-TS2.776C92C7-E515-4890-88DA-9DE91B41E981.svs",
             hasQuant: true,
             composition: {
               tumorCells: 50,
@@ -999,6 +1135,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-DU-A7T8/01Z-00-DX1/thumb.png",
             preview: "images/TCGA-DU-A7T8/01Z-00-DX1/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-A7T8-01Z-00-DX1.2D5A2041-46F5-4571-A933-2629E7617B31.svs",
             hasQuant: false,
             composition: null,
             notes: [
@@ -1039,6 +1176,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-DU-6407/01A-01-TS1/thumb.png",
             preview: "images/TCGA-DU-6407/01A-01-TS1/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-01A-01-TS1.bc2f10ec-3b78-4d0f-8866-6aa26a107503.svs",
             hasQuant: true,
             composition: {
               tumorCells: 100,
@@ -1061,6 +1199,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-DU-6407/02A-01-TS1/thumb.png",
             preview: "images/TCGA-DU-6407/02A-01-TS1/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-02A-01-TS1.DDCA3FBE-94B2-4791-B4DB-144E172B45EF.svs",
             hasQuant: true,
             composition: {
               tumorCells: 45,
@@ -1084,6 +1223,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-DU-6407/02B-01-TS1/thumb.png",
             preview: "images/TCGA-DU-6407/02B-01-TS1/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-02B-01-TS1.90E66B88-254F-4CAD-8415-662A50022438.svs",
             hasQuant: true,
             composition: {
               tumorCells: 50,
@@ -1107,6 +1247,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-DU-6407/01Z-00-DX1/thumb.png",
             preview: "images/TCGA-DU-6407/01Z-00-DX1/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-01Z-00-DX1.191E7DFE-7BB3-446F-BA9D-8123B83F75D9.svs",
             hasQuant: false,
             composition: null,
             notes: [
@@ -1147,6 +1288,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-S9-A6TU/01A-01-TSA/thumb.png",
             preview: "images/TCGA-S9-A6TU/01A-01-TSA/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-S9-A6TU-01A-01-TSA.8764C48F-59EC-42C5-A537-235E08E8DB18.svs",
             hasQuant: true,
             composition: {
               tumorCells: 40,
@@ -1170,6 +1312,7 @@
             stain: "Stain not specified",
             thumbnail: "images/TCGA-S9-A6TU/01Z-00-DX1/thumb.png",
             preview: "images/TCGA-S9-A6TU/01Z-00-DX1/roi.dzi",
+            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-S9-A6TU-01Z-00-DX1.58000391-215E-4740-AD40-1489B348922B.svs",
             hasQuant: false,
             composition: null,
             notes: [
@@ -1186,6 +1329,39 @@
     let currentSlideIndex = 0;
     let heatmapOn = false;
     let viewer = null;
+    const roiStorageKey = "digital-pathology-rois-v1";
+    const savedRois = loadSavedRois();
+    let activeRoiEditId = null;
+
+    function loadSavedRois() {
+      try {
+        const raw = window.localStorage.getItem(roiStorageKey);
+        return raw ? JSON.parse(raw) : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function persistSavedRois() {
+      try {
+        window.localStorage.setItem(roiStorageKey, JSON.stringify(savedRois));
+      } catch (error) {
+        setViewerStatus("Unable to persist ROI data in this browser.");
+      }
+    }
+
+    function getCurrentSlide() {
+      return caseData[currentCaseId].slides[currentSlideIndex];
+    }
+
+    function getRoiStorageKey() {
+      const slide = getCurrentSlide();
+      return `${currentCaseId}::${slide.slideId}`;
+    }
+
+    function getCurrentRois() {
+      return savedRois[getRoiStorageKey()] || [];
+    }
 
     function getFilteredCaseIds(query) {
       const q = (query || "").trim().toLowerCase();
@@ -1315,6 +1491,386 @@
       `;
     }
 
+    function formatRoiRect(rect) {
+      return [
+        `x ${rect.x.toFixed(0)}`,
+        `y ${rect.y.toFixed(0)}`,
+        `w ${rect.width.toFixed(0)}`,
+        `h ${rect.height.toFixed(0)}`
+      ].join("  ");
+    }
+
+    function sanitizeFilename(value) {
+      return (value || "slide")
+        .replace(/[^a-z0-9._-]+/gi, "_")
+        .replace(/_+/g, "_")
+        .replace(/^_|_$/g, "");
+    }
+
+    function triggerFileDownload(filename, blob) {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    }
+
+    function triggerUrlDownload(url) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    function buildRoiGeoJson(slide, rois) {
+      return {
+        type: "FeatureCollection",
+        name: `${slide.submitterId}-portal-rois`,
+        features: rois.map((roi) => {
+          const x = Number(roi.imageRect.x.toFixed(3));
+          const y = Number(roi.imageRect.y.toFixed(3));
+          const width = Number(roi.imageRect.width.toFixed(3));
+          const height = Number(roi.imageRect.height.toFixed(3));
+
+          return {
+            type: "Feature",
+            properties: {
+              name: roi.name,
+              note: roi.note || "",
+              slideId: slide.slideId,
+              submitterId: slide.submitterId,
+              zoom: Number(roi.zoom.toFixed(4)),
+              savedAt: roi.savedAt
+            },
+            geometry: {
+              type: "Polygon",
+              coordinates: [[
+                [x, y],
+                [x + width, y],
+                [x + width, y + height],
+                [x, y + height],
+                [x, y]
+              ]]
+            }
+          };
+        })
+      };
+    }
+
+    function buildQuPathScript(slide, rois) {
+      const roiPayload = rois.map((roi) => ({
+        name: roi.name,
+        note: roi.note || "",
+        x: Number(roi.imageRect.x.toFixed(3)),
+        y: Number(roi.imageRect.y.toFixed(3)),
+        width: Number(roi.imageRect.width.toFixed(3)),
+        height: Number(roi.imageRect.height.toFixed(3))
+      }));
+      const groovyRoiList = roiPayload.length
+        ? roiPayload.map((roi) => `  [
+    name: ${JSON.stringify(roi.name)},
+    note: ${JSON.stringify(roi.note)},
+    x: ${roi.x},
+    y: ${roi.y},
+    width: ${roi.width},
+    height: ${roi.height}
+  ]`).join(",\n")
+        : "";
+
+      return `import qupath.lib.objects.PathObjects
+import qupath.lib.regions.ImagePlane
+import qupath.lib.roi.ROIs
+
+def rois = [
+${groovyRoiList}
+]
+
+if (getCurrentImageData() == null) {
+    print "Open the matching SVS in QuPath before running this script."
+    return
+}
+
+rois.each { roi ->
+    def annotation = PathObjects.createAnnotationObject(
+        ROIs.createRectangleROI(roi.x, roi.y, roi.width, roi.height, ImagePlane.getDefaultPlane())
+    )
+    annotation.setName(roi.name)
+    addObject(annotation)
+}
+
+println "Imported ${roiPayload.length} ROI annotation(s) from the portal package for ${slide.submitterId}."
+`;
+    }
+
+    function buildQuPathReadme(caseInfo, slide, rois) {
+      return [
+        "QuPath Handoff Package",
+        "=====================",
+        "",
+        `Case ID: ${currentCaseId}`,
+        `Slide label: ${slide.label}`,
+        `Submitter ID: ${slide.submitterId}`,
+        `Slide ID: ${slide.slideId}`,
+        `Source SVS URL: ${slide.svsUrl || "Not configured"}`,
+        `Saved ROI count: ${rois.length}`,
+        "",
+        "Recommended workflow:",
+        "1. Open the downloaded SVS in QuPath.",
+        "2. Run open_in_qupath.groovy in the QuPath script editor to recreate rectangle ROIs.",
+        "3. Optionally keep roi.geojson and slide-info.json with your project record.",
+        "",
+        "Notes:",
+        "- ROI coordinates are exported in full-resolution image pixel units.",
+        "- This package is generated from the portal's current saved ROI views.",
+        "- If the SVS does not start downloading from the portal, use the Source SVS URL above directly."
+      ].join("\n");
+    }
+
+    function downloadCurrentSvs() {
+      const slide = getCurrentSlide();
+
+      if (!slide.svsUrl) {
+        setViewerStatus("SVS source URL is not configured for this slide.");
+        return;
+      }
+
+      triggerUrlDownload(slide.svsUrl);
+      setViewerStatus(`Started SVS download for ${slide.label}`);
+    }
+
+    async function downloadQuPathPackage() {
+      const slide = getCurrentSlide();
+      const caseInfo = caseData[currentCaseId];
+      const rois = getCurrentRois();
+      const packageButton = document.getElementById("packageBtn");
+
+      if (!slide.svsUrl) {
+        setViewerStatus("SVS source URL is not configured for this slide.");
+        return;
+      }
+
+      if (typeof JSZip === "undefined") {
+        setViewerStatus("ZIP packaging library failed to load.");
+        return;
+      }
+
+      packageButton.disabled = true;
+      packageButton.textContent = "Packaging...";
+      setViewerStatus("Building the QuPath package...");
+
+      const zip = new JSZip();
+      const safeBaseName = sanitizeFilename(slide.submitterId || slide.label);
+      const geoJson = buildRoiGeoJson(slide, rois);
+      const handoffPayload = {
+        generatedAt: new Date().toISOString(),
+        caseId: currentCaseId,
+        caseSummary: {
+          diagnosis: caseInfo.diagnosis,
+          grade: caseInfo.grade,
+          project: caseInfo.project,
+          primarySite: caseInfo.primarySite
+        },
+        slide: {
+          label: slide.label,
+          submitterId: slide.submitterId,
+          slideId: slide.slideId,
+          fileId: slide.fileId,
+          section: slide.section,
+          stain: slide.stain,
+          svsUrl: slide.svsUrl
+        },
+        rois: rois.map((roi) => ({
+          name: roi.name,
+          note: roi.note || "",
+          zoom: roi.zoom,
+          savedAt: roi.savedAt,
+          viewportRect: roi.viewportRect,
+          imageRect: roi.imageRect
+        }))
+      };
+
+      zip.file("slide-info.json", JSON.stringify(handoffPayload, null, 2));
+      zip.file("roi.geojson", JSON.stringify(geoJson, null, 2));
+      zip.file("open_in_qupath.groovy", buildQuPathScript(slide, rois));
+      zip.file("README.txt", buildQuPathReadme(caseInfo, slide, rois));
+      zip.file("svs-url.txt", `${slide.svsUrl}\n`);
+
+      try {
+        const blob = await zip.generateAsync({ type: "blob" });
+        triggerFileDownload(`${safeBaseName}_qupath_package.zip`, blob);
+        setViewerStatus(`Downloaded QuPath package for ${slide.label}`);
+      } catch (error) {
+        setViewerStatus("Unable to build the QuPath package in this browser.");
+      } finally {
+        packageButton.disabled = false;
+        packageButton.textContent = "Download QuPath Package";
+      }
+    }
+
+    function getRoiDraftValues() {
+      return {
+        name: document.getElementById("roiNameInput").value.trim(),
+        note: document.getElementById("roiNoteInput").value.trim()
+      };
+    }
+
+    function clearRoiDraftValues() {
+      document.getElementById("roiNameInput").value = "";
+      document.getElementById("roiNoteInput").value = "";
+      activeRoiEditId = null;
+    }
+
+    function renderRoiList() {
+      const roiList = document.getElementById("roiList");
+      const slide = getCurrentSlide();
+      const rois = getCurrentRois();
+
+      if (!rois.length) {
+        roiList.innerHTML = '<div class="empty-text">No ROI views saved for this slide yet.</div>';
+        return;
+      }
+
+      roiList.innerHTML = rois.map((roi) => `
+        <div class="roi-card">
+          <div class="roi-card-head">
+            <div class="roi-card-title">${roi.name}</div>
+          </div>
+          <div class="roi-card-meta">${slide.label} · zoom ${roi.zoom.toFixed(2)} · saved ${roi.savedAt}</div>
+          <div class="roi-card-coords">${formatRoiRect(roi.imageRect)}</div>
+          ${roi.note ? `<div class="roi-card-note">${roi.note}</div>` : ""}
+          <div class="roi-card-actions">
+            <button class="btn" type="button" data-roi-action="goto" data-roi-id="${roi.id}">Go to ROI</button>
+            <button class="btn" type="button" data-roi-action="prefill" data-roi-id="${roi.id}">Edit ROI</button>
+            <button class="btn" type="button" data-roi-action="delete" data-roi-id="${roi.id}">Delete</button>
+          </div>
+        </div>
+      `).join("");
+
+      roiList.querySelectorAll("button[data-roi-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const { roiAction, roiId } = button.dataset;
+
+          if (roiAction === "goto") {
+            jumpToRoi(roiId);
+            return;
+          }
+
+          if (roiAction === "prefill") {
+            prefillRoiDraft(roiId);
+            return;
+          }
+
+          if (roiAction === "delete") {
+            deleteRoi(roiId);
+          }
+        });
+      });
+    }
+
+    function prefillRoiDraft(roiId) {
+      const roi = getCurrentRois().find((entry) => entry.id === roiId);
+      if (!roi) return;
+
+      activeRoiEditId = roiId;
+      document.getElementById("roiNameInput").value = roi.name || "";
+      document.getElementById("roiNoteInput").value = roi.note || "";
+      setViewerStatus(`Editing ${roi.name}. Save Current View will update this ROI.`);
+    }
+
+    function saveCurrentViewAsRoi() {
+      if (!viewer || !viewer.viewport || !viewer.world.getItemAt(0)) {
+        setViewerStatus("ROI capture unavailable until the slide has loaded.");
+        return;
+      }
+
+      const imageItem = viewer.world.getItemAt(0);
+      const bounds = viewer.viewport.getBounds(true);
+      const imageRect = imageItem.viewportToImageRectangle(bounds);
+      const storageKey = getRoiStorageKey();
+      const rois = savedRois[storageKey] || [];
+      const savedAt = new Date().toLocaleString();
+      const draft = getRoiDraftValues();
+      const existingIndex = activeRoiEditId
+        ? rois.findIndex((entry) => entry.id === activeRoiEditId)
+        : -1;
+      const roiId = existingIndex >= 0 ? activeRoiEditId : `${storageKey}::${Date.now()}`;
+      const roiPayload = {
+        id: roiId,
+        name: draft.name || `ROI ${existingIndex >= 0 ? existingIndex + 1 : rois.length + 1}`,
+        note: draft.note,
+        zoom: viewer.viewport.getZoom(true),
+        savedAt,
+        viewportRect: {
+          x: bounds.x,
+          y: bounds.y,
+          width: bounds.width,
+          height: bounds.height
+        },
+        imageRect: {
+          x: imageRect.x,
+          y: imageRect.y,
+          width: imageRect.width,
+          height: imageRect.height
+        }
+      };
+
+      if (existingIndex >= 0) {
+        rois[existingIndex] = roiPayload;
+      } else {
+        rois.push(roiPayload);
+      }
+
+      savedRois[storageKey] = rois;
+      persistSavedRois();
+      renderRoiList();
+      clearRoiDraftValues();
+      switchTab("slideTab");
+      setViewerStatus(`${existingIndex >= 0 ? "Updated" : "Saved"} ${roiPayload.name} from the current view`);
+    }
+
+    function deleteRoi(roiId) {
+      const storageKey = getRoiStorageKey();
+      const rois = getCurrentRois();
+      const nextRois = rois.filter((entry) => entry.id !== roiId);
+
+      if (nextRois.length === rois.length) {
+        setViewerStatus("Unable to delete the selected ROI.");
+        return;
+      }
+
+      if (activeRoiEditId === roiId) {
+        clearRoiDraftValues();
+      }
+
+      savedRois[storageKey] = nextRois;
+      persistSavedRois();
+      renderRoiList();
+      setViewerStatus("Deleted the selected ROI");
+    }
+
+    function jumpToRoi(roiId) {
+      const roi = getCurrentRois().find((entry) => entry.id === roiId);
+      if (!roi || !viewer || !viewer.viewport) {
+        setViewerStatus("Unable to restore the selected ROI view.");
+        return;
+      }
+
+      const viewportRect = new OpenSeadragon.Rect(
+        roi.viewportRect.x,
+        roi.viewportRect.y,
+        roi.viewportRect.width,
+        roi.viewportRect.height
+      );
+
+      viewer.viewport.fitBounds(viewportRect, true);
+      setViewerStatus(`Restored ${roi.name}`);
+    }
+
     function initViewer(dziPath) {
       const viewerElement = document.getElementById("slidePreview");
       viewerElement.innerHTML = "";
@@ -1340,7 +1896,7 @@
 
     async function renderSlideDetails() {
       const data = caseData[currentCaseId];
-      const slide = data.slides[currentSlideIndex];
+      const slide = getCurrentSlide();
 
       document.getElementById("slideMetaLabel").textContent = slide.label || "-";
       document.getElementById("slideMetaSubmitter").textContent = slide.submitterId || "-";
@@ -1382,6 +1938,8 @@
       document.getElementById("reviewNotes").innerHTML = (slide.notes || [])
         .map((note) => `<li>${note}</li>`)
         .join("");
+
+      renderRoiList();
     }
 
     async function selectSlide(index) {
@@ -1450,8 +2008,11 @@
         if (event.key === "Enter") applySearch();
       });
       document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
+      document.getElementById("addRoiBtn").addEventListener("click", saveCurrentViewAsRoi);
+      document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
+      document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
+      document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
       document.getElementById("imsBtn").addEventListener("click", openIMS);
-      document.getElementById("exportBtn").addEventListener("click", exportReport);
 
       document.querySelectorAll(".tab-button").forEach((button) => {
         button.addEventListener("click", () => switchTab(button.dataset.tab));
