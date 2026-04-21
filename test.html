@@ -1571,12 +1571,24 @@
         width: Number(roi.imageRect.width.toFixed(3)),
         height: Number(roi.imageRect.height.toFixed(3))
       }));
+      const groovyRoiList = roiPayload.length
+        ? roiPayload.map((roi) => `  [
+    name: ${JSON.stringify(roi.name)},
+    note: ${JSON.stringify(roi.note)},
+    x: ${roi.x},
+    y: ${roi.y},
+    width: ${roi.width},
+    height: ${roi.height}
+  ]`).join(",\n")
+        : "";
 
       return `import qupath.lib.objects.PathObjects
 import qupath.lib.regions.ImagePlane
 import qupath.lib.roi.ROIs
 
-def rois = ${JSON.stringify(roiPayload, null, 2)}
+def rois = [
+${groovyRoiList}
+]
 
 if (getCurrentImageData() == null) {
     print "Open the matching SVS in QuPath before running this script."
