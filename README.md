@@ -3,7 +3,7 @@
 This demo explores how case-level clinical meta-data and slide-level information can be unified within a single pathology review interface.
 The current implementation combines a static frontend, FastAPI backend, AWS S3 asset storage, and OpenSeadragon-based whole-slide image viewing.
 <a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank">
-Open the Digital Pathology Demo Portal
+Open the Digital Pathology Portal Demo
 </a>
 
 <img src="digital_pathology_demo_architecture.png" width="1000">
