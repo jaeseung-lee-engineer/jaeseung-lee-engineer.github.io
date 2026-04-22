@@ -6,7 +6,7 @@ The current implementation combines a static frontend, FastAPI backend, AWS S3 a
 Open the Digital Pathology Demo Portal
 </a>
 
-## High-level architecture of the proposed workflow:
+## High-level architecture:
 
 This system design demonstrates a conceptual integration with Qupath and an Image Management System (IMS) such as Proscia Concentriq LS.
 
