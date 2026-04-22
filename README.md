@@ -43,7 +43,8 @@ To support downstream pathology review beyond the browser-based viewer, the port
 - QuPath Package Download — exports a handoff ZIP that includes `slide-info.json`, `roi.geojson`, `open_in_qupath.groovy`, `README.txt`, and `svs-url.txt`
 - ROI Handoff — preserves saved ROI geometry in image pixel coordinates so reviewer-selected regions can be recreated inside QuPath
 - Review Context Preservation — carries slide identifiers, case summary metadata, and source SVS link forward into the downstream analysis step
-
+- Current implementation stores ROI client-side in localStorage for lightweight review continuity.
+  
 ## IMS Integration
 
 Designed to conceptually support retrieval of:
