@@ -1430,6 +1430,9 @@ rois.each { roi ->
         ROIs.createRectangleROI(roi.x, roi.y, roi.width, roi.height, ImagePlane.getDefaultPlane())
     )
     annotation.setName(roi.name)
+    if (roi.note) {
+        annotation.setDescription(roi.note)
+    }
     addObject(annotation)
 }
 
