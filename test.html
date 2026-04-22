@@ -1082,6 +1082,7 @@
 
   <script>
     const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
+    const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
 
     let caseData = {};
 
@@ -1102,6 +1103,24 @@
       }
     }
 
+    function normalizeAssetUrl(assetPath) {
+      if (!assetPath) return assetPath;
+      if (/^https?:\/\//.test(assetPath)) return assetPath;
+
+      return `${S3_ASSET_BASE_URL}${assetPath.replace(/^images\//, "")}`;
+    }
+
+    function normalizeCaseDataAssets(data) {
+      Object.values(data).forEach((entry) => {
+        if (!entry || !Array.isArray(entry.slides)) return;
+
+        entry.slides.forEach((slide) => {
+          slide.thumbnail = normalizeAssetUrl(slide.thumbnail);
+          slide.preview = normalizeAssetUrl(slide.preview);
+        });
+      });
+    }
+
     async function loadCaseData() {
       const response = await fetch(CASE_DATA_URL, {
         method: "GET",
@@ -1114,6 +1133,7 @@
       }
 
       caseData = await response.json();
+      normalizeCaseDataAssets(caseData);
     }
 
     function persistSavedRois() {
