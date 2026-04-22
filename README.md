@@ -6,11 +6,10 @@ The current implementation combines a static frontend, FastAPI backend, AWS S3 a
 Open the Digital Pathology Demo Portal
 </a>
 
-## System Design (Conceptual)
+## High-level architecture of the proposed workflow:
 
 This system design demonstrates a conceptual integration with Qupath and an Image Management System (IMS) such as Proscia Concentriq LS.
 
-High-level architecture of the proposed workflow:
 <img src="images/digital_pathology_workflow.png" width="850">
 
 This demo now includes a lightweight FastAPI backend deployed separately from the static frontend. The current implementation uses an API-first metadata flow, falls back to AWS S3 if the API is unavailable, and streams slide assets directly from S3.
