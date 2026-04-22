@@ -1081,249 +1081,9 @@
   </main>
 
   <script>
-    const caseData = {
-      "TCGA-DU-A7T8": {
-        diagnosis: "Mixed glioma",
-        grade: "G3",
-        site: "Brain (Cerebrum)",
-        age: "35",
-        sex: "Male",
-        status: "Deceased",
-        tumorContext: "Primary",
-        slidesLinked: 2,
-        project: "TCGA-LGG",
-        projectName: "Brain Lower Grade Glioma",
-        diseaseType: "Gliomas",
-        primarySite: "Brain",
-        tissueOrigin: "Cerebrum",
-        resectionSite: "Nervous system, NOS",
-        morphology: "9382/3",
-        followup: "11 years 212 days",
-        race: "White",
-        ethnicity: "Not Hispanic or Latino",
-        slides: [
-          {
-            label: "01A-02-TS2",
-            submitterId: "TCGA-DU-A7T8-01A-02-TS2",
-            slideId: "776c92c7-e515-4890-88da-9de91b41e981",
-            fileId: "bf7e8f61-44c8-4040-afc8-42cb687f2c12",
-            section: "Section TOP",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-DU-A7T8/01A-02-TS2/thumb.png",
-            preview: "images/TCGA-DU-A7T8/01A-02-TS2/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-A7T8-01A-02-TS2.776C92C7-E515-4890-88DA-9DE91B41E981.svs",
-            hasQuant: true,
-            composition: {
-              tumorCells: 50,
-              tumorNuclei: 60,
-              stromalCells: 40,
-              normalCells: 10
-            },
-            notes: [
-              "Higher tumor nuclei proportion observed.",
-              "Mixed tissue composition present.",
-              "Quantitative values included for demonstration purposes.",
-              "For demo purposes only."
-            ]
-          },
-          {
-            label: "01Z-00-DX1",
-            submitterId: "TCGA-DU-A7T8-01Z-00-DX1",
-            slideId: "f3365952-0bc6-4464-bd66-b78a078dc787",
-            fileId: "a26d6758-564e-4b15-9300-dce25e6ccf55",
-            section: "Section not reported",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-DU-A7T8/01Z-00-DX1/thumb.png",
-            preview: "images/TCGA-DU-A7T8/01Z-00-DX1/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-A7T8-01Z-00-DX1.2D5A2041-46F5-4571-A933-2629E7617B31.svs",
-            hasQuant: false,
-            composition: null,
-            notes: [
-              "Quantitative composition data not available.",
-              "Annotation not available for this slide.",
-              "For demo purposes only."
-            ]
-          }
-        ]
-      },
+    const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
 
-      "TCGA-DU-6407": {
-        diagnosis: "Oligodendroglioma, NOS",
-        grade: "G2",
-        site: "Brain (Cerebrum)",
-        age: "35",
-        sex: "Female",
-        status: "Deceased",
-        tumorContext: "Primary",
-        slidesLinked: 4,
-        project: "TCGA-LGG",
-        projectName: "Brain Lower Grade Glioma",
-        diseaseType: "Gliomas",
-        primarySite: "Brain",
-        tissueOrigin: "Cerebrum",
-        resectionSite: "Nervous system, NOS",
-        morphology: "9450/3",
-        followup: "7 years 319 days",
-        race: "White",
-        ethnicity: "Not Hispanic or Latino",
-        slides: [
-          {
-            label: "01A-01-TS1",
-            submitterId: "TCGA-DU-6407-01A-01-TS1",
-            slideId: "bc2f10ec-3b78-4d0f-8866-6aa26a107503",
-            fileId: "d9232b3c-60b9-4039-b5d7-2a550f3da0fb",
-            section: "Section TOP",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-DU-6407/01A-01-TS1/thumb.png",
-            preview: "images/TCGA-DU-6407/01A-01-TS1/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-01A-01-TS1.bc2f10ec-3b78-4d0f-8866-6aa26a107503.svs",
-            hasQuant: true,
-            composition: {
-              tumorCells: 100,
-              tumorNuclei: 75,
-              stromalCells: null,
-              normalCells: null
-            },
-            notes: [
-              "High tumor cell content observed.",
-              "Quantitative values included for demonstration purposes.",
-              "For demo purposes only."
-            ]
-          },
-          {
-            label: "02A-01-TS1",
-            submitterId: "TCGA-DU-6407-02A-01-TS1",
-            slideId: "ddca3fbe-94b2-4791-b4db-144e172b45ef",
-            fileId: "1e67b2c1-febc-403c-9c7d-d9d643df7f13",
-            section: "Section TOP",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-DU-6407/02A-01-TS1/thumb.png",
-            preview: "images/TCGA-DU-6407/02A-01-TS1/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-02A-01-TS1.DDCA3FBE-94B2-4791-B4DB-144E172B45EF.svs",
-            hasQuant: true,
-            composition: {
-              tumorCells: 45,
-              tumorNuclei: 70,
-              stromalCells: 45,
-              normalCells: 10
-            },
-            notes: [
-              "Tumor and stromal components both present.",
-              "Overall tissue composition appears mixed.",
-              "Quantitative values included for demonstration purposes.",
-              "For demo purposes only."
-            ]
-          },
-          {
-            label: "02B-01-TS1",
-            submitterId: "TCGA-DU-6407-02B-01-TS1",
-            slideId: "90e66b88-254f-4cad-8415-662a50022438",
-            fileId: "192d7a02-aa71-45d4-a2fb-6f9da0651e1f",
-            section: "Section TOP",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-DU-6407/02B-01-TS1/thumb.png",
-            preview: "images/TCGA-DU-6407/02B-01-TS1/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-02B-01-TS1.90E66B88-254F-4CAD-8415-662A50022438.svs",
-            hasQuant: true,
-            composition: {
-              tumorCells: 50,
-              tumorNuclei: 85,
-              stromalCells: 45,
-              normalCells: 5
-            },
-            notes: [
-              "Higher tumor nuclei proportion observed.",
-              "Stromal component present.",
-              "Quantitative values included for demonstration purposes.",
-              "For demo purposes only."
-            ]
-          },
-          {
-            label: "01Z-00-DX1",
-            submitterId: "TCGA-DU-6407-01Z-00-DX1",
-            slideId: "7407f327-85d1-42ef-adca-ca08328c0ee4",
-            fileId: "b78b3e94-2427-4c48-a0d6-0741f55bc333",
-            section: "Section not reported",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-DU-6407/01Z-00-DX1/thumb.png",
-            preview: "images/TCGA-DU-6407/01Z-00-DX1/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-DU-6407-01Z-00-DX1.191E7DFE-7BB3-446F-BA9D-8123B83F75D9.svs",
-            hasQuant: false,
-            composition: null,
-            notes: [
-              "Quantitative composition data not available.",
-              "Annotation not available for this slide.",
-              "For demo purposes only."
-            ]
-          }
-        ]
-      },
-
-      "TCGA-S9-A6TU": {
-        diagnosis: "Astrocytoma, NOS",
-        grade: "G2",
-        site: "Brain (Cerebrum)",
-        age: "38",
-        sex: "Male",
-        status: "Alive",
-        tumorContext: "Primary",
-        slidesLinked: 2,
-        project: "TCGA-LGG",
-        projectName: "Brain Lower Grade Glioma",
-        diseaseType: "Gliomas",
-        primarySite: "Brain",
-        tissueOrigin: "Cerebrum",
-        resectionSite: "Nervous system, NOS",
-        morphology: "9400/3",
-        followup: "7 years 94 days",
-        race: "White",
-        ethnicity: "Not Hispanic or Latino",
-        slides: [
-          {
-            label: "01A-01-TSA",
-            submitterId: "TCGA-S9-A6TU-01A-01-TSA",
-            slideId: "8764c48f-59ec-42c5-a537-235e08e8db18",
-            fileId: "2c889b79-4c65-4629-98c9-0b87842ddfa8",
-            section: "Section TOP",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-S9-A6TU/01A-01-TSA/thumb.png",
-            preview: "images/TCGA-S9-A6TU/01A-01-TSA/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-S9-A6TU-01A-01-TSA.8764C48F-59EC-42C5-A537-235E08E8DB18.svs",
-            hasQuant: true,
-            composition: {
-              tumorCells: 40,
-              tumorNuclei: 80,
-              stromalCells: 50,
-              normalCells: 10
-            },
-            notes: [
-              "Higher tumor nuclei proportion observed.",
-              "Mixed tissue composition present.",
-              "Quantitative values included for demonstration purposes.",
-              "For demo purposes only."
-            ]
-          },
-          {
-            label: "01Z-00-DX1",
-            submitterId: "TCGA-S9-A6TU-01Z-00-DX1",
-            slideId: "7c02fd8c-52d2-425a-980d-d008b28d775a",
-            fileId: "4c118ab5-56b5-4835-bccc-129c8b33b852",
-            section: "Section not reported",
-            stain: "Stain not specified",
-            thumbnail: "images/TCGA-S9-A6TU/01Z-00-DX1/thumb.png",
-            preview: "images/TCGA-S9-A6TU/01Z-00-DX1/roi.dzi",
-            svsUrl: "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/TCGA-S9-A6TU-01Z-00-DX1.58000391-215E-4740-AD40-1489B348922B.svs",
-            hasQuant: false,
-            composition: null,
-            notes: [
-              "Quantitative composition data not available.",
-              "Annotation not available for this slide.",
-              "For demo purposes only."
-            ]
-          }
-        ]
-      }
-    };
+    let caseData = {};
 
     let currentCaseId = "TCGA-DU-A7T8";
     let currentSlideIndex = 0;
@@ -1340,6 +1100,20 @@
       } catch (error) {
         return {};
       }
+    }
+
+    async function loadCaseData() {
+      const response = await fetch(CASE_DATA_URL, {
+        method: "GET",
+        mode: "cors",
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load case data: ${response.status}`);
+      }
+
+      caseData = await response.json();
     }
 
     function persistSavedRois() {
@@ -1953,6 +1727,8 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
     }
 
     async function selectCase(caseId) {
+      if (!caseData[caseId]) return;
+
       currentCaseId = caseId;
       heatmapOn = false;
       document.getElementById("heatmapOverlay").classList.remove("visible");
@@ -2018,9 +1794,25 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         button.addEventListener("click", () => switchTab(button.dataset.tab));
       });
 
-      renderQuickCaseList(Object.keys(caseData));
-      selectCase("TCGA-DU-A7T8");
-      switchTab("caseTab");
+      loadCaseData()
+        .then(() => {
+          const caseIds = Object.keys(caseData);
+          if (!caseIds.length) {
+            setViewerStatus("No case data available from AWS.");
+            return;
+          }
+
+          const initialCaseId = caseData[currentCaseId] ? currentCaseId : caseIds[0];
+          renderQuickCaseList(caseIds);
+          selectCase(initialCaseId);
+          switchTab("caseTab");
+        })
+        .catch((error) => {
+          console.error(error);
+          document.getElementById("quickCaseList").innerHTML = '<div class="empty-text">Unable to load cases from AWS.</div>';
+          document.getElementById("slideThumbs").innerHTML = '<div class="empty-text">No slide data loaded.</div>';
+          setViewerStatus("Unable to load case data from AWS S3.");
+        });
     });
   </script>
 </body>
