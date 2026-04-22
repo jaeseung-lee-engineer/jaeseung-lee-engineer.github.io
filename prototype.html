@@ -750,48 +750,54 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       background: var(--surface-subtle);
-      padding: 8px 10px;
+      padding: 10px 12px;
     }
 
     .roi-card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+
+    .roi-card-summary {
+      min-width: 0;
+      display: flex;
+      align-items: center;
       gap: 8px;
-      margin-bottom: 4px;
+      flex-wrap: wrap;
     }
 
     .roi-card-title {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text);
-    }
-
-    .roi-card-meta,
-    .roi-card-coords {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .roi-card-coords {
-      margin-top: 4px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.4;
     }
 
     .roi-card-note {
-      margin-top: 6px;
-      color: var(--text);
-      font-size: 11px;
+      color: var(--muted);
+      font-size: 12px;
       line-height: 1.5;
-      white-space: pre-wrap;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .roi-card-separator {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
     }
 
     .roi-card-actions {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      margin-top: 8px;
+      justify-content: flex-end;
+      flex-shrink: 0;
     }
 
     .notes ul {
@@ -1000,7 +1006,7 @@
                     <input class="roi-input" id="roiNoteInput" type="text" placeholder="ROI note for QuPath handoff (optional)" />
                     <button class="btn" type="button" id="addRoiSecondaryBtn">Save Current View</button>
                   </div>
-                  <div class="roi-helper-text">Save the current zoomed region as a reusable ROI bookmark.</div>
+                  <div class="roi-helper-text">Save the current zoomed region as a reusable ROI bookmark. ROI views are currently stored only on this device in the browser.</div>
                 </div>
                 <div id="roiList" class="roi-list">
                   <div class="empty-text">No ROI views saved for this slide yet.</div>
@@ -1551,7 +1557,6 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
     function renderRoiList() {
       const roiList = document.getElementById("roiList");
-      const slide = getCurrentSlide();
       const rois = getCurrentRois();
 
       if (!rois.length) {
@@ -1562,15 +1567,16 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       roiList.innerHTML = rois.map((roi) => `
         <div class="roi-card">
           <div class="roi-card-head">
-            <div class="roi-card-title">${roi.name}</div>
-          </div>
-          <div class="roi-card-meta">${slide.label} · zoom ${roi.zoom.toFixed(2)} · saved ${roi.savedAt}</div>
-          <div class="roi-card-coords">${formatRoiRect(roi.imageRect)}</div>
-          ${roi.note ? `<div class="roi-card-note">${roi.note}</div>` : ""}
-          <div class="roi-card-actions">
-            <button class="btn" type="button" data-roi-action="goto" data-roi-id="${roi.id}">Go to ROI</button>
-            <button class="btn" type="button" data-roi-action="prefill" data-roi-id="${roi.id}">Edit ROI</button>
-            <button class="btn" type="button" data-roi-action="delete" data-roi-id="${roi.id}">Delete</button>
+            <div class="roi-card-summary">
+              <div class="roi-card-title">${roi.name}</div>
+              ${roi.note ? '<div class="roi-card-separator">|</div>' : ""}
+              ${roi.note ? `<div class="roi-card-note">${roi.note}</div>` : ""}
+            </div>
+            <div class="roi-card-actions">
+              <button class="btn" type="button" data-roi-action="goto" data-roi-id="${roi.id}">Go to ROI</button>
+              <button class="btn" type="button" data-roi-action="prefill" data-roi-id="${roi.id}">Edit ROI</button>
+              <button class="btn" type="button" data-roi-action="delete" data-roi-id="${roi.id}">Delete</button>
+            </div>
           </div>
         </div>
       `).join("");
