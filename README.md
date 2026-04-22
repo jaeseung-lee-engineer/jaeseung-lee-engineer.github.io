@@ -10,7 +10,7 @@ Open the Digital Pathology Demo Portal
 
 This system design demonstrates a conceptual integration with Qupath and an Image Management System (IMS) such as Proscia Concentriq LS.
 
-<img src="images/digital_pathology_workflow.png" width="850">
+<img src="digital_pathology_demo_architecture.png" width="850">
 
 This demo now includes a lightweight FastAPI backend deployed separately from the static frontend. The current implementation uses an API-first metadata flow, falls back to AWS S3 if the API is unavailable, and streams slide assets directly from S3.
 
