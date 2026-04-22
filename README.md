@@ -6,7 +6,7 @@ The current implementation combines a static frontend, FastAPI backend, AWS S3 a
 Open the Digital Pathology Demo Portal
 </a>
 
-<img src="digital_pathology_demo_architecture.png" width="850">
+<img src="digital_pathology_demo_architecture.png" width="1000">
 
 This demo now includes a lightweight FastAPI backend deployed separately from the static frontend. The current implementation uses an API-first metadata flow, falls back to AWS S3 if the API is unavailable, and streams slide assets directly from S3.
 
