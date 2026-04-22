@@ -39,11 +39,19 @@ POST /annotations
 
 To support downstream pathology review beyond the browser-based viewer, the portal includes export features designed to preserve workflow continuity into QuPath.
 
-- SVS Source Download — downloads the original slide file so the same case can be opened directly in QuPath for follow-up review
+- SVS Source Download — downloads the original whole-slide SVS file from AWS S3 so review can continue in external tools such as QuPath without breaking workflow continuity
 - QuPath Package Download — exports a handoff ZIP that includes `slide-info.json`, `roi.geojson`, `open_in_qupath.groovy`, `README.txt`, and `svs-url.txt`
 - ROI Handoff — preserves saved ROI geometry in image pixel coordinates so reviewer-selected regions can be recreated inside QuPath
 - Review Context Preservation — carries slide identifiers, case summary metadata, and source SVS link forward into the downstream analysis step
+- Current implementation stores ROI client-side in localStorage for lightweight review continuity.
 
+## AWS S3
+- case-data.json
+- thumbnail images
+- DZI files
+- DZI tile JPEGs
+- source SVS files
+  
 ## IMS Integration
 
 Designed to conceptually support retrieval of:
