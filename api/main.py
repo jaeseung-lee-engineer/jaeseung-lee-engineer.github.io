@@ -1,12 +1,17 @@
 import json
-from pathlib import Path
+import os
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(title="Digital Pathology API")
-CASE_DATA_PATH = Path(__file__).resolve().parents[1] / "case-data.json"
+CASE_DATA_URL = os.getenv(
+    "CASE_DATA_URL",
+    "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,12 +29,23 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "caseDataSource": CASE_DATA_URL}
 
 
 def load_case_data():
-    with CASE_DATA_PATH.open("r", encoding="utf-8") as file:
-        return json.load(file)
+    try:
+        with urlopen(CASE_DATA_URL, timeout=15) as response:
+            return json.load(response)
+    except HTTPError as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Unable to read case data from S3: HTTP {error.code}",
+        ) from error
+    except URLError as error:
+        raise HTTPException(
+            status_code=502,
+            detail="Unable to reach the case data source.",
+        ) from error
 
 
 def build_case_summary(case_id, case):
