@@ -1080,6 +1080,7 @@
   </main>
 
   <script>
+    const API_BASE_URL = "";
     const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
     const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
 
@@ -1120,7 +1121,32 @@
       });
     }
 
-    async function loadCaseData() {
+    function getApiUrl(path) {
+      if (!API_BASE_URL) return "";
+      return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
+    }
+
+    async function loadCaseDataFromApi() {
+      const apiUrl = getApiUrl("/portal-data");
+      if (!apiUrl) {
+        throw new Error("API base URL is not configured.");
+      }
+
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        mode: "cors",
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load case data from API: ${response.status}`);
+      }
+
+      caseData = await response.json();
+      normalizeCaseDataAssets(caseData);
+    }
+
+    async function loadCaseDataFromS3() {
       const response = await fetch(CASE_DATA_URL, {
         method: "GET",
         mode: "cors",
@@ -1133,6 +1159,15 @@
 
       caseData = await response.json();
       normalizeCaseDataAssets(caseData);
+    }
+
+    async function loadCaseData() {
+      try {
+        await loadCaseDataFromApi();
+      } catch (apiError) {
+        console.warn("API case data load failed; falling back to S3.", apiError);
+        await loadCaseDataFromS3();
+      }
     }
 
     function persistSavedRois() {
