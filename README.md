@@ -1,23 +1,31 @@
 # Digital Pathology Web Portal Demo
 
 This demo explores how case-level clinical meta-data and slide-level information can be unified within a single pathology review interface.
+The current implementation combines a static frontend, FastAPI backend, AWS S3 asset storage, and OpenSeadragon-based whole-slide image viewing.
 <a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank">
 Open the Digital Pathology Demo Portal
 </a>
 
 ## System Design (Conceptual)
 
-This system design demonstrates a conceptual integration with an Image Management System (IMS) such as Proscia Concentriq LS.
+This system design demonstrates a conceptual integration with Qupath and an Image Management System (IMS) such as Proscia Concentriq LS.
 
 High-level architecture of the proposed workflow:
 <img src="images/digital_pathology_workflow.png" width="850">
 
-While this demo does not include a backend, the following API structure illustrates how case-level data and slide details could be accessed in a real-world deployment:
+This demo now includes a lightweight FastAPI backend deployed separately from the static frontend. The current implementation uses an API-first metadata flow, falls back to AWS S3 if the API is unavailable, and streams slide assets directly from S3.
 
-GET /api/cases  
-GET /api/cases/{id}  
-GET /api/slides/{slide_id}  
-POST /api/annotations  
+Current API endpoints:
+
+GET /health  
+GET /cases  
+GET /cases/{case_id}  
+GET /portal-data  
+
+Additional API structure that could be expanded in a real-world deployment:
+
+GET /slides/{slide_id}  
+POST /annotations  
 
 ## Interface
 
@@ -26,6 +34,15 @@ POST /api/annotations
 - Linked Slides — Navigation across slides  
 - Slide Details — Quantitative metrics & notes  
 - Annotation Toggle — Region highlighting (by Pathologists or AI software)
+
+## QuPath Workflow Continuity
+
+To support downstream pathology review beyond the browser-based viewer, the portal includes export features designed to preserve workflow continuity into QuPath.
+
+- SVS Source Download — downloads the original slide file so the same case can be opened directly in QuPath for follow-up review
+- QuPath Package Download — exports a handoff ZIP that includes `slide-info.json`, `roi.geojson`, `open_in_qupath.groovy`, `README.txt`, and `svs-url.txt`
+- ROI Handoff — preserves saved ROI geometry in image pixel coordinates so reviewer-selected regions can be recreated inside QuPath
+- Review Context Preservation — carries slide identifiers, case summary metadata, and source SVS link forward into the downstream analysis step
 
 ## IMS Integration
 
@@ -37,9 +54,11 @@ Designed to conceptually support retrieval of:
 
 ## Tech Stack
 
-- HTML
-- CSS
-- JavaScript
+- HTML/CSS/JavaScript
+- FastAPI
+- OpenSeadragon
+- AWS S3
+- Render
 
 ## Disclaimer
 
