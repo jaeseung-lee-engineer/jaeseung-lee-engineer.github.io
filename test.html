@@ -1302,10 +1302,6 @@
       document.getElementById("viewerStatus").textContent = message;
     }
 
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     function buildCompositionRow(label, value) {
       if (value === null || value === undefined || value === "--") return "";
       return `
@@ -1732,16 +1728,8 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("slideMetaSection").textContent = slide.section || "-";
 
       setViewerStatus("Fetching slide data...");
-      await delay(250);
-
       initViewer(slide.preview);
-
-      setViewerStatus("Slide data loaded");
-      setTimeout(() => {
-        if (document.getElementById("viewerStatus").textContent === "Slide data loaded") {
-          setViewerStatus("Ready");
-        }
-      }, 800);
+      setViewerStatus("Ready");
 
       const compositionContainer = document.getElementById("compositionContainer");
       const interpretation = document.getElementById("compositionInterpretation");
