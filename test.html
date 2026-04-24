@@ -977,7 +977,7 @@
 
                 <div class="viewer-actions">
                   <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
-                  <button class="btn" type="button" id="packageBtn">Download QuPath Package</button>
+                  <button class="btn" type="button" id="packageBtn">Export ROI</button>
                   <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
                   <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
                 </div>
@@ -1541,7 +1541,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         setViewerStatus("Unable to build the QuPath package in this browser.");
       } finally {
         packageButton.disabled = false;
-        packageButton.textContent = "Download QuPath Package";
+        packageButton.textContent = "Export ROI";
       }
     }
 
