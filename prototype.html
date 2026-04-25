@@ -450,11 +450,30 @@
       justify-content: flex-end;
     }
 
-    .case-hero-actions .btn {
-      height: 30px;
-      padding: 0 8px;
-      font-size: 11px;
+    .case-hero-actions .action-separator {
+      color: var(--border-strong);
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .case-hero-actions .action-link {
+      height: auto;
+      padding: 2px 0;
+      border: none;
+      background: transparent;
+      border-radius: 0;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--text);
       white-space: nowrap;
+      box-shadow: none;
+    }
+
+    .case-hero-actions .action-link:hover {
+      background: transparent;
+      color: var(--text);
+      text-decoration: underline;
     }
 
     .case-hero-separator {
@@ -915,9 +934,55 @@
       }
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1600px) {
+      .prototype-demo {
+        font-size: 13px;
+      }
+
       .case-hero {
         gap: 6px;
+      }
+
+      .prototype-topbar,
+      .prototype-main,
+      .prototype-sidebar,
+      .sidebar-section,
+      .slide-list-meta,
+      .details-table,
+      .notes li,
+      .empty-text,
+      .footer,
+      .case-status-note,
+      .roi-card-note,
+      .roi-panel-title,
+      .status-tag,
+      .topbar-meta,
+      .search-row .btn,
+      .case-search,
+      .slide-list-label,
+      .slide-list-subtext,
+      .roi-input,
+      .roi-form-actions .btn {
+        font-size: 11px;
+      }
+
+      .summary-label {
+        font-size: 9px;
+      }
+
+      .summary-value,
+      .case-hero-actions .action-link,
+      .panel h4,
+      .panel h5,
+      .notes li,
+      .empty-text {
+        font-size: 12px;
+      }
+
+      .roi-card-title,
+      .tab-button,
+      .badge {
+        font-size: 11px;
       }
 
       .main-grid {
@@ -1041,11 +1106,15 @@
               <span class="summary-value" id="slidesLinked">-</span>
             </div>
             <div class="case-hero-actions">
-              <button class="btn" type="button" id="fullscreenToggleBtn">Fullscreen</button>
-              <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
-              <button class="btn" type="button" id="packageBtn">Export ROI</button>
-              <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
-              <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+              <button class="btn action-link" type="button" id="fullscreenToggleBtn">⛶ Fullscreen</button>
+              <span class="action-separator" aria-hidden="true">|</span>
+              <button class="btn action-link" type="button" id="downloadSvsBtn">↓ Download SVS</button>
+              <span class="action-separator" aria-hidden="true">|</span>
+              <button class="btn action-link" type="button" id="packageBtn">□ Export ROI</button>
+              <span class="action-separator" aria-hidden="true">|</span>
+              <button class="btn action-link" type="button" id="heatmapBtn">◉ Annotation</button>
+              <span class="action-separator" aria-hidden="true">|</span>
+              <button class="btn action-link" type="button" id="imsBtn">↗ Concentriq LS</button>
             </div>
           </div>
           <div class="main-grid">
@@ -1118,7 +1187,6 @@
 
               <div id="slideTab" class="tab-content notes">
                 <div class="section-block">
-                  <h5>Slide Metadata</h5>
                   <table class="details-table">
                     <tbody>
                       <tr><th>Slide Label</th><td id="slideMetaLabel"></td></tr>
@@ -1618,7 +1686,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       }
 
       packageButton.disabled = true;
-      packageButton.textContent = "Packaging...";
+      packageButton.textContent = "□ Packaging...";
       setViewerStatus("Building the QuPath package...");
 
       const zip = new JSZip();
@@ -1664,7 +1732,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         setViewerStatus("Unable to build the QuPath package in this browser.");
       } finally {
         packageButton.disabled = false;
-        packageButton.textContent = "Export ROI";
+        packageButton.textContent = "□ Export ROI";
       }
     }
 
@@ -2062,7 +2130,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
       document.body.classList.toggle("demo-fullscreen", nextState);
       demo.classList.toggle("is-fullscreen", nextState);
-      toggleButton.textContent = nextState ? "Exit Fullscreen" : "Fullscreen";
+      toggleButton.textContent = nextState ? "⛶ Exit Fullscreen" : "⛶ Fullscreen";
       if (nextState) {
         requestAnimationFrame(() => {
           measureFullscreenLayout();
