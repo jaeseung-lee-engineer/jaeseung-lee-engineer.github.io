@@ -51,8 +51,8 @@
     }
 
     .container {
-      max-width: 1440px;
-      margin: 0 auto;
+      max-width: none;
+      margin: 0;
       padding: 14px 18px 28px;
     }
 
@@ -136,9 +136,11 @@
 
     .prototype-demo.is-fullscreen .prototype-main,
     .prototype-demo.is-fullscreen .prototype-sidebar,
+    .prototype-demo.is-fullscreen .roi-panel,
     .prototype-demo.is-fullscreen .side-panel,
     .prototype-demo:fullscreen .prototype-main,
     .prototype-demo:fullscreen .prototype-sidebar,
+    .prototype-demo:fullscreen .roi-panel,
     .prototype-demo:fullscreen .side-panel {
       min-height: 0;
       overflow: auto;
@@ -148,7 +150,10 @@
     .prototype-demo:fullscreen .main-grid {
       flex: 1;
       min-height: 0;
-      grid-template-columns: minmax(0, 1fr) var(--fullscreen-sidepanel-width, 360px);
+      grid-template-columns:
+        minmax(0, 1fr)
+        var(--fullscreen-roi-width, 220px)
+        var(--fullscreen-sidepanel-width, 340px);
     }
 
     .prototype-demo.is-fullscreen .viewer-panel,
@@ -435,6 +440,23 @@
       min-width: 0;
     }
 
+    .case-hero-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      min-width: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .case-hero-actions .btn {
+      height: 30px;
+      padding: 0 8px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
     .case-hero-separator {
       color: var(--border-strong);
       font-size: 12px;
@@ -462,8 +484,8 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(320px, 0.95fr);
-      grid-template-areas: "viewer sidepanel";
+      grid-template-columns: minmax(0, 1fr) 220px 340px;
+      grid-template-areas: "viewer roipanel sidepanel";
       gap: 10px;
       align-items: stretch;
     }
@@ -473,10 +495,19 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
+      min-height: 0;
+      height: 100%;
     }
 
     .side-panel {
       grid-area: sidepanel;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .roi-panel {
+      grid-area: roipanel;
       display: flex;
       flex-direction: column;
       min-width: 0;
@@ -494,26 +525,14 @@
       color: var(--text);
     }
 
-    .viewer-toolbar {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      margin-bottom: 8px;
-    }
-
-    .viewer-toolbar .btn {
-      height: 30px;
-      padding: 0 8px;
-      font-size: 11px;
-    }
-
     .viewer {
       position: relative;
+      flex: 1 1 auto;
       border: 1px solid var(--border);
       border-radius: 6px;
       width: 100%;
-      height: min(600px, calc(100vh - 280px));
+      height: auto;
+      min-height: min(760px, calc(100vh - 220px));
       background: #f8fafc;
       overflow: hidden;
     }
@@ -718,32 +737,40 @@
       flex-wrap: wrap;
     }
 
-    .roi-helper-text {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.4;
-    }
-
     .roi-form {
-      display: grid;
-      gap: 8px;
+      display: block;
+      margin-top: 10px;
       margin-bottom: 10px;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--surface-subtle);
     }
 
     .roi-form-row {
       display: grid;
       gap: 8px;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
-      align-items: center;
+      grid-template-columns: 1fr;
+      align-items: stretch;
     }
 
-    .roi-form-row .btn {
-      height: 38px;
-      padding: 0 12px;
+    .roi-form-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .roi-form-actions .btn {
+      height: 34px;
+      padding: 0 10px;
+      white-space: nowrap;
+      flex: 1 1 120px;
+    }
+
+    .btn.danger {
+      border-color: #fecaca;
+      color: #991b1b;
+      background: #fef2f2;
+    }
+
+    .btn.danger:hover {
+      background: #fee2e2;
     }
 
     .roi-input,
@@ -772,60 +799,66 @@
     .roi-list {
       display: grid;
       gap: 8px;
+      align-content: start;
+      min-height: 0;
+      overflow: auto;
     }
 
     .roi-card {
       border: 1px solid var(--border);
       border-radius: 6px;
       background: var(--surface-subtle);
-      padding: 10px 12px;
+      padding: 9px 10px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .roi-card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 0;
+    .roi-card:hover {
+      border-color: var(--border-strong);
+      background: #f8fafc;
     }
 
-    .roi-card-summary {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+    .roi-card.active {
+      border-color: var(--accent-border);
+      background: #eff6ff;
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.08);
     }
 
     .roi-card-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--text);
-      line-height: 1.4;
+      line-height: 1.35;
+      margin-bottom: 4px;
     }
 
     .roi-card-note {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-      white-space: nowrap;
+      font-size: 11px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
     }
 
-    .roi-card-separator {
+    .roi-panel-header {
+      margin-bottom: 8px;
+    }
+
+    .roi-panel-title {
+      margin: 0 0 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1;
     }
 
-    .roi-card-actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      flex-shrink: 0;
+    .roi-panel-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
     }
 
     .notes ul {
@@ -859,6 +892,29 @@
       flex-wrap: wrap;
     }
 
+    @media (max-width: 2000px) {
+      .case-hero-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-start;
+        padding-top: 6px;
+        border-top: 1px solid var(--border);
+      }
+    }
+
+    @media (max-width: 2000px) {
+      .prototype-demo.is-fullscreen .main-grid,
+      .prototype-demo:fullscreen .main-grid,
+      .main-grid {
+        grid-template-columns: minmax(0, 1fr) 340px;
+        grid-template-areas: "viewer sidepanel";
+      }
+
+      .roi-panel {
+        display: none;
+      }
+    }
+
     @media (max-width: 1200px) {
       .case-hero {
         gap: 6px;
@@ -868,6 +924,7 @@
         grid-template-columns: 1fr;
         grid-template-areas:
           "viewer"
+          "roipanel"
           "sidepanel";
       }
     }
@@ -896,12 +953,12 @@
         white-space: normal;
       }
 
-      .viewer-toolbar {
-        flex-wrap: wrap;
-      }
-
       .roi-form-row {
         grid-template-columns: 1fr;
+      }
+
+      .case-hero-actions {
+        justify-content: flex-start;
       }
     }
   </style>
@@ -912,16 +969,9 @@
       <a class="back-link" href="index.html">← Back to home</a>
       <h1>Digital Pathology Review Portal</h1>
       <p class="subtitle">
-        Prototype interface for case-level review integrating whole-slide viewing, metadata context, conceptual IMS connectivity, and TCGA open-access data for interface demonstration.
+        Prototype interface for case-level review built with TCGA open-access data, integrating whole-slide viewing, metadata context, and conceptual IMS connectivity. Implementation details and system design available on <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank">GitHub Repository</a>
       </p>
     </header>
-
-    <div class="intro">
-      <p class="repo-link">
-        Implementation details and system design available on
-        <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank">GitHub Repository</a>
-      </p>
-    </div>
 
     <div class="prototype-demo">
       <div class="prototype-topbar">
@@ -931,7 +981,6 @@
         </div>
         <div class="topbar-meta">
           IMS Integration Concept: <strong style="color: var(--text); font-weight: 600;">Proscia Concentriq LS</strong>
-          <button class="btn" type="button" id="fullscreenToggleBtn">Fullscreen</button>
         </div>
       </div>
 
@@ -991,15 +1040,16 @@
               <span class="summary-label">Slides Linked</span>
               <span class="summary-value" id="slidesLinked">-</span>
             </div>
+            <div class="case-hero-actions">
+              <button class="btn" type="button" id="fullscreenToggleBtn">Fullscreen</button>
+              <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
+              <button class="btn" type="button" id="packageBtn">Export ROI</button>
+              <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
+              <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
+            </div>
           </div>
           <div class="main-grid">
             <div class="panel viewer-panel">
-              <div class="viewer-toolbar">
-                <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
-                <button class="btn" type="button" id="packageBtn">Export ROI</button>
-                <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
-                <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-              </div>
               <div class="viewer">
                 <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
@@ -1012,18 +1062,24 @@
                   </div>
                 </div>
               </div>
-              <div class="section-block">
-                <div class="roi-form">
-                  <div class="roi-form-row">
-                    <input class="roi-input" id="roiNameInput" type="text" placeholder="ROI name (optional)" />
-                    <input class="roi-input" id="roiNoteInput" type="text" placeholder="ROI note for QuPath handoff (optional)" />
-                    <button class="btn" type="button" id="addRoiSecondaryBtn">Save Current View</button>
+            </div>
+
+            <div class="panel roi-panel">
+              <div class="roi-panel-header">
+                <h4 class="roi-panel-title">ROI List</h4>
+              </div>
+              <div class="roi-form">
+                <div class="roi-form-row">
+                  <input class="roi-input" id="roiNameInput" type="text" placeholder="Name" />
+                  <input class="roi-input" id="roiNoteInput" type="text" placeholder="Description" />
+                  <div class="roi-form-actions">
+                  <button class="btn" type="button" id="addRoiSecondaryBtn">Save Current View</button>
+                  <button class="btn danger" type="button" id="deleteRoiBtn" hidden>Delete ROI</button>
                   </div>
-                  <div class="roi-helper-text">Save the current zoomed region as a reusable ROI bookmark. ROI views are currently stored only on this device in the browser.</div>
                 </div>
-                <div id="roiList" class="roi-list">
-                  <div class="empty-text">No ROI views saved for this slide yet.</div>
-                </div>
+              </div>
+              <div id="roiList" class="roi-list">
+                <div class="empty-text">No ROI views saved for this slide yet.</div>
               </div>
             </div>
 
@@ -1113,6 +1169,7 @@
     const roiStorageKey = "digital-pathology-rois-v1";
     const savedRois = loadSavedRois();
     let activeRoiEditId = null;
+    let suppressRoiEditReset = false;
 
     function loadSavedRois() {
       try {
@@ -1622,10 +1679,75 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("roiNameInput").value = "";
       document.getElementById("roiNoteInput").value = "";
       activeRoiEditId = null;
+      updateRoiFormUi();
+    }
+
+    function updateRoiFormUi() {
+      const saveButton = document.getElementById("addRoiSecondaryBtn");
+      const deleteButton = document.getElementById("deleteRoiBtn");
+
+      if (!saveButton || !deleteButton) return;
+
+      const isEditing = Boolean(activeRoiEditId);
+      saveButton.textContent = isEditing ? "Update ROI" : "Save Current View";
+      deleteButton.hidden = !isEditing;
+    }
+
+    function getActiveRoi() {
+      if (!activeRoiEditId) return null;
+      return getCurrentRois().find((entry) => entry.id === activeRoiEditId) || null;
+    }
+
+    function approximatelyEqual(a, b, tolerance = 0.0005) {
+      return Math.abs(a - b) <= tolerance;
+    }
+
+    function isCurrentViewportMatchingRoi(roi) {
+      if (!roi || !viewer || !viewer.viewport) return false;
+
+      const bounds = viewer.viewport.getBounds(true);
+      return approximatelyEqual(bounds.x, roi.viewportRect.x)
+        && approximatelyEqual(bounds.y, roi.viewportRect.y)
+        && approximatelyEqual(bounds.width, roi.viewportRect.width)
+        && approximatelyEqual(bounds.height, roi.viewportRect.height);
+    }
+
+    function resetRoiEditIfViewportChanged() {
+      if (!activeRoiEditId || suppressRoiEditReset) return;
+
+      const activeRoi = getActiveRoi();
+      if (!activeRoi) {
+        clearRoiDraftValues();
+        renderRoiList();
+        return;
+      }
+
+      if (isCurrentViewportMatchingRoi(activeRoi)) return;
+
+      activeRoiEditId = null;
+      updateRoiFormUi();
+      renderRoiList();
+      setViewerStatus("Viewer moved from the selected ROI. Save Current View will create a new ROI.");
+    }
+
+    function syncActiveRoiForCurrentSlide() {
+      if (!activeRoiEditId) {
+        updateRoiFormUi();
+        return;
+      }
+
+      const activeRoiExists = getCurrentRois().some((entry) => entry.id === activeRoiEditId);
+      if (!activeRoiExists) {
+        clearRoiDraftValues();
+        return;
+      }
+
+      updateRoiFormUi();
     }
 
     function renderRoiList() {
       const roiList = document.getElementById("roiList");
+      syncActiveRoiForCurrentSlide();
       const rois = getCurrentRois();
 
       if (!rois.length) {
@@ -1635,51 +1757,24 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
       roiList.replaceChildren(...rois.map((roi) => {
         const card = document.createElement("div");
-        card.className = "roi-card";
-
-        const head = document.createElement("div");
-        head.className = "roi-card-head";
-
-        const summary = document.createElement("div");
-        summary.className = "roi-card-summary";
+        card.className = `roi-card${roi.id === activeRoiEditId ? " active" : ""}`;
+        card.addEventListener("click", () => {
+          jumpToRoi(roi.id);
+          prefillRoiDraft(roi.id);
+        });
 
         const title = document.createElement("div");
         title.className = "roi-card-title";
         title.textContent = roi.name;
-        summary.appendChild(title);
+        card.appendChild(title);
 
         if (roi.note) {
-          const separator = document.createElement("div");
-          separator.className = "roi-card-separator";
-          separator.textContent = "|";
-
           const note = document.createElement("div");
           note.className = "roi-card-note";
           note.textContent = roi.note;
-
-          summary.append(separator, note);
+          card.appendChild(note);
         }
 
-        const actions = document.createElement("div");
-        actions.className = "roi-card-actions";
-
-        const actionConfigs = [
-          { label: "Go to ROI", handler: () => jumpToRoi(roi.id) },
-          { label: "Edit ROI", handler: () => prefillRoiDraft(roi.id) },
-          { label: "Delete", handler: () => deleteRoi(roi.id) }
-        ];
-
-        actionConfigs.forEach(({ label, handler }) => {
-          const button = document.createElement("button");
-          button.className = "btn";
-          button.type = "button";
-          button.textContent = label;
-          button.addEventListener("click", handler);
-          actions.appendChild(button);
-        });
-
-        head.append(summary, actions);
-        card.appendChild(head);
         return card;
       }));
     }
@@ -1691,6 +1786,8 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       activeRoiEditId = roiId;
       document.getElementById("roiNameInput").value = roi.name || "";
       document.getElementById("roiNoteInput").value = roi.note || "";
+      updateRoiFormUi();
+      renderRoiList();
       setViewerStatus(`Editing ${roi.name}. Save Current View will update this ROI.`);
     }
 
@@ -1765,6 +1862,11 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       setViewerStatus("Deleted the selected ROI");
     }
 
+    function deleteActiveRoi() {
+      if (!activeRoiEditId) return;
+      deleteRoi(activeRoiEditId);
+    }
+
     function jumpToRoi(roiId) {
       const roi = getCurrentRois().find((entry) => entry.id === roiId);
       if (!roi || !viewer || !viewer.viewport) {
@@ -1779,6 +1881,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         roi.viewportRect.height
       );
 
+      suppressRoiEditReset = true;
       viewer.viewport.fitBounds(viewportRect, true);
       setViewerStatus(`Restored ${roi.name}`);
     }
@@ -1803,6 +1906,21 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         maxZoomPixelRatio: 2,
         minZoomLevel: 0.5,
         visibilityRatio: 1.0
+      });
+
+      viewer.addHandler("animation-finish", () => {
+        if (suppressRoiEditReset) {
+          suppressRoiEditReset = false;
+          return;
+        }
+
+        resetRoiEditIfViewportChanged();
+      });
+
+      viewer.addHandler("canvas-drag-end", resetRoiEditIfViewportChanged);
+      viewer.addHandler("canvas-click", resetRoiEditIfViewportChanged);
+      viewer.addHandler("canvas-scroll", () => {
+        requestAnimationFrame(resetRoiEditIfViewportChanged);
       });
     }
 
@@ -1911,14 +2029,23 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
     function measureFullscreenLayout() {
       const demo = document.querySelector(".prototype-demo");
       const pageHeader = document.querySelector(".page-header");
+      const roiPanel = document.querySelector(".roi-panel");
       const sidePanel = document.querySelector(".side-panel");
-      if (!demo || !pageHeader || !sidePanel) return;
+      if (!demo || !pageHeader || !roiPanel || !sidePanel) return;
 
       const topOffset = Math.max(pageHeader.getBoundingClientRect().bottom + 12, 16);
       demo.style.setProperty("--demo-fullscreen-top", `${Math.round(topOffset)}px`);
+      const roiWidth = roiPanel.offsetParent === null
+        ? 220
+        : Math.max(Math.round(roiPanel.getBoundingClientRect().width), 220);
+      const sidePanelWidth = Math.max(Math.round(sidePanel.getBoundingClientRect().width), 340);
+      demo.style.setProperty(
+        "--fullscreen-roi-width",
+        `${roiWidth}px`
+      );
       demo.style.setProperty(
         "--fullscreen-sidepanel-width",
-        `${Math.round(sidePanel.getBoundingClientRect().width)}px`
+        `${sidePanelWidth}px`
       );
     }
 
@@ -1936,6 +2063,12 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.body.classList.toggle("demo-fullscreen", nextState);
       demo.classList.toggle("is-fullscreen", nextState);
       toggleButton.textContent = nextState ? "Exit Fullscreen" : "Fullscreen";
+      if (nextState) {
+        requestAnimationFrame(() => {
+          measureFullscreenLayout();
+          syncViewerLayout();
+        });
+      }
       syncViewerLayout();
     }
 
@@ -1992,6 +2125,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       });
       document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
       document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
+      document.getElementById("deleteRoiBtn").addEventListener("click", deleteActiveRoi);
       document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
       document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
       document.getElementById("imsBtn").addEventListener("click", openIMS);
