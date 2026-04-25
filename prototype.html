@@ -952,6 +952,18 @@
         grid-template-areas: "viewer sidepanel";
       }
 
+      .prototype-demo.is-fullscreen .main-grid.compact-show-roi,
+      .prototype-demo:fullscreen .main-grid.compact-show-roi {
+        grid-template-columns: minmax(0, 1fr) 220px;
+        grid-template-areas: "viewer roipanel";
+      }
+
+      .prototype-demo.is-fullscreen .main-grid.compact-show-side,
+      .prototype-demo:fullscreen .main-grid.compact-show-side {
+        grid-template-columns: minmax(0, 1fr) 340px;
+        grid-template-areas: "viewer sidepanel";
+      }
+
       .main-grid.compact-show-roi .roi-panel,
       .main-grid.compact-show-side .side-panel {
         display: flex;
@@ -2200,7 +2212,12 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       mainGrid.classList.remove(otherClass);
       mainGrid.classList.toggle(targetClass, shouldOpen);
       updateCompactPanelButtons();
-      requestAnimationFrame(syncViewerLayout);
+      requestAnimationFrame(() => {
+        if (isDemoFullscreen) {
+          measureFullscreenLayout();
+        }
+        syncViewerLayout();
+      });
     }
 
     function syncViewerLayout() {
