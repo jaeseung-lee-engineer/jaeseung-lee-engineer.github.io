@@ -1502,18 +1502,16 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         `Slide label: ${slide.label}`,
         `Submitter ID: ${slide.submitterId}`,
         `Slide ID: ${slide.slideId}`,
-        `Source SVS URL: ${slide.svsUrl || "Not configured"}`,
         `Saved ROI count: ${rois.length}`,
         "",
         "Recommended workflow:",
-        "1. Open the downloaded SVS in QuPath.",
+        "1. Open the matching SVS in QuPath.",
         "2. Run open_in_qupath.groovy in the QuPath script editor to recreate rectangle ROIs.",
         "3. Optionally keep roi.geojson and slide-info.json with your project record.",
         "",
         "Notes:",
         "- ROI coordinates are exported in full-resolution image pixel units.",
-        "- This package is generated from the portal's current saved ROI views.",
-        "- If the SVS does not start downloading from the portal, use the Source SVS URL above directly."
+        "- This package is generated from the portal's current saved ROI views."
       ].join("\n");
     }
 
@@ -1567,8 +1565,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
           slideId: slide.slideId,
           fileId: slide.fileId,
           section: slide.section,
-          stain: slide.stain,
-          svsUrl: slide.svsUrl
+          stain: slide.stain
         },
         rois: rois.map((roi) => ({
           name: roi.name,
@@ -1584,7 +1581,6 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       zip.file("roi.geojson", JSON.stringify(geoJson, null, 2));
       zip.file("open_in_qupath.groovy", buildQuPathScript(slide, rois));
       zip.file("README.txt", buildQuPathReadme(caseInfo, slide, rois));
-      zip.file("svs-url.txt", `${slide.svsUrl}\n`);
 
       try {
         const blob = await zip.generateAsync({ type: "blob" });
