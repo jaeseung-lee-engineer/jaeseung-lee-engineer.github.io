@@ -106,6 +106,63 @@
       box-shadow: var(--shadow);
     }
 
+    body.demo-fullscreen {
+      overflow: hidden;
+    }
+
+    .prototype-demo.is-fullscreen,
+    .prototype-demo:fullscreen {
+      position: fixed;
+      top: var(--demo-fullscreen-top, 140px);
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prototype-demo.is-fullscreen .prototype-layout,
+    .prototype-demo:fullscreen .prototype-layout {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .prototype-demo.is-fullscreen .prototype-main,
+    .prototype-demo:fullscreen .prototype-main {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prototype-demo.is-fullscreen .prototype-main,
+    .prototype-demo.is-fullscreen .prototype-sidebar,
+    .prototype-demo.is-fullscreen .side-panel,
+    .prototype-demo:fullscreen .prototype-main,
+    .prototype-demo:fullscreen .prototype-sidebar,
+    .prototype-demo:fullscreen .side-panel {
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .prototype-demo.is-fullscreen .main-grid,
+    .prototype-demo:fullscreen .main-grid {
+      flex: 1;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1fr) var(--fullscreen-sidepanel-width, 360px);
+    }
+
+    .prototype-demo.is-fullscreen .viewer-panel,
+    .prototype-demo:fullscreen .viewer-panel {
+      min-height: 0;
+    }
+
+    .prototype-demo.is-fullscreen .viewer,
+    .prototype-demo:fullscreen .viewer {
+      flex: 1;
+      min-height: 480px;
+      height: auto;
+    }
+
     .prototype-topbar {
       display: flex;
       justify-content: space-between;
@@ -145,6 +202,9 @@
     }
 
     .topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       white-space: nowrap;
     }
 
@@ -351,35 +411,7 @@
       background: var(--bg);
     }
 
-    .content-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .content-head h3 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    .content-head-meta {
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .case-hero {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .summary-card,
+    .case-hero,
     .panel {
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -387,25 +419,45 @@
       box-shadow: var(--shadow);
     }
 
-    .summary-card {
-      padding: 10px;
-      min-height: 70px;
+    .case-hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+    }
+
+    .case-hero-item {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .case-hero-separator {
+      color: var(--border-strong);
+      font-size: 12px;
+      line-height: 1;
     }
 
     .summary-label {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      margin-bottom: 6px;
+      margin-bottom: 0;
+      line-height: 1.2;
+      white-space: nowrap;
     }
 
     .summary-value {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
-      line-height: 1.25;
+      line-height: 1.2;
       color: var(--text);
+      min-width: 0;
     }
 
     .main-grid {
@@ -442,47 +494,18 @@
       color: var(--text);
     }
 
-    .viewer-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-
-    .viewer-header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .viewer-header h4 {
-      margin: 0;
-    }
-
-    .viewer-header-meta {
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .viewer-actions {
+    .viewer-toolbar {
       display: flex;
       gap: 6px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-bottom: 8px;
     }
 
-    .viewer-actions .btn {
+    .viewer-toolbar .btn {
       height: 30px;
       padding: 0 8px;
       font-size: 11px;
-    }
-
-    .viewer-status {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      min-height: 1.2em;
     }
 
     .viewer {
@@ -580,7 +603,12 @@
       border-color: #bfdbfe;
     }
 
-    
+    .badge-red {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
     .tabs {
       display: flex;
       gap: 6px;
@@ -833,7 +861,7 @@
 
     @media (max-width: 1200px) {
       .case-hero {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
       }
 
       .main-grid {
@@ -855,24 +883,20 @@
       }
 
       .case-hero {
-        grid-template-columns: 1fr;
+        align-items: flex-start;
       }
 
       .prototype-topbar,
-      .content-head,
-      .footer-inner,
-      .viewer-header {
+      .footer-inner {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .topbar-meta,
-      .content-head-meta,
-      .viewer-header-meta {
+      .topbar-meta {
         white-space: normal;
       }
 
-      .viewer-actions {
+      .viewer-toolbar {
         flex-wrap: wrap;
       }
 
@@ -888,7 +912,7 @@
       <a class="back-link" href="index.html">← Back to home</a>
       <h1>Digital Pathology Review Portal</h1>
       <p class="subtitle">
-        Prototype interface for case-level review integrating whole-slide viewing, metadata context, and conceptual IMS connectivity.
+        Prototype interface for case-level review integrating whole-slide viewing, metadata context, conceptual IMS connectivity, and TCGA open-access data for interface demonstration.
       </p>
     </header>
 
@@ -907,6 +931,7 @@
         </div>
         <div class="topbar-meta">
           IMS Integration Concept: <strong style="color: var(--text); font-weight: 600;">Proscia Concentriq LS</strong>
+          <button class="btn" type="button" id="fullscreenToggleBtn">Fullscreen</button>
         </div>
       </div>
 
@@ -936,55 +961,45 @@
         </aside>
 
         <section class="prototype-main">
-          <div class="content-head">
-            <h3 id="caseTitle">Case ID: -</h3>
-            <div class="content-head-meta">TCGA open-access data for interface demonstration</div>
-          </div>
-
           <div class="case-hero">
-            <div class="summary-card">
-              <div class="summary-label">Primary Diagnosis</div>
-              <div class="summary-value" id="heroDiagnosis">-</div>
+            <div class="case-hero-item">
+              <span class="summary-label">Case ID</span>
+              <span class="summary-value" id="caseTitle">-</span>
             </div>
-
-            <div class="summary-card">
-              <div class="summary-label">Age / Sex</div>
-              <div class="summary-value" id="ageSex">-</div>
+            <span class="case-hero-separator" aria-hidden="true">|</span>
+            <div class="case-hero-item">
+              <span class="summary-label">Primary Diagnosis</span>
+              <span class="summary-value" id="heroDiagnosis">-</span>
             </div>
-
-            <div class="summary-card">
-              <div class="summary-label">Vital Status</div>
-              <div class="summary-value" id="vitalStatus">-</div>
+            <span class="case-hero-separator" aria-hidden="true">|</span>
+            <div class="case-hero-item">
+              <span class="summary-label">Age / Sex</span>
+              <span class="summary-value" id="ageSex">-</span>
             </div>
-
-            <div class="summary-card">
-              <div class="summary-label">Tumor Context</div>
-              <div class="summary-value" id="tumorContext">-</div>
+            <span class="case-hero-separator" aria-hidden="true">|</span>
+            <div class="case-hero-item">
+              <span class="summary-label">Vital Status</span>
+              <span class="summary-value" id="vitalStatus">-</span>
             </div>
-
-            <div class="summary-card">
-              <div class="summary-label">Slides Linked</div>
-              <div class="summary-value" id="slidesLinked">-</div>
+            <span class="case-hero-separator" aria-hidden="true">|</span>
+            <div class="case-hero-item">
+              <span class="summary-label">Tumor Context</span>
+              <span class="summary-value" id="tumorContext">-</span>
+            </div>
+            <span class="case-hero-separator" aria-hidden="true">|</span>
+            <div class="case-hero-item">
+              <span class="summary-label">Slides Linked</span>
+              <span class="summary-value" id="slidesLinked">-</span>
             </div>
           </div>
-
           <div class="main-grid">
             <div class="panel viewer-panel">
-              <div class="viewer-header">
-                <div class="viewer-header-left">
-                  <h4>Slide Viewer</h4>
-                </div>
-
-                <div class="viewer-actions">
-                  <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
-                  <button class="btn" type="button" id="packageBtn">Export ROI</button>
-                  <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
-                  <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
-                </div>
+              <div class="viewer-toolbar">
+                <button class="btn" type="button" id="downloadSvsBtn">Download SVS</button>
+                <button class="btn" type="button" id="packageBtn">Export ROI</button>
+                <button class="btn" type="button" id="heatmapBtn">Toggle Annotation</button>
+                <button class="btn" type="button" id="imsBtn">Open in Concentriq LS</button>
               </div>
-
-              <div id="viewerStatus" class="viewer-status">Ready</div>
-
               <div class="viewer">
                 <div id="slidePreview"></div>
                 <div id="heatmapOverlay" aria-hidden="true">
@@ -997,9 +1012,7 @@
                   </div>
                 </div>
               </div>
-
               <div class="section-block">
-                <h5>Saved ROI Views</h5>
                 <div class="roi-form">
                   <div class="roi-form-row">
                     <input class="roi-input" id="roiNameInput" type="text" placeholder="ROI name (optional)" />
@@ -1018,13 +1031,13 @@
               <div class="case-status-bar">
                 <span class="badge badge-green">Reviewed</span>
                 <span class="badge badge-green">QC Passed</span>
-                <span class="badge badge-blue">Annotation Available</span>
+                <span class="badge badge-red">Annotation Not Available</span>
               </div>
             
               <div class="case-status-note">
                 Simulated workflow status for demonstration
               </div>
-            
+
               <div class="tabs">
                 <button class="tab-button active" type="button" data-tab="caseTab">Case Details</button>
                 <button class="tab-button" type="button" data-tab="slideTab">Slide Details</button>
@@ -1096,6 +1109,7 @@
     let currentSlideIndex = 0;
     let heatmapOn = false;
     let viewer = null;
+    let isDemoFullscreen = false;
     const roiStorageKey = "digital-pathology-rois-v1";
     const savedRois = loadSavedRois();
     let activeRoiEditId = null;
@@ -1317,7 +1331,7 @@
     }
 
     function renderCaseHeader(data) {
-      document.getElementById("caseTitle").textContent = `Case ID: ${currentCaseId}`;
+      document.getElementById("caseTitle").textContent = currentCaseId;
       document.getElementById("heroDiagnosis").textContent =
         `${data.diagnosis}${data.grade && data.grade !== "Not Reported" ? ` (${data.grade})` : ""}`;
       document.getElementById("ageSex").textContent = `${data.age} / ${data.sex}`;
@@ -1340,7 +1354,10 @@
     }
 
     function setViewerStatus(message) {
-      document.getElementById("viewerStatus").textContent = message;
+      const statusElement = document.getElementById("viewerStatus");
+      if (statusElement) {
+        statusElement.textContent = message;
+      }
     }
 
     function buildCompositionRow(label, value) {
@@ -1882,6 +1899,77 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       alert("Prototype action: this would open the selected slide in Proscia Concentriq LS using an API deep-link.");
     }
 
+    function syncViewerLayout() {
+      if (!viewer || !viewer.viewport) return;
+
+      requestAnimationFrame(() => {
+        viewer.viewport.resize();
+        viewer.forceRedraw();
+      });
+    }
+
+    function measureFullscreenLayout() {
+      const demo = document.querySelector(".prototype-demo");
+      const pageHeader = document.querySelector(".page-header");
+      const sidePanel = document.querySelector(".side-panel");
+      if (!demo || !pageHeader || !sidePanel) return;
+
+      const topOffset = Math.max(pageHeader.getBoundingClientRect().bottom + 12, 16);
+      demo.style.setProperty("--demo-fullscreen-top", `${Math.round(topOffset)}px`);
+      demo.style.setProperty(
+        "--fullscreen-sidepanel-width",
+        `${Math.round(sidePanel.getBoundingClientRect().width)}px`
+      );
+    }
+
+    function isUsingNativeFullscreen(demo) {
+      return document.fullscreenElement === demo;
+    }
+
+    function updateFullscreenUi(nextState) {
+      const demo = document.querySelector(".prototype-demo");
+      const toggleButton = document.getElementById("fullscreenToggleBtn");
+      if (!demo || !toggleButton) return;
+
+      isDemoFullscreen = nextState;
+
+      document.body.classList.toggle("demo-fullscreen", nextState);
+      demo.classList.toggle("is-fullscreen", nextState);
+      toggleButton.textContent = nextState ? "Exit Fullscreen" : "Fullscreen";
+      syncViewerLayout();
+    }
+
+    async function setDemoFullscreen(nextState) {
+      const demo = document.querySelector(".prototype-demo");
+      if (!demo) return;
+
+      if (nextState) {
+        measureFullscreenLayout();
+      }
+
+      const canUseNativeFullscreen = typeof demo.requestFullscreen === "function";
+
+      if (canUseNativeFullscreen) {
+        try {
+          if (nextState && !isUsingNativeFullscreen(demo)) {
+            await demo.requestFullscreen();
+          } else if (!nextState && document.fullscreenElement) {
+            await document.exitFullscreen();
+          }
+          updateFullscreenUi(nextState);
+          return;
+        } catch (error) {
+          console.error("Unable to toggle native fullscreen.", error);
+        }
+      }
+
+      updateFullscreenUi(nextState);
+    }
+
+    async function toggleDemoFullscreen() {
+      await setDemoFullscreen(!isDemoFullscreen);
+    }
+
     function exportReport() {
       alert("Prototype action: this would export a case summary including case-level details and slide-level metrics.");
     }
@@ -1907,6 +1995,17 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
       document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
       document.getElementById("imsBtn").addEventListener("click", openIMS);
+      document.getElementById("fullscreenToggleBtn").addEventListener("click", toggleDemoFullscreen);
+      document.addEventListener("fullscreenchange", () => {
+        const demo = document.querySelector(".prototype-demo");
+        updateFullscreenUi(Boolean(demo && isUsingNativeFullscreen(demo)));
+      });
+      window.addEventListener("resize", () => {
+        if (isDemoFullscreen) {
+          measureFullscreenLayout();
+          syncViewerLayout();
+        }
+      });
 
       document.querySelectorAll(".tab-button").forEach((button) => {
         button.addEventListener("click", () => switchTab(button.dataset.tab));
