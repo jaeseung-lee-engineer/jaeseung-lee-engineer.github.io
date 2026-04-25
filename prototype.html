@@ -1194,7 +1194,7 @@
               <span class="action-separator" aria-hidden="true">|</span>
               <button class="btn action-link" type="button" id="downloadSvsBtn">↓ Download SVS</button>
               <span class="action-separator" aria-hidden="true">|</span>
-              <button class="btn action-link" type="button" id="packageBtn">□ Export ROI</button>
+              <button class="btn action-link" type="button" id="packageBtn">□ Export to QuPath</button>
               <span class="action-separator" aria-hidden="true">|</span>
               <button class="btn action-link" type="button" id="heatmapBtn">◉ Annotation</button>
               <span class="action-separator" aria-hidden="true">|</span>
@@ -1818,7 +1818,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         setViewerStatus("Unable to build the QuPath package in this browser.");
       } finally {
         packageButton.disabled = false;
-        packageButton.textContent = "□ Export ROI";
+        packageButton.textContent = "□ Export to QuPath";
       }
     }
 
