@@ -12,13 +12,29 @@ CASE_DATA_URL = os.getenv(
     "CASE_DATA_URL",
     "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json",
 )
+DEFAULT_ALLOWED_ORIGINS = [
+    "https://jaeseung-lee-engineer.github.io",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+
+def parse_allowed_origins():
+    raw_origins = os.getenv("ALLOWED_ORIGINS")
+    if not raw_origins:
+        return DEFAULT_ALLOWED_ORIGINS
+
+    origins = [origin.strip() for origin in raw_origins.split(",")]
+    return [origin for origin in origins if origin]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=parse_allowed_origins(),
+    allow_credentials=False,
+    allow_methods=["GET"],
+    allow_headers=["Accept", "Content-Type"],
 )
 
 
@@ -29,7 +45,7 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "caseDataSource": CASE_DATA_URL}
+    return {"status": "ok", "caseDataConfigured": bool(CASE_DATA_URL)}
 
 
 def load_case_data():

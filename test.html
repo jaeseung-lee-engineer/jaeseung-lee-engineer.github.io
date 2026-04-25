@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Digital Pathology Review Portal | Jaeseung Lee</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js" integrity="sha512-VKBuvrXdP1AXvfs+m4l3ZNZSI4PFJF0K0hGJJZ4RiNRkvFMO4IwFRHkoTc7xsdZhMgkLn+Ioq4elndAZicBcRQ==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"></script>
   <style>
     :root {
       --text: #111827;
@@ -1224,20 +1224,53 @@
       const quickList = document.getElementById("quickCaseList");
 
       if (!ids.length) {
-        quickList.innerHTML = '<div class="empty-text">No matching cases found.</div>';
+        quickList.replaceChildren(createEmptyText("No matching cases found."));
         return;
       }
 
-      quickList.innerHTML = ids
-        .map((caseId) => {
-          const activeClass = caseId === currentCaseId ? "primary" : "";
-          return `<button class="btn ${activeClass}" type="button" data-case="${caseId}">${caseId}</button>`;
-        })
-        .join("");
+      quickList.replaceChildren(...ids.map((caseId) => {
+        const button = document.createElement("button");
+        button.className = `btn${caseId === currentCaseId ? " primary" : ""}`;
+        button.type = "button";
+        button.dataset.case = caseId;
+        button.textContent = caseId;
+        button.addEventListener("click", () => selectCase(caseId));
+        return button;
+      }));
+    }
 
-      quickList.querySelectorAll("button[data-case]").forEach((btn) => {
-        btn.addEventListener("click", () => selectCase(btn.dataset.case));
+    function createEmptyText(message) {
+      const emptyText = document.createElement("div");
+      emptyText.className = "empty-text";
+      emptyText.textContent = message;
+      return emptyText;
+    }
+
+    function createThumbnailPlaceholder() {
+      const placeholder = document.createElement("div");
+      placeholder.className = "thumb-placeholder";
+      placeholder.textContent = "Thumbnail";
+      return placeholder;
+    }
+
+    function createThumbnailNode(slide) {
+      const thumbContainer = document.createElement("div");
+      thumbContainer.className = "slide-list-thumb";
+
+      if (!slide.thumbnail) {
+        thumbContainer.appendChild(createThumbnailPlaceholder());
+        return thumbContainer;
+      }
+
+      const image = document.createElement("img");
+      image.src = slide.thumbnail;
+      image.alt = `${slide.label || "Slide"} thumbnail`;
+      image.addEventListener("error", () => {
+        thumbContainer.replaceChildren(createThumbnailPlaceholder());
       });
+
+      thumbContainer.appendChild(image);
+      return thumbContainer;
     }
 
     function renderSlides(caseId) {
@@ -1246,39 +1279,41 @@
 
       currentSlideIndex = 0;
 
-      slideThumbs.innerHTML = slides.map((slide, idx) => {
+      slideThumbs.replaceChildren(...slides.map((slide, idx) => {
         const activeClass = idx === 0 ? "active-thumb" : "";
         const quantTag = slide.hasQuant ? "Quant data" : "No data";
-      
-        return `
-          <div class="slide-list-card ${activeClass}" data-slide-index="${idx}">
-            
-            <div class="slide-list-thumb">
-              ${
-                slide.thumbnail
-                  ? `<img src="${slide.thumbnail}" alt="${slide.label} thumbnail" onerror="this.parentElement.innerHTML='<div class=&quot;thumb-placeholder&quot;>Thumbnail</div>';">`
-                  : `<div class="thumb-placeholder">Thumbnail</div>`
-              }
-            </div>
-      
-            <div class="slide-list-meta">
-              <div class="slide-list-top">
-                <div class="slide-list-label">${slide.label}</div>
-                <span class="status-tag">${quantTag}</span>
-              </div>
-      
-              <div class="slide-list-subtext">
-                ${slide.section || "Unknown"} · ${slide.stain || "H&E"}
-              </div>
-            </div>
-      
-          </div>
-        `;
-      }).join("");
 
-      slideThumbs.querySelectorAll(".slide-list-card[data-slide-index]").forEach((card) => {
-        card.addEventListener("click", () => selectSlide(Number(card.dataset.slideIndex)));
-      });
+        const card = document.createElement("div");
+        card.className = `slide-list-card ${activeClass}`.trim();
+        card.dataset.slideIndex = String(idx);
+        card.addEventListener("click", () => selectSlide(idx));
+
+        card.appendChild(createThumbnailNode(slide));
+
+        const meta = document.createElement("div");
+        meta.className = "slide-list-meta";
+
+        const top = document.createElement("div");
+        top.className = "slide-list-top";
+
+        const label = document.createElement("div");
+        label.className = "slide-list-label";
+        label.textContent = slide.label || "-";
+
+        const status = document.createElement("span");
+        status.className = "status-tag";
+        status.textContent = quantTag;
+
+        top.append(label, status);
+
+        const subtext = document.createElement("div");
+        subtext.className = "slide-list-subtext";
+        subtext.textContent = `${slide.section || "Unknown"} · ${slide.stain || "H&E"}`;
+
+        meta.append(top, subtext);
+        card.appendChild(meta);
+        return card;
+      }));
     }
 
     function renderCaseHeader(data) {
@@ -1309,16 +1344,34 @@
     }
 
     function buildCompositionRow(label, value) {
-      if (value === null || value === undefined || value === "--") return "";
-      return `
-        <div class="composition-row">
-          <div class="composition-head">
-            <span>${label}</span>
-            <strong>${value}%</strong>
-          </div>
-          <div class="bar"><span style="width:${value}%"></span></div>
-        </div>
-      `;
+      if (value === null || value === undefined || value === "--") return null;
+
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) return null;
+
+      const row = document.createElement("div");
+      row.className = "composition-row";
+
+      const head = document.createElement("div");
+      head.className = "composition-head";
+
+      const labelNode = document.createElement("span");
+      labelNode.textContent = label;
+
+      const valueNode = document.createElement("strong");
+      valueNode.textContent = `${numericValue}%`;
+
+      head.append(labelNode, valueNode);
+
+      const bar = document.createElement("div");
+      bar.className = "bar";
+
+      const fill = document.createElement("span");
+      fill.style.width = `${Math.max(0, Math.min(100, numericValue))}%`;
+      bar.appendChild(fill);
+
+      row.append(head, bar);
+      return row;
     }
 
     function formatRoiRect(rect) {
@@ -1563,46 +1616,59 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       const rois = getCurrentRois();
 
       if (!rois.length) {
-        roiList.innerHTML = '<div class="empty-text">No ROI views saved for this slide yet.</div>';
+        roiList.replaceChildren(createEmptyText("No ROI views saved for this slide yet."));
         return;
       }
 
-      roiList.innerHTML = rois.map((roi) => `
-        <div class="roi-card">
-          <div class="roi-card-head">
-            <div class="roi-card-summary">
-              <div class="roi-card-title">${roi.name}</div>
-              ${roi.note ? '<div class="roi-card-separator">|</div>' : ""}
-              ${roi.note ? `<div class="roi-card-note">${roi.note}</div>` : ""}
-            </div>
-            <div class="roi-card-actions">
-              <button class="btn" type="button" data-roi-action="goto" data-roi-id="${roi.id}">Go to ROI</button>
-              <button class="btn" type="button" data-roi-action="prefill" data-roi-id="${roi.id}">Edit ROI</button>
-              <button class="btn" type="button" data-roi-action="delete" data-roi-id="${roi.id}">Delete</button>
-            </div>
-          </div>
-        </div>
-      `).join("");
+      roiList.replaceChildren(...rois.map((roi) => {
+        const card = document.createElement("div");
+        card.className = "roi-card";
 
-      roiList.querySelectorAll("button[data-roi-id]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const { roiAction, roiId } = button.dataset;
+        const head = document.createElement("div");
+        head.className = "roi-card-head";
 
-          if (roiAction === "goto") {
-            jumpToRoi(roiId);
-            return;
-          }
+        const summary = document.createElement("div");
+        summary.className = "roi-card-summary";
 
-          if (roiAction === "prefill") {
-            prefillRoiDraft(roiId);
-            return;
-          }
+        const title = document.createElement("div");
+        title.className = "roi-card-title";
+        title.textContent = roi.name;
+        summary.appendChild(title);
 
-          if (roiAction === "delete") {
-            deleteRoi(roiId);
-          }
+        if (roi.note) {
+          const separator = document.createElement("div");
+          separator.className = "roi-card-separator";
+          separator.textContent = "|";
+
+          const note = document.createElement("div");
+          note.className = "roi-card-note";
+          note.textContent = roi.note;
+
+          summary.append(separator, note);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "roi-card-actions";
+
+        const actionConfigs = [
+          { label: "Go to ROI", handler: () => jumpToRoi(roi.id) },
+          { label: "Edit ROI", handler: () => prefillRoiDraft(roi.id) },
+          { label: "Delete", handler: () => deleteRoi(roi.id) }
+        ];
+
+        actionConfigs.forEach(({ label, handler }) => {
+          const button = document.createElement("button");
+          button.className = "btn";
+          button.type = "button";
+          button.textContent = label;
+          button.addEventListener("click", handler);
+          actions.appendChild(button);
         });
-      });
+
+        head.append(summary, actions);
+        card.appendChild(head);
+        return card;
+      }));
     }
 
     function prefillRoiDraft(roiId) {
@@ -1706,7 +1772,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
     function initViewer(dziPath) {
       const viewerElement = document.getElementById("slidePreview");
-      viewerElement.innerHTML = "";
+      viewerElement.replaceChildren();
 
       if (viewer) {
         viewer.destroy();
@@ -1744,25 +1810,31 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       const interpretation = document.getElementById("compositionInterpretation");
 
       if (slide.hasQuant && slide.composition) {
-        compositionContainer.innerHTML = `
-          <div class="composition-grid">
-            ${buildCompositionRow("Tumor cells", slide.composition.tumorCells)}
-            ${buildCompositionRow("Tumor nuclei", slide.composition.tumorNuclei)}
-            ${buildCompositionRow("Stromal cells", slide.composition.stromalCells)}
-            ${buildCompositionRow("Normal cells", slide.composition.normalCells)}
-          </div>
-        `;
+        const compositionGrid = document.createElement("div");
+        compositionGrid.className = "composition-grid";
+
+        [
+          buildCompositionRow("Tumor cells", slide.composition.tumorCells),
+          buildCompositionRow("Tumor nuclei", slide.composition.tumorNuclei),
+          buildCompositionRow("Stromal cells", slide.composition.stromalCells),
+          buildCompositionRow("Normal cells", slide.composition.normalCells)
+        ].filter(Boolean).forEach((row) => compositionGrid.appendChild(row));
+
+        compositionContainer.replaceChildren(compositionGrid);
         interpretation.textContent = slide.interpretation || "";
       } else {
-        compositionContainer.innerHTML = `
-          <div class="empty-text">Quantitative composition data not available for this slide.</div>
-        `;
+        compositionContainer.replaceChildren(
+          createEmptyText("Quantitative composition data not available for this slide.")
+        );
         interpretation.textContent = slide.interpretation || "";
       }
 
-      document.getElementById("reviewNotes").innerHTML = (slide.notes || [])
-        .map((note) => `<li>${note}</li>`)
-        .join("");
+      const reviewNotes = document.getElementById("reviewNotes");
+      reviewNotes.replaceChildren(...(slide.notes || []).map((note) => {
+        const item = document.createElement("li");
+        item.textContent = note;
+        return item;
+      }));
 
       renderRoiList();
     }
@@ -1859,8 +1931,12 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         })
         .catch((error) => {
           console.error(error);
-          document.getElementById("quickCaseList").innerHTML = '<div class="empty-text">Unable to load cases from AWS.</div>';
-          document.getElementById("slideThumbs").innerHTML = '<div class="empty-text">No slide data loaded.</div>';
+          document.getElementById("quickCaseList").replaceChildren(
+            createEmptyText("Unable to load cases from AWS.")
+          );
+          document.getElementById("slideThumbs").replaceChildren(
+            createEmptyText("No slide data loaded.")
+          );
           setViewerStatus("Unable to load case data from AWS S3.");
         });
     });
