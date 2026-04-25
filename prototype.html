@@ -456,6 +456,10 @@
       line-height: 1;
     }
 
+    .compact-only-action {
+      display: none;
+    }
+
     .case-hero-actions .action-link {
       height: auto;
       padding: 2px 0;
@@ -919,18 +923,38 @@
         padding-top: 6px;
         border-top: 1px solid var(--border);
       }
+
+      .compact-only-action {
+        display: inline-flex;
+      }
     }
 
     @media (max-width: 2000px) {
       .prototype-demo.is-fullscreen .main-grid,
       .prototype-demo:fullscreen .main-grid,
       .main-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas: "viewer";
+      }
+
+      .roi-panel,
+      .side-panel {
+        display: none;
+      }
+
+      .main-grid.compact-show-roi {
+        grid-template-columns: minmax(0, 1fr) 220px;
+        grid-template-areas: "viewer roipanel";
+      }
+
+      .main-grid.compact-show-side {
         grid-template-columns: minmax(0, 1fr) 340px;
         grid-template-areas: "viewer sidepanel";
       }
 
-      .roi-panel {
-        display: none;
+      .main-grid.compact-show-roi .roi-panel,
+      .main-grid.compact-show-side .side-panel {
+        display: flex;
       }
     }
 
@@ -1163,6 +1187,10 @@
               <button class="btn action-link" type="button" id="heatmapBtn">◉ Annotation</button>
               <span class="action-separator" aria-hidden="true">|</span>
               <button class="btn action-link" type="button" id="imsBtn">↗ Concentriq LS</button>
+              <span class="action-separator compact-only-action" aria-hidden="true">|</span>
+              <button class="btn action-link compact-only-action" type="button" id="toggleRoiPanelBtn">▣ ROI List</button>
+              <span class="action-separator compact-only-action" aria-hidden="true">|</span>
+              <button class="btn action-link compact-only-action" type="button" id="toggleDetailsPanelBtn">☰ Case/Slide Detail</button>
             </div>
           </div>
           <div class="main-grid">
@@ -1269,7 +1297,6 @@
       </div>
     </div>
   </main>
-
   <script>
     const API_BASE_URL = "https://jaeseung-lee-engineer-github-io.onrender.com";
     const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
@@ -1286,7 +1313,6 @@
     const savedRois = loadSavedRois();
     let activeRoiEditId = null;
     let suppressRoiEditReset = false;
-
     function loadSavedRois() {
       try {
         const raw = window.localStorage.getItem(roiStorageKey);
@@ -2133,6 +2159,50 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       alert("Prototype action: this would open the selected slide in Proscia Concentriq LS using an API deep-link.");
     }
 
+    function isCompactPanelMode() {
+      return window.matchMedia("(max-width: 2000px)").matches;
+    }
+
+    function updateCompactPanelButtons() {
+      const mainGrid = document.querySelector(".main-grid");
+      const roiPanel = document.querySelector(".roi-panel");
+      const sidePanel = document.querySelector(".side-panel");
+      const roiButton = document.getElementById("toggleRoiPanelBtn");
+      const detailsButton = document.getElementById("toggleDetailsPanelBtn");
+
+      if (!mainGrid || !roiPanel || !sidePanel || !roiButton || !detailsButton) return;
+
+      if (!isCompactPanelMode()) {
+        mainGrid.classList.remove("compact-show-roi", "compact-show-side");
+        roiButton.textContent = "▣ ROI List";
+        detailsButton.textContent = "☰ Case/Slide Detail";
+        return;
+      }
+
+      roiButton.textContent = mainGrid.classList.contains("compact-show-roi")
+        ? "▣ Hide ROI List"
+        : "▣ ROI List";
+      detailsButton.textContent = mainGrid.classList.contains("compact-show-side")
+        ? "☰ Hide Case/Slide Detail"
+        : "☰ Case/Slide Detail";
+    }
+
+    function toggleCompactPanel(panelName) {
+      if (!isCompactPanelMode()) return;
+
+      const mainGrid = document.querySelector(".main-grid");
+      if (!mainGrid) return;
+
+      const targetClass = panelName === "roi" ? "compact-show-roi" : "compact-show-side";
+      const otherClass = panelName === "roi" ? "compact-show-side" : "compact-show-roi";
+      const shouldOpen = !mainGrid.classList.contains(targetClass);
+
+      mainGrid.classList.remove(otherClass);
+      mainGrid.classList.toggle(targetClass, shouldOpen);
+      updateCompactPanelButtons();
+      requestAnimationFrame(syncViewerLayout);
+    }
+
     function syncViewerLayout() {
       if (!viewer || !viewer.viewport) return;
 
@@ -2245,12 +2315,15 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
       document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
       document.getElementById("imsBtn").addEventListener("click", openIMS);
+      document.getElementById("toggleRoiPanelBtn").addEventListener("click", () => toggleCompactPanel("roi"));
+      document.getElementById("toggleDetailsPanelBtn").addEventListener("click", () => toggleCompactPanel("side"));
       document.getElementById("fullscreenToggleBtn").addEventListener("click", toggleDemoFullscreen);
       document.addEventListener("fullscreenchange", () => {
         const demo = document.querySelector(".prototype-demo");
         updateFullscreenUi(Boolean(demo && isUsingNativeFullscreen(demo)));
       });
       window.addEventListener("resize", () => {
+        updateCompactPanelButtons();
         if (isDemoFullscreen) {
           measureFullscreenLayout();
           syncViewerLayout();
@@ -2273,6 +2346,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
           renderQuickCaseList(caseIds);
           selectCase(initialCaseId);
           switchTab("caseTab");
+          updateCompactPanelButtons();
         })
         .catch((error) => {
           console.error(error);
