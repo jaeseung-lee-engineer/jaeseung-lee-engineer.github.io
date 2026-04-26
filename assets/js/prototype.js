@@ -17,6 +17,7 @@ let activeRoiEditId = null;
 let suppressRoiEditReset = false;
 let roiOverlayDragState = null;
 let roiOverlayRenderFrame = 0;
+let roiOverlaySyncFrame = 0;
 function loadSavedRois() {
   try {
     const raw = window.localStorage.getItem(roiStorageKey);
@@ -759,8 +760,9 @@ function setEditableRoiOverlayRect(rect) {
 
   layer.classList.remove("hidden");
   box.classList.remove("hidden");
-  box.style.left = `${clamped.left}px`;
-  box.style.top = `${clamped.top}px`;
+  box.dataset.left = String(clamped.left);
+  box.dataset.top = String(clamped.top);
+  box.style.transform = `translate3d(${clamped.left}px, ${clamped.top}px, 0)`;
   box.style.width = `${clamped.width}px`;
   box.style.height = `${clamped.height}px`;
 }
@@ -780,8 +782,7 @@ function renderPersistentRoiOverlaysNow() {
     const item = document.createElement("button");
     item.type = "button";
     item.className = `roi-display-item${roi.shape === "circle" ? " circle" : ""}${roi.id === activeRoiEditId ? " active" : ""}`;
-    item.style.left = `${pixelRect.left}px`;
-    item.style.top = `${pixelRect.top}px`;
+    item.style.transform = `translate3d(${pixelRect.left}px, ${pixelRect.top}px, 0)`;
     item.style.width = `${pixelRect.width}px`;
     item.style.height = `${pixelRect.height}px`;
     item.title = roi.name || "ROI";
@@ -822,6 +823,20 @@ function renderPersistentRoiOverlays() {
   roiOverlayRenderFrame = requestAnimationFrame(() => {
     roiOverlayRenderFrame = 0;
     renderPersistentRoiOverlaysNow();
+  });
+}
+
+function scheduleRoiOverlaySync(options = {}) {
+  const { resetEditState = false } = options;
+
+  if (roiOverlaySyncFrame) return;
+
+  roiOverlaySyncFrame = requestAnimationFrame(() => {
+    roiOverlaySyncFrame = 0;
+    showEditableRoiOverlayForActiveRoi();
+    if (resetEditState) {
+      resetRoiEditIfViewportChanged();
+    }
   });
 }
 
@@ -872,8 +887,8 @@ function getViewportRectFromOverlay() {
   const { box } = getRoiEditElements();
   if (!box || !viewer || !viewer.viewport) return null;
 
-  const left = Number.parseFloat(box.style.left || "0");
-  const top = Number.parseFloat(box.style.top || "0");
+  const left = Number.parseFloat(box.dataset.left || "0");
+  const top = Number.parseFloat(box.dataset.top || "0");
   const width = Number.parseFloat(box.style.width || "0");
   const height = Number.parseFloat(box.style.height || "0");
 
@@ -985,8 +1000,8 @@ function startRoiOverlayDrag(event, mode) {
     startX: event.clientX,
     startY: event.clientY,
     startRect: {
-      left: Number.parseFloat(box.style.left || "0"),
-      top: Number.parseFloat(box.style.top || "0"),
+      left: Number.parseFloat(box.dataset.left || "0"),
+      top: Number.parseFloat(box.dataset.top || "0"),
       width: Number.parseFloat(box.style.width || "0"),
       height: Number.parseFloat(box.style.height || "0")
     }
@@ -1219,24 +1234,39 @@ function initViewer(dziPath) {
   });
 
   viewer.addOnceHandler("open", () => {
-    renderPersistentRoiOverlays();
+    scheduleRoiOverlaySync();
+  });
+
+  viewer.addHandler("animation", () => {
+    scheduleRoiOverlaySync();
+  });
+
+  viewer.addHandler("pan", () => {
+    scheduleRoiOverlaySync();
+  });
+
+  viewer.addHandler("zoom", () => {
+    scheduleRoiOverlaySync();
   });
 
   viewer.addHandler("animation-finish", () => {
     if (suppressRoiEditReset) {
       suppressRoiEditReset = false;
-      showEditableRoiOverlayForActiveRoi();
+      scheduleRoiOverlaySync();
       return;
     }
 
-    showEditableRoiOverlayForActiveRoi();
-    resetRoiEditIfViewportChanged();
+    scheduleRoiOverlaySync({ resetEditState: true });
   });
 
-  viewer.addHandler("canvas-drag-end", resetRoiEditIfViewportChanged);
-  viewer.addHandler("canvas-click", resetRoiEditIfViewportChanged);
+  viewer.addHandler("canvas-drag-end", () => {
+    scheduleRoiOverlaySync({ resetEditState: true });
+  });
+  viewer.addHandler("canvas-click", () => {
+    scheduleRoiOverlaySync({ resetEditState: true });
+  });
   viewer.addHandler("canvas-scroll", () => {
-    requestAnimationFrame(resetRoiEditIfViewportChanged);
+    scheduleRoiOverlaySync({ resetEditState: true });
   });
 }
 
@@ -1424,7 +1454,7 @@ function syncViewerLayout() {
   requestAnimationFrame(() => {
     viewer.viewport.resize();
     viewer.forceRedraw();
-    showEditableRoiOverlayForActiveRoi();
+    scheduleRoiOverlaySync();
   });
 }
 

@@ -606,6 +606,10 @@ body.demo-fullscreen {
   pointer-events: none;
   cursor: default;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform, width, height;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 
 .roi-display-item.circle,
@@ -692,6 +696,10 @@ body.demo-fullscreen {
   background: transparent;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
   pointer-events: none;
+  will-change: transform, width, height;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 
 .roi-edit-edge {
