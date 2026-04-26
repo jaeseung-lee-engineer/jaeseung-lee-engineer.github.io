@@ -25,6 +25,7 @@ POST /annotations
 ## Interface
 
 - Slide Viewer — Whole-slide image visualization  
+- Fullscreen Mode — Expanded slide-focused review workspace  
 - Case Details — Clinical metadata  
 - Linked Slides — Navigation across slides  
 - Slide Details — Quantitative metrics & notes  
@@ -34,7 +35,7 @@ POST /annotations
 
 To support downstream pathology review beyond the browser-based viewer, the portal includes export features designed to preserve workflow continuity into QuPath.
 
-- SVS Source Download — downloads the original whole-slide SVS file from AWS S3 so review can continue in external tools such as QuPath without breaking workflow continuity
+- Download SVS — downloads the original whole-slide SVS file from AWS S3 so review can continue in external tools such as QuPath without breaking workflow continuity
 - Export to QuPath — exports a Qupath handoff ZIP that includes `slide-info.json`, `roi.geojson`, `open_in_qupath.groovy`, `README.txt`, and `svs-url.txt`
 - ROI Handoff — preserves saved ROI geometry in image pixel coordinates so reviewer-selected regions can be recreated inside QuPath
 - Review Context Preservation — carries slide identifiers, case summary metadata, and source SVS link forward into the downstream analysis step
@@ -59,8 +60,7 @@ Designed to conceptually support retrieval of:
 
 - HTML/CSS/JavaScript
 - FastAPI
-- OpenSeadragon
-- AWS S3
+- Amazon Web Service (AWS)
 - Render
 
 ## Disclaimer
