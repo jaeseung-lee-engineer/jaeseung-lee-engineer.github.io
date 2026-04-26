@@ -1,6 +1,7 @@
 const API_BASE_URL = "https://jaeseung-lee-engineer-github-io.onrender.com";
 const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
 const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
+const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
 
 let caseData = {};
 let caseSummaries = [];
@@ -44,10 +45,9 @@ function isValidAssetUrl(url) {
   if (!url || typeof url !== 'string') return false;
   try {
     const parsed = new URL(url, S3_ASSET_BASE_URL);
-    // Only allow https and same origin
-    return parsed.protocol === 'https:' && 
-           (parsed.origin === S3_ASSET_BASE_URL.replace(/\/$/, '') || 
-            url.startsWith('/'));
+    // Only allow https assets from the configured S3 origin or same-origin relative paths.
+    return parsed.protocol === "https:"
+      && (parsed.origin === S3_ASSET_ORIGIN || url.startsWith("/"));
   } catch {
     return false;
   }
@@ -441,6 +441,11 @@ function setViewerPlaceholder(title, message) {
   card.append(heading, body);
   wrapper.appendChild(card);
   slidePreview.replaceChildren(wrapper);
+}
+
+function showViewerError(message) {
+  setViewerPlaceholder("Viewer unavailable", message);
+  setViewerStatus(message);
 }
 
 function buildCompositionRow(label, value) {
@@ -1358,6 +1363,8 @@ function initViewer(dziPath) {
     prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
     tileSources: dziPath,
     showNavigator: true,
+    crossOriginPolicy: "Anonymous",
+    ajaxWithCredentials: false,
     animationTime: 0.35,
     blendTime: 0,
     constrainDuringPan: true,
@@ -1368,6 +1375,17 @@ function initViewer(dziPath) {
 
   viewer.addOnceHandler("open", () => {
     scheduleRoiOverlaySync();
+    setViewerStatus("Ready");
+  });
+
+  viewer.addHandler("open-failed", (event) => {
+    console.error("OpenSeadragon open failed", event);
+    showViewerError("Unable to load the slide preview from AWS S3.");
+  });
+
+  viewer.addHandler("tile-load-failed", (event) => {
+    console.error("OpenSeadragon tile load failed", event);
+    showViewerError("Slide tiles could not be loaded from AWS S3.");
   });
 
   viewer.addHandler("animation", () => {
@@ -1417,7 +1435,6 @@ async function renderSlideDetails() {
   setViewerStatus("Fetching slide data...");
   hideEditableRoiOverlay();
   initViewer(slide.preview);
-  setViewerStatus("Ready");
 
   const compositionContainer = document.getElementById("compositionContainer");
   const interpretation = document.getElementById("compositionInterpretation");
