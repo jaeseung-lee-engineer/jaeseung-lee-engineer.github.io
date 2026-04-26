@@ -566,6 +566,207 @@
       background: #f5f5f5;
     }
 
+    .roi-display-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 24;
+      pointer-events: none;
+    }
+
+    .roi-display-item {
+      position: absolute;
+      border: 2px solid rgba(37, 99, 235, 0.55);
+      background: transparent;
+      pointer-events: none;
+      cursor: default;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .roi-display-item.circle,
+    .roi-edit-box.circle {
+      border-radius: 999px;
+    }
+
+    .roi-display-item:hover {
+      border-color: rgba(37, 99, 235, 0.8);
+    }
+
+    .roi-display-item.active {
+      border-color: #1d4ed8;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+    }
+
+    .roi-display-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid rgba(29, 78, 216, 0.85);
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 999px;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .roi-display-handle.nw {
+      top: -6px;
+      left: -6px;
+      cursor: nwse-resize;
+    }
+
+    .roi-display-handle.ne {
+      top: -6px;
+      right: -6px;
+      cursor: nesw-resize;
+    }
+
+    .roi-display-handle.sw {
+      bottom: -6px;
+      left: -6px;
+      cursor: nesw-resize;
+    }
+
+    .roi-display-handle.se {
+      bottom: -6px;
+      right: -6px;
+      cursor: nwse-resize;
+    }
+
+    .roi-display-move {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 34px;
+      height: 16px;
+      padding: 0 8px;
+      border: 1px solid rgba(29, 78, 216, 0.85);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #1d4ed8;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 14px;
+      text-align: center;
+      pointer-events: auto;
+      touch-action: none;
+      cursor: move;
+      user-select: none;
+    }
+
+    .roi-edit-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    .roi-edit-box {
+      position: absolute;
+      border: 2px solid #2563eb;
+      background: transparent;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+      pointer-events: none;
+    }
+
+    .roi-edit-edge {
+      position: absolute;
+      pointer-events: auto;
+      cursor: move;
+      touch-action: none;
+    }
+
+    .roi-edit-edge.top,
+    .roi-edit-edge.bottom {
+      left: 12px;
+      right: 12px;
+      height: 12px;
+    }
+
+    .roi-edit-edge.left,
+    .roi-edit-edge.right {
+      top: 12px;
+      bottom: 12px;
+      width: 12px;
+    }
+
+    .roi-edit-edge.top {
+      top: -6px;
+    }
+
+    .roi-edit-edge.bottom {
+      bottom: -6px;
+    }
+
+    .roi-edit-edge.left {
+      left: -6px;
+    }
+
+    .roi-edit-edge.right {
+      right: -6px;
+    }
+
+    .roi-edit-box.hidden,
+    .roi-edit-layer.hidden {
+      display: none;
+    }
+
+    .roi-edit-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid #1d4ed8;
+      background: #ffffff;
+      border-radius: 999px;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .roi-move-handle {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 34px;
+      height: 16px;
+      padding: 0 8px;
+      border: 1px solid #1d4ed8;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #1d4ed8;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 14px;
+      text-align: center;
+      pointer-events: auto;
+      touch-action: none;
+      cursor: move;
+      user-select: none;
+    }
+
+    .roi-edit-handle.nw {
+      top: -6px;
+      left: -6px;
+      cursor: nwse-resize;
+    }
+
+    .roi-edit-handle.ne {
+      top: -6px;
+      right: -6px;
+      cursor: nesw-resize;
+    }
+
+    .roi-edit-handle.sw {
+      bottom: -6px;
+      left: -6px;
+      cursor: nesw-resize;
+    }
+
+    .roi-edit-handle.se {
+      bottom: -6px;
+      right: -6px;
+      cursor: nwse-resize;
+    }
+
     #heatmapOverlay {
       position: absolute;
       inset: 0;
@@ -1200,7 +1401,7 @@
               <span class="action-separator" aria-hidden="true">|</span>
               <button class="btn action-link" type="button" id="imsBtn">↗ Concentriq LS</button>
               <span class="action-separator compact-only-action" aria-hidden="true">|</span>
-              <button class="btn action-link compact-only-action" type="button" id="toggleRoiPanelBtn">▣ ROI List</button>
+              <button class="btn action-link compact-only-action" type="button" id="toggleRoiPanelBtn">▣ Regions of Interest</button>
               <span class="action-separator compact-only-action" aria-hidden="true">|</span>
               <button class="btn action-link compact-only-action" type="button" id="toggleDetailsPanelBtn">☰ Case/Slide Detail</button>
             </div>
@@ -1209,6 +1410,20 @@
             <div class="panel viewer-panel">
               <div class="viewer">
                 <div id="slidePreview"></div>
+                <div class="roi-display-layer" id="roiDisplayLayer" aria-hidden="true"></div>
+                <div class="roi-edit-layer hidden" id="roiEditLayer" aria-hidden="true">
+                  <div class="roi-edit-box hidden" id="roiEditBox">
+                    <div class="roi-move-handle" data-handle="move">⋮⋮</div>
+                    <div class="roi-edit-edge top" data-handle="move"></div>
+                    <div class="roi-edit-edge right" data-handle="move"></div>
+                    <div class="roi-edit-edge bottom" data-handle="move"></div>
+                    <div class="roi-edit-edge left" data-handle="move"></div>
+                    <div class="roi-edit-handle nw" data-handle="nw"></div>
+                    <div class="roi-edit-handle ne" data-handle="ne"></div>
+                    <div class="roi-edit-handle sw" data-handle="sw"></div>
+                    <div class="roi-edit-handle se" data-handle="se"></div>
+                  </div>
+                </div>
                 <div id="heatmapOverlay" aria-hidden="true">
                   <div class="heatmapMessage">
                     <h4>Annotation Visualization</h4>
@@ -1223,10 +1438,15 @@
 
             <div class="panel roi-panel">
               <div class="roi-panel-header">
-                <h4 class="roi-panel-title">ROI List</h4>
+                <h4 class="roi-panel-title">Regions of Interest</h4>
+                <p class="roi-panel-subtitle">Save and manage regions for downstream analysis (e.g., QuPath)</p>
               </div>
               <div class="roi-form">
                 <div class="roi-form-row">
+                  <select class="roi-input" id="roiShapeSelect">
+                    <option value="rectangle">Rectangle</option>
+                    <option value="circle">Circle</option>
+                  </select>
                   <input class="roi-input" id="roiNameInput" type="text" placeholder="Name" />
                   <input class="roi-input" id="roiNoteInput" type="text" placeholder="Description" />
                   <div class="roi-form-actions">
@@ -1236,7 +1456,7 @@
                 </div>
               </div>
               <div id="roiList" class="roi-list">
-                <div class="empty-text">No ROI views saved for this slide yet.</div>
+                <div class="empty-text">No saved views yet. Create a region to export or analyze in QuPath.</div>
               </div>
             </div>
 
@@ -1325,6 +1545,8 @@
     const savedRois = loadSavedRois();
     let activeRoiEditId = null;
     let suppressRoiEditReset = false;
+    let roiOverlayDragState = null;
+    let roiOverlayRenderFrame = 0;
     function loadSavedRois() {
       try {
         const raw = window.localStorage.getItem(roiStorageKey);
@@ -1647,12 +1869,23 @@
           const y = Number(roi.imageRect.y.toFixed(3));
           const width = Number(roi.imageRect.width.toFixed(3));
           const height = Number(roi.imageRect.height.toFixed(3));
+          const shape = roi.shape || "rectangle";
+          const circleCoordinates = Array.from({ length: 25 }, (_, index) => {
+            const theta = (Math.PI * 2 * index) / 24;
+            const centerX = x + width / 2;
+            const centerY = y + height / 2;
+            return [
+              Number((centerX + (width / 2) * Math.cos(theta)).toFixed(3)),
+              Number((centerY + (height / 2) * Math.sin(theta)).toFixed(3))
+            ];
+          });
 
           return {
             type: "Feature",
             properties: {
               name: roi.name,
               note: roi.note || "",
+              shape,
               slideId: slide.slideId,
               submitterId: slide.submitterId,
               zoom: Number(roi.zoom.toFixed(4)),
@@ -1660,13 +1893,15 @@
             },
             geometry: {
               type: "Polygon",
-              coordinates: [[
-                [x, y],
-                [x + width, y],
-                [x + width, y + height],
-                [x, y + height],
-                [x, y]
-              ]]
+              coordinates: [shape === "circle"
+                ? circleCoordinates
+                : [
+                  [x, y],
+                  [x + width, y],
+                  [x + width, y + height],
+                  [x, y + height],
+                  [x, y]
+                ]]
             }
           };
         })
@@ -1677,6 +1912,7 @@
       const roiPayload = rois.map((roi) => ({
         name: roi.name,
         note: roi.note || "",
+        shape: roi.shape || "rectangle",
         x: Number(roi.imageRect.x.toFixed(3)),
         y: Number(roi.imageRect.y.toFixed(3)),
         width: Number(roi.imageRect.width.toFixed(3)),
@@ -1686,6 +1922,7 @@
         ? roiPayload.map((roi) => `  [
     name: ${JSON.stringify(roi.name)},
     note: ${JSON.stringify(roi.note)},
+    shape: ${JSON.stringify(roi.shape)},
     x: ${roi.x},
     y: ${roi.y},
     width: ${roi.width},
@@ -1708,7 +1945,9 @@ if (getCurrentImageData() == null) {
 
 rois.each { roi ->
     def annotation = PathObjects.createAnnotationObject(
-        ROIs.createRectangleROI(roi.x, roi.y, roi.width, roi.height, ImagePlane.getDefaultPlane())
+        roi.shape == 'circle'
+            ? ROIs.createEllipseROI(roi.x, roi.y, roi.width, roi.height, ImagePlane.getDefaultPlane())
+            : ROIs.createRectangleROI(roi.x, roi.y, roi.width, roi.height, ImagePlane.getDefaultPlane())
     )
     annotation.setName(roi.name)
     if (roi.note) {
@@ -1734,7 +1973,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         "",
         "Recommended workflow:",
         "1. Open the matching SVS in QuPath.",
-        "2. Run open_in_qupath.groovy in the QuPath script editor to recreate rectangle ROIs.",
+        "2. Run open_in_qupath.groovy in the QuPath script editor to recreate saved ROIs.",
         "3. Optionally keep roi.geojson and slide-info.json with your project record.",
         "",
         "Notes:",
@@ -1796,6 +2035,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
           stain: slide.stain
         },
         rois: rois.map((roi) => ({
+          shape: roi.shape || "rectangle",
           name: roi.name,
           note: roi.note || "",
           zoom: roi.zoom,
@@ -1824,16 +2064,20 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
     function getRoiDraftValues() {
       return {
+        shape: document.getElementById("roiShapeSelect").value,
         name: document.getElementById("roiNameInput").value.trim(),
         note: document.getElementById("roiNoteInput").value.trim()
       };
     }
 
     function clearRoiDraftValues() {
+      document.getElementById("roiShapeSelect").value = "rectangle";
       document.getElementById("roiNameInput").value = "";
       document.getElementById("roiNoteInput").value = "";
       activeRoiEditId = null;
       updateRoiFormUi();
+      hideEditableRoiOverlay();
+      renderPersistentRoiOverlays();
     }
 
     function updateRoiFormUi() {
@@ -1881,7 +2125,327 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       activeRoiEditId = null;
       updateRoiFormUi();
       renderRoiList();
+      hideEditableRoiOverlay();
       setViewerStatus("Viewer moved from the selected ROI. Save Current View will create a new ROI.");
+    }
+
+    function getRoiEditElements() {
+      return {
+        displayLayer: document.getElementById("roiDisplayLayer"),
+        layer: document.getElementById("roiEditLayer"),
+        box: document.getElementById("roiEditBox"),
+        viewerElement: document.querySelector(".viewer")
+      };
+    }
+
+    function hideEditableRoiOverlay() {
+      const { layer, box } = getRoiEditElements();
+      if (!layer || !box) return;
+      layer.classList.add("hidden");
+      box.classList.add("hidden");
+      box.classList.remove("circle");
+    }
+
+    function getPixelRectFromViewportRect(viewportRect) {
+      if (!viewer || !viewer.viewport) return null;
+      const topLeft = viewer.viewport.pixelFromPoint(
+        new OpenSeadragon.Point(viewportRect.x, viewportRect.y),
+        true
+      );
+      const bottomRight = viewer.viewport.pixelFromPoint(
+        new OpenSeadragon.Point(viewportRect.x + viewportRect.width, viewportRect.y + viewportRect.height),
+        true
+      );
+      return {
+        left: topLeft.x,
+        top: topLeft.y,
+        width: bottomRight.x - topLeft.x,
+        height: bottomRight.y - topLeft.y
+      };
+    }
+
+    function clampOverlayRect(rect, bounds) {
+      const minSize = 24;
+      const next = { ...rect };
+
+      next.width = Math.max(minSize, next.width);
+      next.height = Math.max(minSize, next.height);
+      next.left = Math.min(Math.max(0, next.left), Math.max(0, bounds.width - next.width));
+      next.top = Math.min(Math.max(0, next.top), Math.max(0, bounds.height - next.height));
+      next.width = Math.min(next.width, bounds.width - next.left);
+      next.height = Math.min(next.height, bounds.height - next.top);
+      next.width = Math.max(minSize, next.width);
+      next.height = Math.max(minSize, next.height);
+      return next;
+    }
+
+    function setEditableRoiOverlayRect(rect) {
+      const { layer, box, viewerElement } = getRoiEditElements();
+      if (!layer || !box || !viewerElement) return;
+
+      const clamped = clampOverlayRect(rect, {
+        width: viewerElement.clientWidth,
+        height: viewerElement.clientHeight
+      });
+
+      layer.classList.remove("hidden");
+      box.classList.remove("hidden");
+      box.style.left = `${clamped.left}px`;
+      box.style.top = `${clamped.top}px`;
+      box.style.width = `${clamped.width}px`;
+      box.style.height = `${clamped.height}px`;
+    }
+
+    function renderPersistentRoiOverlaysNow() {
+      const { displayLayer } = getRoiEditElements();
+      if (!displayLayer || !viewer || !viewer.viewport) return;
+
+      const rois = getCurrentRois();
+      if (!rois.length) {
+        displayLayer.replaceChildren();
+        return;
+      }
+
+      displayLayer.replaceChildren(...rois.map((roi) => {
+        const pixelRect = getPixelRectFromViewportRect(roi.viewportRect);
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = `roi-display-item${roi.shape === "circle" ? " circle" : ""}${roi.id === activeRoiEditId ? " active" : ""}`;
+        item.style.left = `${pixelRect.left}px`;
+        item.style.top = `${pixelRect.top}px`;
+        item.style.width = `${pixelRect.width}px`;
+        item.style.height = `${pixelRect.height}px`;
+        item.title = roi.name || "ROI";
+        const moveHandle = document.createElement("div");
+        moveHandle.className = "roi-display-move";
+        moveHandle.dataset.handle = "move";
+        moveHandle.textContent = "⋮⋮";
+        moveHandle.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          focusRoiForEditing(roi.id, { jump: false });
+          requestAnimationFrame(() => {
+            startRoiOverlayDrag(event, "move");
+          });
+        });
+        item.appendChild(moveHandle);
+        ["nw", "ne", "sw", "se"].forEach((handleName) => {
+          const handle = document.createElement("div");
+          handle.className = `roi-display-handle ${handleName}`;
+          handle.dataset.handle = handleName;
+          handle.addEventListener("pointerdown", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            focusRoiForEditing(roi.id, { jump: false });
+            requestAnimationFrame(() => {
+              startRoiOverlayDrag(event, handleName);
+            });
+          });
+          item.appendChild(handle);
+        });
+        return item;
+      }));
+    }
+
+    function renderPersistentRoiOverlays() {
+      if (roiOverlayRenderFrame) return;
+
+      roiOverlayRenderFrame = requestAnimationFrame(() => {
+        roiOverlayRenderFrame = 0;
+        renderPersistentRoiOverlaysNow();
+      });
+    }
+
+    function focusRoiForEditing(roiId, options = {}) {
+      const { jump = true } = options;
+      prefillRoiDraft(roiId);
+      if (jump) {
+        jumpToRoi(roiId);
+      }
+
+      const refreshOverlay = () => {
+        syncViewerLayout();
+        showEditableRoiOverlayForActiveRoi();
+      };
+
+      requestAnimationFrame(() => {
+        refreshOverlay();
+        requestAnimationFrame(refreshOverlay);
+      });
+
+      setTimeout(refreshOverlay, 60);
+    }
+
+    function showEditableRoiOverlayForActiveRoi() {
+      const roi = getActiveRoi();
+      if (!roi || !viewer || !viewer.viewport) {
+        hideEditableRoiOverlay();
+        renderPersistentRoiOverlays();
+        return;
+      }
+
+      const pixelRect = getPixelRectFromViewportRect(roi.viewportRect);
+      if (!pixelRect) {
+        hideEditableRoiOverlay();
+        renderPersistentRoiOverlays();
+        return;
+      }
+
+      const { box } = getRoiEditElements();
+      if (box) {
+        box.classList.toggle("circle", roi.shape === "circle");
+      }
+      setEditableRoiOverlayRect(pixelRect);
+      renderPersistentRoiOverlays();
+    }
+
+    function getViewportRectFromOverlay() {
+      const { box } = getRoiEditElements();
+      if (!box || !viewer || !viewer.viewport) return null;
+
+      const left = Number.parseFloat(box.style.left || "0");
+      const top = Number.parseFloat(box.style.top || "0");
+      const width = Number.parseFloat(box.style.width || "0");
+      const height = Number.parseFloat(box.style.height || "0");
+
+      const topLeft = viewer.viewport.pointFromPixel(new OpenSeadragon.Point(left, top), true);
+      const bottomRight = viewer.viewport.pointFromPixel(new OpenSeadragon.Point(left + width, top + height), true);
+
+      return {
+        x: topLeft.x,
+        y: topLeft.y,
+        width: bottomRight.x - topLeft.x,
+        height: bottomRight.y - topLeft.y
+      };
+    }
+
+    function applyOverlayRectToActiveRoi() {
+      if (!activeRoiEditId || !viewer || !viewer.viewport || !viewer.world.getItemAt(0)) return;
+
+      const viewportRect = getViewportRectFromOverlay();
+      if (!viewportRect) return;
+
+      const imageItem = viewer.world.getItemAt(0);
+      const imageRect = imageItem.viewportToImageRectangle(
+        new OpenSeadragon.Rect(
+          viewportRect.x,
+          viewportRect.y,
+          viewportRect.width,
+          viewportRect.height
+        )
+      );
+
+      const storageKey = getRoiStorageKey();
+      const rois = getCurrentRois();
+      const roiIndex = rois.findIndex((entry) => entry.id === activeRoiEditId);
+      if (roiIndex < 0) return;
+
+      rois[roiIndex] = {
+        ...rois[roiIndex],
+        shape: rois[roiIndex].shape || "rectangle",
+        zoom: viewer.viewport.getZoom(true),
+        savedAt: new Date().toLocaleString(),
+        viewportRect,
+        imageRect: {
+          x: imageRect.x,
+          y: imageRect.y,
+          width: imageRect.width,
+          height: imageRect.height
+        }
+      };
+
+      savedRois[storageKey] = rois;
+      persistSavedRois();
+      renderRoiList();
+      setViewerStatus(`Updated ${rois[roiIndex].name} ROI bounds`);
+    }
+
+    function buildOverlayRectFromDrag(state, clientX, clientY) {
+      const dx = clientX - state.startX;
+      const dy = clientY - state.startY;
+      const rect = { ...state.startRect };
+
+      if (state.mode === "move") {
+        rect.left += dx;
+        rect.top += dy;
+        return rect;
+      }
+
+      if (state.mode.includes("n")) {
+        rect.top += dy;
+        rect.height -= dy;
+      }
+      if (state.mode.includes("s")) {
+        rect.height += dy;
+      }
+      if (state.mode.includes("w")) {
+        rect.left += dx;
+        rect.width -= dx;
+      }
+      if (state.mode.includes("e")) {
+        rect.width += dx;
+      }
+
+      return rect;
+    }
+
+    function stopRoiOverlayDrag() {
+      if (!roiOverlayDragState) return;
+      roiOverlayDragState = null;
+      applyOverlayRectToActiveRoi();
+      showEditableRoiOverlayForActiveRoi();
+    }
+
+    function handleRoiOverlayPointerMove(event) {
+      if (!roiOverlayDragState) return;
+      event.preventDefault();
+      setEditableRoiOverlayRect(
+        buildOverlayRectFromDrag(roiOverlayDragState, event.clientX, event.clientY)
+      );
+    }
+
+    function startRoiOverlayDrag(event, mode) {
+      if (!activeRoiEditId) return;
+      const { box } = getRoiEditElements();
+      if (!box) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      roiOverlayDragState = {
+        mode,
+        startX: event.clientX,
+        startY: event.clientY,
+        startRect: {
+          left: Number.parseFloat(box.style.left || "0"),
+          top: Number.parseFloat(box.style.top || "0"),
+          width: Number.parseFloat(box.style.width || "0"),
+          height: Number.parseFloat(box.style.height || "0")
+        }
+      };
+    }
+
+    function buildSeedViewportRect(bounds, shape) {
+      const nextShape = shape || "rectangle";
+      const scale = 0.25;
+
+      if (nextShape === "circle") {
+        const diameter = Math.min(bounds.width, bounds.height) * scale;
+        return {
+          x: bounds.x + (bounds.width - diameter) / 2,
+          y: bounds.y + (bounds.height - diameter) / 2,
+          width: diameter,
+          height: diameter
+        };
+      }
+
+      const width = bounds.width * scale;
+      const height = bounds.height * scale;
+      return {
+        x: bounds.x + (bounds.width - width) / 2,
+        y: bounds.y + (bounds.height - height) / 2,
+        width,
+        height
+      };
     }
 
     function syncActiveRoiForCurrentSlide() {
@@ -1904,6 +2468,8 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       syncActiveRoiForCurrentSlide();
       const rois = getCurrentRois();
 
+      renderPersistentRoiOverlays();
+
       if (!rois.length) {
         roiList.replaceChildren(createEmptyText("No ROI views saved for this slide yet."));
         return;
@@ -1913,8 +2479,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         const card = document.createElement("div");
         card.className = `roi-card${roi.id === activeRoiEditId ? " active" : ""}`;
         card.addEventListener("click", () => {
-          jumpToRoi(roi.id);
-          prefillRoiDraft(roi.id);
+          focusRoiForEditing(roi.id);
         });
 
         const title = document.createElement("div");
@@ -1938,10 +2503,12 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       if (!roi) return;
 
       activeRoiEditId = roiId;
+      document.getElementById("roiShapeSelect").value = roi.shape || "rectangle";
       document.getElementById("roiNameInput").value = roi.name || "";
       document.getElementById("roiNoteInput").value = roi.note || "";
       updateRoiFormUi();
       renderRoiList();
+      showEditableRoiOverlayForActiveRoi();
       setViewerStatus(`Editing ${roi.name}. Save Current View will update this ROI.`);
     }
 
@@ -1961,24 +2528,32 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       const existingIndex = activeRoiEditId
         ? rois.findIndex((entry) => entry.id === activeRoiEditId)
         : -1;
+      const existingRoi = existingIndex >= 0 ? rois[existingIndex] : null;
+      const overlayViewportRect = getViewportRectFromOverlay();
+      const baseViewportRect = existingRoi
+        ? (overlayViewportRect || existingRoi.viewportRect)
+        : buildSeedViewportRect(bounds, draft.shape);
+      const nextBoundsRect = new OpenSeadragon.Rect(
+        baseViewportRect.x,
+        baseViewportRect.y,
+        baseViewportRect.width,
+        baseViewportRect.height
+      );
+      const nextImageRect = imageItem.viewportToImageRectangle(nextBoundsRect);
       const roiId = existingIndex >= 0 ? activeRoiEditId : `${storageKey}::${Date.now()}`;
       const roiPayload = {
         id: roiId,
+        shape: draft.shape || existingRoi?.shape || "rectangle",
         name: draft.name || `ROI ${existingIndex >= 0 ? existingIndex + 1 : rois.length + 1}`,
         note: draft.note,
         zoom: viewer.viewport.getZoom(true),
         savedAt,
-        viewportRect: {
-          x: bounds.x,
-          y: bounds.y,
-          width: bounds.width,
-          height: bounds.height
-        },
+        viewportRect: baseViewportRect,
         imageRect: {
-          x: imageRect.x,
-          y: imageRect.y,
-          width: imageRect.width,
-          height: imageRect.height
+          x: nextImageRect.x,
+          y: nextImageRect.y,
+          width: nextImageRect.width,
+          height: nextImageRect.height
         }
       };
 
@@ -1991,9 +2566,16 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       savedRois[storageKey] = rois;
       persistSavedRois();
       renderRoiList();
-      clearRoiDraftValues();
       switchTab("slideTab");
-      setViewerStatus(`${existingIndex >= 0 ? "Updated" : "Saved"} ${roiPayload.name} from the current view`);
+
+      if (existingIndex >= 0) {
+        clearRoiDraftValues();
+        setViewerStatus(`Updated ${roiPayload.name} from the current view`);
+        return;
+      }
+
+      prefillRoiDraft(roiId);
+      setViewerStatus(`Seeded ${roiPayload.shape} ROI at the viewport center. Drag or resize to fine-tune.`);
     }
 
     function deleteRoi(roiId) {
@@ -2037,6 +2619,9 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
       suppressRoiEditReset = true;
       viewer.viewport.fitBounds(viewportRect, true);
+      requestAnimationFrame(() => {
+        showEditableRoiOverlayForActiveRoi();
+      });
       setViewerStatus(`Restored ${roi.name}`);
     }
 
@@ -2054,20 +2639,26 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
         prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
         tileSources: dziPath,
         showNavigator: true,
-        animationTime: 0.8,
-        blendTime: 0.1,
+        animationTime: 0.35,
+        blendTime: 0,
         constrainDuringPan: true,
         maxZoomPixelRatio: 2,
         minZoomLevel: 0.5,
         visibilityRatio: 1.0
       });
 
+      viewer.addOnceHandler("open", () => {
+        renderPersistentRoiOverlays();
+      });
+
       viewer.addHandler("animation-finish", () => {
         if (suppressRoiEditReset) {
           suppressRoiEditReset = false;
+          showEditableRoiOverlayForActiveRoi();
           return;
         }
 
+        showEditableRoiOverlayForActiveRoi();
         resetRoiEditIfViewportChanged();
       });
 
@@ -2088,6 +2679,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("slideMetaSection").textContent = slide.section || "-";
 
       setViewerStatus("Fetching slide data...");
+      hideEditableRoiOverlay();
       initViewer(slide.preview);
       setViewerStatus("Ready");
 
@@ -2186,14 +2778,14 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
 
       if (!isCompactPanelMode()) {
         mainGrid.classList.remove("compact-show-roi", "compact-show-side");
-        roiButton.textContent = "▣ ROI List";
+        roiButton.textContent = "▣ Regions of Interest";
         detailsButton.textContent = "☰ Case/Slide Detail";
         return;
       }
 
       roiButton.textContent = mainGrid.classList.contains("compact-show-roi")
-        ? "▣ Hide ROI List"
-        : "▣ ROI List";
+        ? "▣ Hide Regions of Interest"
+        : "▣ Regions of Interest";
       detailsButton.textContent = mainGrid.classList.contains("compact-show-side")
         ? "☰ Hide Case/Slide Detail"
         : "☰ Case/Slide Detail";
@@ -2226,6 +2818,7 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       requestAnimationFrame(() => {
         viewer.viewport.resize();
         viewer.forceRedraw();
+        showEditableRoiOverlayForActiveRoi();
       });
     }
 
@@ -2321,6 +2914,8 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      const roiEditBox = document.getElementById("roiEditBox");
+      const roiEditLayer = document.getElementById("roiEditLayer");
       document.getElementById("searchBtn").addEventListener("click", applySearch);
       document.getElementById("caseSearch").addEventListener("input", liveFilter);
       document.getElementById("caseSearch").addEventListener("keydown", (event) => {
@@ -2335,6 +2930,20 @@ println "Imported ${roiPayload.length} ROI annotation(s) from the portal package
       document.getElementById("toggleRoiPanelBtn").addEventListener("click", () => toggleCompactPanel("roi"));
       document.getElementById("toggleDetailsPanelBtn").addEventListener("click", () => toggleCompactPanel("side"));
       document.getElementById("fullscreenToggleBtn").addEventListener("click", toggleDemoFullscreen);
+      ["click", "dblclick"].forEach((eventName) => {
+        roiEditLayer.addEventListener(eventName, (event) => {
+          if (!event.target.closest(".roi-edit-edge, .roi-edit-handle")) return;
+          event.preventDefault();
+          event.stopPropagation();
+        }, true);
+      });
+      roiEditBox.addEventListener("pointerdown", (event) => {
+        const handle = event.target.closest("[data-handle]");
+        startRoiOverlayDrag(event, handle ? handle.dataset.handle : "move");
+      });
+      window.addEventListener("pointermove", handleRoiOverlayPointerMove);
+      window.addEventListener("pointerup", stopRoiOverlayDrag);
+      window.addEventListener("pointercancel", stopRoiOverlayDrag);
       document.addEventListener("fullscreenchange", () => {
         const demo = document.querySelector(".prototype-demo");
         updateFullscreenUi(Boolean(demo && isUsingNativeFullscreen(demo)));
