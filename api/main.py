@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -19,6 +20,11 @@ DEFAULT_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+CACHE_TTL_SECONDS = int(os.getenv("CASE_DATA_CACHE_TTL_SECONDS", "1800"))
+_case_data_cache = {
+    "loaded_at": 0.0,
+    "payload": None,
+}
 
 
 def parse_allowed_origins():
@@ -49,9 +55,19 @@ def health():
 
 
 def load_case_data():
+    now = time.time()
+    cached_payload = _case_data_cache["payload"]
+    loaded_at = _case_data_cache["loaded_at"]
+
+    if cached_payload is not None and (now - loaded_at) < CACHE_TTL_SECONDS:
+        return cached_payload
+
     try:
         with urlopen(CASE_DATA_URL, timeout=15) as response:
-            return json.load(response)
+            payload = json.load(response)
+            _case_data_cache["payload"] = payload
+            _case_data_cache["loaded_at"] = now
+            return payload
     except HTTPError as error:
         raise HTTPException(
             status_code=502,
