@@ -20,23 +20,71 @@ let roiOverlayRenderFrame = 0;
 let roiOverlaySyncFrame = 0;
 function loadSavedRois() {
   try {
+    // Security: Check localStorage availability
+    if (!window.localStorage) {
+      return {};
+    }
     const raw = window.localStorage.getItem(roiStorageKey);
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) return {};
+    
+    // Security: Validate and parse JSON carefully
+    const parsed = JSON.parse(raw);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed;
+    }
+    return {};
   } catch (error) {
+    console.warn('Unable to load ROI data from storage');
     return {};
   }
 }
 
-function normalizeAssetUrl(assetPath) {
-  if (!assetPath) return assetPath;
-  if (/^https?:\/\//.test(assetPath)) return assetPath;
+// Security: Validate and sanitize URLs
+function isValidAssetUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  try {
+    const parsed = new URL(url, S3_ASSET_BASE_URL);
+    // Only allow https and same origin
+    return parsed.protocol === 'https:' && 
+           (parsed.origin === S3_ASSET_BASE_URL.replace(/\/$/, '') || 
+            url.startsWith('/'));
+  } catch {
+    return false;
+  }
+}
 
-  return `${S3_ASSET_BASE_URL}${assetPath.replace(/^images\//, "")}`;
+function normalizeAssetUrl(assetPath) {
+  if (!assetPath) return '';
+  if (typeof assetPath !== 'string') return '';
+  
+  // Security: Reject dangerous protocols
+  if (/^(javascript|data|vbscript):/i.test(assetPath)) return '';
+  
+  if (/^https?:\/\//.test(assetPath)) {
+    return isValidAssetUrl(assetPath) ? assetPath : '';
+  }
+
+  const normalized = `${S3_ASSET_BASE_URL}${assetPath.replace(/^images\//, "")}`;
+  return isValidAssetUrl(normalized) ? normalized : '';
+}
+
+// Security: Validate API response schema
+function isValidCaseData(data) {
+  if (!data || typeof data !== 'object') return false;
+  if (!Array.isArray(data.slides)) return false;
+  return data.slides.every(slide => 
+    slide && typeof slide === 'object' &&
+    (typeof slide.slideId === 'string' || typeof slide.label === 'string')
+  );
 }
 
 function normalizeCaseDataAssets(data) {
   Object.values(data).forEach((entry) => {
     if (!entry || !Array.isArray(entry.slides)) return;
+    if (!isValidCaseData(entry)) {
+      console.warn('Invalid case data structure detected');
+      return;
+    }
 
     entry.slides.forEach((slide) => {
       slide.thumbnail = normalizeAssetUrl(slide.thumbnail);
@@ -47,6 +95,12 @@ function normalizeCaseDataAssets(data) {
 
 function normalizeSingleCaseAssets(entry) {
   if (!entry || !Array.isArray(entry.slides)) return entry;
+  
+  // Security: Validate case data structure
+  if (!isValidCaseData(entry)) {
+    console.warn('Invalid case data structure from API');
+    return { slides: [] };
+  }
 
   entry.slides.forEach((slide) => {
     slide.thumbnail = normalizeAssetUrl(slide.thumbnail);
@@ -70,15 +124,21 @@ async function loadCaseSummariesFromApi() {
   const response = await fetch(apiUrl, {
     method: "GET",
     mode: "cors",
-    cache: "no-store"
+    cache: "no-store",
+    credentials: "omit"
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to load case summaries from API: ${response.status}`);
+    throw new Error("Failed to load case summaries from API.");
   }
 
-  const payload = await response.json();
-  caseSummaries = Array.isArray(payload.cases) ? payload.cases : [];
+  try {
+    const payload = await response.json();
+    // Security: Validate response structure
+    caseSummaries = Array.isArray(payload.cases) ? payload.cases : [];
+  } catch (e) {
+    throw new Error("Invalid API response format.");
+  }
 }
 
 async function loadCaseDataFromApi(caseId) {
@@ -90,16 +150,21 @@ async function loadCaseDataFromApi(caseId) {
   const response = await fetch(apiUrl, {
     method: "GET",
     mode: "cors",
-    cache: "no-store"
+    cache: "no-store",
+    credentials: "omit"
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to load case data from API: ${response.status}`);
+    throw new Error("Failed to load case data from API.");
   }
 
-  const entry = await response.json();
-  caseData[caseId] = normalizeSingleCaseAssets(entry);
-  return caseData[caseId];
+  try {
+    const entry = await response.json();
+    caseData[caseId] = normalizeSingleCaseAssets(entry);
+    return caseData[caseId];
+  } catch (e) {
+    throw new Error("Invalid API response format.");
+  }
 }
 
 async function loadFullCaseDataFromS3() {
@@ -131,12 +196,17 @@ async function loadCaseList() {
   try {
     await loadCaseSummariesFromApi();
   } catch (apiError) {
-    console.warn("API case summary load failed; falling back to S3.", apiError);
+    console.warn("API case summary load failed; falling back to S3.");
     await loadFullCaseDataFromS3();
   }
 }
 
 async function ensureCaseLoaded(caseId) {
+  if (!caseId || typeof caseId !== 'string') {
+    console.warn('Invalid case ID provided');
+    return null;
+  }
+  
   if (caseData[caseId]) return caseData[caseId];
 
   if (hasFullDatasetFallback) {
@@ -146,7 +216,7 @@ async function ensureCaseLoaded(caseId) {
   try {
     return await loadCaseDataFromApi(caseId);
   } catch (apiError) {
-    console.warn(`API case load failed for ${caseId}; falling back to S3.`, apiError);
+    console.warn("API case load failed; falling back to S3.");
     await loadFullCaseDataFromS3();
     return caseData[caseId] || null;
   }
@@ -154,9 +224,28 @@ async function ensureCaseLoaded(caseId) {
 
 function persistSavedRois() {
   try {
-    window.localStorage.setItem(roiStorageKey, JSON.stringify(savedRois));
+    // Security: Check localStorage availability
+    if (!window.localStorage) {
+      setViewerStatus("Unable to persist ROI data: localStorage not available.");
+      return;
+    }
+    
+    const jsonStr = JSON.stringify(savedRois);
+    
+    // Security: Enforce storage quota (5MB limit for this app)
+    const MAX_STORAGE_SIZE = 5242880; // 5MB
+    if (jsonStr.length > MAX_STORAGE_SIZE) {
+      setViewerStatus("ROI data exceeds storage limit. Please delete old ROIs.");
+      return;
+    }
+    
+    window.localStorage.setItem(roiStorageKey, jsonStr);
   } catch (error) {
-    setViewerStatus("Unable to persist ROI data in this browser.");
+    if (error.name === 'QuotaExceededError') {
+      setViewerStatus("Browser storage quota exceeded. Please clear old data.");
+    } else {
+      setViewerStatus("Unable to persist ROI data in this browser.");
+    }
   }
 }
 
@@ -632,12 +721,50 @@ async function downloadQuPathPackage() {
   }
 }
 
+// Security: Input validation utilities
+function validateRoiInput(name, note, shape) {
+  const MAX_NAME_LENGTH = 255;
+  const MAX_NOTE_LENGTH = 1000;
+  const VALID_SHAPES = ['rectangle', 'circle'];
+  
+  // Validate shape
+  if (!VALID_SHAPES.includes(shape)) {
+    console.warn('Invalid ROI shape detected');
+    return false;
+  }
+  
+  // Validate name length
+  if (name && name.length > MAX_NAME_LENGTH) {
+    setViewerStatus('ROI name is too long (max 255 characters)');
+    return false;
+  }
+  
+  // Validate note length
+  if (note && note.length > MAX_NOTE_LENGTH) {
+    setViewerStatus('ROI description is too long (max 1000 characters)');
+    return false;
+  }
+  
+  return true;
+}
+
+function sanitizeRoiInput(text) {
+  if (!text || typeof text !== 'string') return '';
+  // Remove control characters
+  return text.replace(/[\x00-\x1F\x7F]/g, '').trim();
+}
+
 function getRoiDraftValues() {
-  return {
-    shape: document.getElementById("roiShapeSelect").value,
-    name: document.getElementById("roiNameInput").value.trim(),
-    note: document.getElementById("roiNoteInput").value.trim()
-  };
+  const shape = document.getElementById("roiShapeSelect").value;
+  const name = sanitizeRoiInput(document.getElementById("roiNameInput").value);
+  const note = sanitizeRoiInput(document.getElementById("roiNoteInput").value);
+  
+  // Security: Validate inputs
+  if (!validateRoiInput(name, note, shape)) {
+    return null;
+  }
+  
+  return { shape, name, note };
 }
 
 function clearRoiDraftValues() {
@@ -1111,6 +1238,12 @@ function saveCurrentViewAsRoi() {
   const rois = savedRois[storageKey] || [];
   const savedAt = new Date().toLocaleString();
   const draft = getRoiDraftValues();
+  
+  // Security: Validate draft values
+  if (!draft) {
+    return;
+  }
+  
   const existingIndex = activeRoiEditId
     ? rois.findIndex((entry) => entry.id === activeRoiEditId)
     : -1;
