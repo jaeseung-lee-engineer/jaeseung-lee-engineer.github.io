@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <!-- Security: Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' https:; connect-src 'self' https://cdnjs.cloudflare.com https://jaeseung-lee-engineer-github-io.onrender.com https://jaeseung-lee.s3.us-east-2.amazonaws.com; frame-ancestors 'none'" />
-  <!-- Security: Prevent clickjacking -->
-  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' https:; connect-src 'self' https://cdnjs.cloudflare.com https://jaeseung-lee-engineer-github-io.onrender.com https://jaeseung-lee.s3.us-east-2.amazonaws.com" />
   <!-- Security: MIME type sniffing protection -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <!-- Security: Referrer policy -->
   <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <!-- NOTE: X-Frame-Options and frame-ancestors require HTTP headers (not supported on GitHub Pages) -->
+  <!-- Set via web server configuration in production: X-Frame-Options: DENY -->
   <title>Digital Pathology Review Portal | Jaeseung Lee</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js" integrity="sha512-VKBuvrXdP1AXvfs+m4l3ZNZSI4PFJF0K0hGJJZ4RiNRkvFMO4IwFRHkoTc7xsdZhMgkLn+Ioq4elndAZicBcRQ==" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"></script>
