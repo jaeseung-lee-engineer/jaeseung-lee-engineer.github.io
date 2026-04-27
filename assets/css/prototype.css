@@ -621,7 +621,6 @@ body.demo-fullscreen {
 .roi-display-item.circle .roi-display-handle,
 .roi-edit-box.circle .roi-edit-handle {
   z-index: 3;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.98), 0 0 0 2px rgba(29, 78, 216, 0.95), 0 2px 6px rgba(15, 23, 42, 0.22);
 }
 
 .roi-display-item.circle .roi-display-handle.nw,
