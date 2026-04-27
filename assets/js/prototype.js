@@ -966,11 +966,8 @@ function renderPersistentRoiOverlaysNow() {
     item.style.width = `${pixelRect.width}px`;
     item.style.height = `${pixelRect.height}px`;
     item.title = roi.name || "ROI";
-    const moveHandle = document.createElement("div");
-    moveHandle.className = "roi-display-move";
-    moveHandle.dataset.handle = "move";
-    moveHandle.textContent = "⋮⋮";
-    moveHandle.addEventListener("pointerdown", (event) => {
+    item.addEventListener("pointerdown", (event) => {
+      if (event.target.closest(".roi-display-handle")) return;
       event.preventDefault();
       event.stopPropagation();
       focusRoiForEditing(roi.id, { jump: false });
@@ -978,7 +975,6 @@ function renderPersistentRoiOverlaysNow() {
         startRoiOverlayDrag(event, "move");
       });
     });
-    item.appendChild(moveHandle);
     ["nw", "ne", "sw", "se"].forEach((handleName) => {
       const handle = document.createElement("div");
       handle.className = `roi-display-handle ${handleName}`;
@@ -1781,14 +1777,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("fullscreenToggleBtn").addEventListener("click", toggleDemoFullscreen);
   ["click", "dblclick"].forEach((eventName) => {
     roiEditLayer.addEventListener(eventName, (event) => {
-      if (!event.target.closest(".roi-edit-edge, .roi-edit-handle")) return;
+      if (!event.target.closest(".roi-edit-box, .roi-edit-handle")) return;
       event.preventDefault();
       event.stopPropagation();
     }, true);
   });
   roiEditBox.addEventListener("pointerdown", (event) => {
-    const handle = event.target.closest("[data-handle]");
-    startRoiOverlayDrag(event, handle ? handle.dataset.handle : "move");
+    if (event.target === roiEditBox) {
+      startRoiOverlayDrag(event, "move");
+      return;
+    }
+
+    const handle = event.target.closest(".roi-edit-handle");
+    if (handle?.dataset.handle) {
+      startRoiOverlayDrag(event, handle.dataset.handle);
+    }
   });
   window.addEventListener("pointermove", handleRoiOverlayPointerMove);
   window.addEventListener("pointerup", stopRoiOverlayDrag);
