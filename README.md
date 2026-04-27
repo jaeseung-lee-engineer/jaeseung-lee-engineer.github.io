@@ -29,7 +29,7 @@ POST /annotations
 - Case Details — Clinical metadata  
 - Linked Slides — Navigation across slides  
 - Slide Details — Quantitative metrics & notes  
-- Annotation Toggle — Region highlighting (by Pathologists or AI software)
+- Import Annotation — Import annotations from QuPath
 
 ## QuPath Workflow Continuity
 
