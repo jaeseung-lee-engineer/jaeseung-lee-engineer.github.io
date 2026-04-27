@@ -976,9 +976,13 @@ body.demo-fullscreen {
 }
 
 .roi-form-actions {
+  position: relative;
   display: grid;
   gap: 8px;
   grid-template-columns: minmax(0, 1fr);
+  min-height: 34px;
+  grid-auto-rows: 34px;
+  align-items: stretch;
 }
 
 .roi-form-actions.is-editing {
@@ -1007,6 +1011,7 @@ body.demo-fullscreen {
 .roi-form-actions .btn.is-hidden {
   visibility: hidden;
   pointer-events: none;
+  position: absolute;
 }
 
 .btn.danger {
