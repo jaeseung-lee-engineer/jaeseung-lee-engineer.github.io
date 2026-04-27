@@ -954,7 +954,11 @@ function renderPersistentRoiOverlaysNow() {
     return;
   }
 
-  displayLayer.replaceChildren(...rois.map((roi) => {
+  displayLayer.replaceChildren(...rois.flatMap((roi) => {
+    if (roi.id === activeRoiEditId) {
+      return [];
+    }
+
     const viewportRect = roi.shape === "circle"
       ? normalizeRectToCircle(roi.viewportRect)
       : roi.viewportRect;
@@ -989,7 +993,7 @@ function renderPersistentRoiOverlaysNow() {
       });
       item.appendChild(handle);
     });
-    return item;
+    return [item];
   }));
 }
 
@@ -1172,6 +1176,28 @@ function handleRoiOverlayPointerMove(event) {
   setEditableRoiOverlayRect(
     buildOverlayRectFromDrag(roiOverlayDragState, event.clientX, event.clientY)
   );
+}
+
+function handleRoiOverlayWheel(event) {
+  if (!viewer || !viewer.viewport) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const { viewerElement } = getRoiEditElements();
+  if (!viewerElement) return;
+
+  const rect = viewerElement.getBoundingClientRect();
+  const pixel = new OpenSeadragon.Point(
+    event.clientX - rect.left,
+    event.clientY - rect.top
+  );
+  const refPoint = viewer.viewport.pointFromPixel(pixel, true);
+  const zoomFactor = event.deltaY < 0 ? 1.2 : (1 / 1.2);
+
+  viewer.viewport.zoomBy(zoomFactor, refPoint, true);
+  viewer.viewport.applyConstraints();
+  scheduleRoiOverlaySync({ resetEditState: true });
 }
 
 function startRoiOverlayDrag(event, mode) {
@@ -1759,6 +1785,7 @@ function switchTab(tabId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const roiDisplayLayer = document.getElementById("roiDisplayLayer");
   const roiEditBox = document.getElementById("roiEditBox");
   const roiEditLayer = document.getElementById("roiEditLayer");
   document.getElementById("searchBtn").addEventListener("click", applySearch);
@@ -1793,6 +1820,8 @@ document.addEventListener("DOMContentLoaded", () => {
       startRoiOverlayDrag(event, handle.dataset.handle);
     }
   });
+  roiDisplayLayer.addEventListener("wheel", handleRoiOverlayWheel, { passive: false });
+  roiEditBox.addEventListener("wheel", handleRoiOverlayWheel, { passive: false });
   window.addEventListener("pointermove", handleRoiOverlayPointerMove);
   window.addEventListener("pointerup", stopRoiOverlayDrag);
   window.addEventListener("pointercancel", stopRoiOverlayDrag);
