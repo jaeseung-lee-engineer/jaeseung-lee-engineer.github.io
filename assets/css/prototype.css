@@ -624,6 +624,16 @@ body.demo-fullscreen {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.98), 0 0 0 2px rgba(29, 78, 216, 0.95), 0 2px 6px rgba(15, 23, 42, 0.22);
 }
 
+.roi-display-item.circle .roi-display-move,
+.roi-edit-box.circle .roi-move-handle {
+  top: -6px;
+  min-width: 24px;
+  height: 12px;
+  padding: 0 6px;
+  font-size: 8px;
+  line-height: 8px;
+}
+
 .roi-display-item.circle .roi-display-handle.nw,
 .roi-edit-box.circle .roi-edit-handle.nw {
   top: 14.5%;
@@ -708,17 +718,17 @@ body.demo-fullscreen {
   top: -8px;
   left: 50%;
   transform: translateX(-50%);
-  min-width: 34px;
-  height: 16px;
-  padding: 0 8px;
+  min-width: 24px;
+  height: 12px;
+  padding: 0 6px;
   border: 2px solid #ffffff;
   border-radius: 999px;
   background: #2563eb;
   box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.95), 0 2px 8px rgba(15, 23, 42, 0.24);
   color: #ffffff;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
-  line-height: 14px;
+  line-height: 8px;
   text-align: center;
   pointer-events: auto;
   touch-action: none;
@@ -807,17 +817,17 @@ body.demo-fullscreen {
   top: -8px;
   left: 50%;
   transform: translateX(-50%);
-  min-width: 34px;
-  height: 16px;
-  padding: 0 8px;
+  min-width: 24px;
+  height: 12px;
+  padding: 0 6px;
   border: 2px solid #ffffff;
   border-radius: 999px;
   background: #2563eb;
   box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.95), 0 2px 8px rgba(15, 23, 42, 0.24);
   color: #ffffff;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
-  line-height: 14px;
+  line-height: 8px;
   text-align: center;
   pointer-events: auto;
   touch-action: none;
