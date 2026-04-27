@@ -789,8 +789,9 @@ function updateRoiFormUi() {
   if (!saveButton || !deleteButton) return;
 
   const isEditing = Boolean(activeRoiEditId);
-  saveButton.textContent = isEditing ? "Update ROI" : "Save Current View";
-  deleteButton.hidden = !isEditing;
+  saveButton.textContent = isEditing ? "Update ROI" : "Create ROI";
+  deleteButton.classList.toggle("is-hidden", !isEditing);
+  deleteButton.setAttribute("aria-hidden", String(!isEditing));
 }
 
 function getActiveRoi() {
@@ -828,7 +829,7 @@ function resetRoiEditIfViewportChanged() {
   updateRoiFormUi();
   renderRoiList();
   hideEditableRoiOverlay();
-  setViewerStatus("Viewer moved from the selected ROI. Save Current View will create a new ROI.");
+  setViewerStatus("Viewer moved from the selected ROI. Create ROI will add a new ROI.");
 }
 
 function getRoiEditElements() {
@@ -1309,7 +1310,7 @@ function prefillRoiDraft(roiId) {
   updateRoiFormUi();
   renderRoiList();
   showEditableRoiOverlayForActiveRoi();
-  setViewerStatus(`Editing ${roi.name}. Save Current View will update this ROI.`);
+  setViewerStatus(`Editing ${roi.name}. Update ROI will save these changes.`);
 }
 
 function saveCurrentViewAsRoi() {

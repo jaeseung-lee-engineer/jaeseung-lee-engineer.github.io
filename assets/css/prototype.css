@@ -976,16 +976,21 @@ body.demo-fullscreen {
 }
 
 .roi-form-actions {
-  display: flex;
+  display: grid;
   gap: 8px;
-  flex-wrap: wrap;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .roi-form-actions .btn {
   height: 34px;
   padding: 0 10px;
   white-space: nowrap;
-  flex: 1 1 120px;
+  width: 100%;
+}
+
+.roi-form-actions .btn.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .btn.danger {
