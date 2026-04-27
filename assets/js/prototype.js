@@ -1386,8 +1386,8 @@ function saveCurrentViewAsRoi() {
     return;
   }
 
-  prefillRoiDraft(roiId);
-  setViewerStatus(`Seeded ${roiPayload.shape} ROI at the viewport center. Drag or resize to fine-tune.`);
+  clearRoiDraftValues();
+  setViewerStatus(`Created ${roiPayload.name}`);
 }
 
 function deleteRoi(roiId) {
