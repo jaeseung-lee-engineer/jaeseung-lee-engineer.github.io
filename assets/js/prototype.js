@@ -866,9 +866,19 @@ function getPixelRectFromViewportRect(viewportRect) {
   };
 }
 
-function clampOverlayRect(rect, bounds) {
+function clampOverlayRect(rect, bounds, shape = "rectangle") {
   const minSize = 24;
   const next = { ...rect };
+
+  if (shape === "circle") {
+    const maxSize = Math.max(minSize, Math.min(bounds.width, bounds.height));
+    const size = Math.min(Math.max(minSize, next.width), maxSize);
+    next.width = size;
+    next.height = size;
+    next.left = Math.min(Math.max(0, next.left), Math.max(0, bounds.width - size));
+    next.top = Math.min(Math.max(0, next.top), Math.max(0, bounds.height - size));
+    return next;
+  }
 
   next.width = Math.max(minSize, next.width);
   next.height = Math.max(minSize, next.height);
@@ -881,14 +891,44 @@ function clampOverlayRect(rect, bounds) {
   return next;
 }
 
+function normalizeRectToCircle(rect, options = {}) {
+  const { anchor = "center", mode = "" } = options;
+  const next = { ...rect };
+
+  if (anchor === "drag-corner") {
+    const size = Math.max(Math.abs(next.width), Math.abs(next.height));
+    const east = mode.includes("e");
+    const south = mode.includes("s");
+    const anchorX = east ? next.left : next.left + next.width;
+    const anchorY = south ? next.top : next.top + next.height;
+
+    next.width = size;
+    next.height = size;
+    next.left = east ? anchorX : anchorX - size;
+    next.top = south ? anchorY : anchorY - size;
+    return next;
+  }
+
+  const size = Math.min(Math.abs(next.width), Math.abs(next.height));
+  const centerX = next.left + (next.width / 2);
+  const centerY = next.top + (next.height / 2);
+
+  next.width = size;
+  next.height = size;
+  next.left = centerX - (size / 2);
+  next.top = centerY - (size / 2);
+  return next;
+}
+
 function setEditableRoiOverlayRect(rect) {
   const { layer, box, viewerElement } = getRoiEditElements();
   if (!layer || !box || !viewerElement) return;
+  const shape = box.classList.contains("circle") ? "circle" : "rectangle";
 
   const clamped = clampOverlayRect(rect, {
     width: viewerElement.clientWidth,
     height: viewerElement.clientHeight
-  });
+  }, shape);
 
   layer.classList.remove("hidden");
   box.classList.remove("hidden");
@@ -910,7 +950,10 @@ function renderPersistentRoiOverlaysNow() {
   }
 
   displayLayer.replaceChildren(...rois.map((roi) => {
-    const pixelRect = getPixelRectFromViewportRect(roi.viewportRect);
+    const viewportRect = roi.shape === "circle"
+      ? normalizeRectToCircle(roi.viewportRect)
+      : roi.viewportRect;
+    const pixelRect = getPixelRectFromViewportRect(viewportRect);
     const item = document.createElement("button");
     item.type = "button";
     item.className = `roi-display-item${roi.shape === "circle" ? " circle" : ""}${roi.id === activeRoiEditId ? " active" : ""}`;
@@ -1000,7 +1043,10 @@ function showEditableRoiOverlayForActiveRoi() {
     return;
   }
 
-  const pixelRect = getPixelRectFromViewportRect(roi.viewportRect);
+  const viewportRect = roi.shape === "circle"
+    ? normalizeRectToCircle(roi.viewportRect)
+    : roi.viewportRect;
+  const pixelRect = getPixelRectFromViewportRect(viewportRect);
   if (!pixelRect) {
     hideEditableRoiOverlay();
     renderPersistentRoiOverlays();
@@ -1102,6 +1148,13 @@ function buildOverlayRectFromDrag(state, clientX, clientY) {
     rect.width += dx;
   }
 
+  if (state.shape === "circle") {
+    return normalizeRectToCircle(rect, {
+      anchor: "drag-corner",
+      mode: state.mode
+    });
+  }
+
   return rect;
 }
 
@@ -1124,11 +1177,13 @@ function startRoiOverlayDrag(event, mode) {
   if (!activeRoiEditId) return;
   const { box } = getRoiEditElements();
   if (!box) return;
+  const activeRoi = getActiveRoi();
 
   event.preventDefault();
   event.stopPropagation();
   roiOverlayDragState = {
     mode,
+    shape: activeRoi?.shape || "rectangle",
     startX: event.clientX,
     startY: event.clientY,
     startRect: {
@@ -1257,11 +1312,14 @@ function saveCurrentViewAsRoi() {
   const baseViewportRect = existingRoi
     ? (overlayViewportRect || existingRoi.viewportRect)
     : buildSeedViewportRect(bounds, draft.shape);
+  const normalizedViewportRect = (draft.shape || existingRoi?.shape) === "circle"
+    ? normalizeRectToCircle(baseViewportRect)
+    : baseViewportRect;
   const nextBoundsRect = new OpenSeadragon.Rect(
-    baseViewportRect.x,
-    baseViewportRect.y,
-    baseViewportRect.width,
-    baseViewportRect.height
+    normalizedViewportRect.x,
+    normalizedViewportRect.y,
+    normalizedViewportRect.width,
+    normalizedViewportRect.height
   );
   const nextImageRect = imageItem.viewportToImageRectangle(nextBoundsRect);
   const roiId = existingIndex >= 0 ? activeRoiEditId : `${storageKey}::${Date.now()}`;
@@ -1272,7 +1330,7 @@ function saveCurrentViewAsRoi() {
     note: draft.note,
     zoom: viewer.viewport.getZoom(true),
     savedAt,
-    viewportRect: baseViewportRect,
+    viewportRect: normalizedViewportRect,
     imageRect: {
       x: nextImageRect.x,
       y: nextImageRect.y,
