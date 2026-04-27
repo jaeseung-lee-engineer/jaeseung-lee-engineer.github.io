@@ -617,6 +617,37 @@ body.demo-fullscreen {
   border-radius: 999px;
 }
 
+.roi-display-item.circle .roi-display-handle,
+.roi-edit-box.circle .roi-edit-handle {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.96), 0 0 0 4px rgba(29, 78, 216, 0.95), 0 4px 12px rgba(15, 23, 42, 0.3);
+}
+
+.roi-display-item.circle .roi-display-handle.nw,
+.roi-edit-box.circle .roi-edit-handle.nw {
+  top: -10px;
+  left: -10px;
+}
+
+.roi-display-item.circle .roi-display-handle.ne,
+.roi-edit-box.circle .roi-edit-handle.ne {
+  top: -10px;
+  right: -10px;
+}
+
+.roi-display-item.circle .roi-display-handle.sw,
+.roi-edit-box.circle .roi-edit-handle.sw {
+  bottom: -10px;
+  left: -10px;
+}
+
+.roi-display-item.circle .roi-display-handle.se,
+.roi-edit-box.circle .roi-edit-handle.se {
+  bottom: -10px;
+  right: -10px;
+}
+
 .roi-display-item:hover {
   border-color: rgba(37, 99, 235, 0.8);
 }
