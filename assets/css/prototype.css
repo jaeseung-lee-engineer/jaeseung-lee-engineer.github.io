@@ -609,7 +609,8 @@ body.demo-fullscreen {
   will-change: transform, width, height;
   backface-visibility: hidden;
   transform: translateZ(0);
-  contain: layout style paint;
+  overflow: visible;
+  contain: layout style;
 }
 
 .roi-display-item.circle,
@@ -734,7 +735,8 @@ body.demo-fullscreen {
   will-change: transform, width, height;
   backface-visibility: hidden;
   transform: translateZ(0);
-  contain: layout style paint;
+  overflow: visible;
+  contain: layout style;
 }
 
 .roi-edit-edge {
