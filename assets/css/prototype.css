@@ -978,6 +978,10 @@ body.demo-fullscreen {
 .roi-form-actions {
   display: grid;
   gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.roi-form-actions.is-editing {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
@@ -986,6 +990,18 @@ body.demo-fullscreen {
   padding: 0 10px;
   white-space: nowrap;
   width: 100%;
+}
+
+.roi-form-actions #addRoiSecondaryBtn {
+  grid-column: 1 / -1;
+}
+
+.roi-form-actions.is-editing #addRoiSecondaryBtn {
+  grid-column: auto;
+}
+
+.roi-form-actions #deleteRoiBtn {
+  grid-column: 1;
 }
 
 .roi-form-actions .btn.is-hidden {

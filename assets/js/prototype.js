@@ -785,11 +785,13 @@ function clearRoiDraftValues() {
 function updateRoiFormUi() {
   const saveButton = document.getElementById("addRoiSecondaryBtn");
   const deleteButton = document.getElementById("deleteRoiBtn");
+  const actionContainer = saveButton?.closest(".roi-form-actions");
 
-  if (!saveButton || !deleteButton) return;
+  if (!saveButton || !deleteButton || !actionContainer) return;
 
   const isEditing = Boolean(activeRoiEditId);
   saveButton.textContent = isEditing ? "Update ROI" : "Create ROI";
+  actionContainer.classList.toggle("is-editing", isEditing);
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
 }
