@@ -868,24 +868,29 @@ function getPixelRectFromViewportRect(viewportRect) {
 
 function clampOverlayRect(rect, bounds, shape = "rectangle") {
   const minSize = 24;
+  const handlePadding = 6;
   const next = { ...rect };
+  const minLeft = handlePadding;
+  const minTop = handlePadding;
+  const maxWidth = Math.max(minSize, bounds.width - (handlePadding * 2));
+  const maxHeight = Math.max(minSize, bounds.height - (handlePadding * 2));
 
   if (shape === "circle") {
-    const maxSize = Math.max(minSize, Math.min(bounds.width, bounds.height));
+    const maxSize = Math.max(minSize, Math.min(maxWidth, maxHeight));
     const size = Math.min(Math.max(minSize, next.width), maxSize);
     next.width = size;
     next.height = size;
-    next.left = Math.min(Math.max(0, next.left), Math.max(0, bounds.width - size));
-    next.top = Math.min(Math.max(0, next.top), Math.max(0, bounds.height - size));
+    next.left = Math.min(Math.max(minLeft, next.left), Math.max(minLeft, bounds.width - handlePadding - size));
+    next.top = Math.min(Math.max(minTop, next.top), Math.max(minTop, bounds.height - handlePadding - size));
     return next;
   }
 
-  next.width = Math.max(minSize, next.width);
-  next.height = Math.max(minSize, next.height);
-  next.left = Math.min(Math.max(0, next.left), Math.max(0, bounds.width - next.width));
-  next.top = Math.min(Math.max(0, next.top), Math.max(0, bounds.height - next.height));
-  next.width = Math.min(next.width, bounds.width - next.left);
-  next.height = Math.min(next.height, bounds.height - next.top);
+  next.width = Math.min(Math.max(minSize, next.width), maxWidth);
+  next.height = Math.min(Math.max(minSize, next.height), maxHeight);
+  next.left = Math.min(Math.max(minLeft, next.left), Math.max(minLeft, bounds.width - handlePadding - next.width));
+  next.top = Math.min(Math.max(minTop, next.top), Math.max(minTop, bounds.height - handlePadding - next.height));
+  next.width = Math.min(next.width, bounds.width - handlePadding - next.left);
+  next.height = Math.min(next.height, bounds.height - handlePadding - next.top);
   next.width = Math.max(minSize, next.width);
   next.height = Math.max(minSize, next.height);
   return next;
