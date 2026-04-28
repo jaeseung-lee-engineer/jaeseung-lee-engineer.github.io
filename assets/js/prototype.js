@@ -2,6 +2,7 @@ const API_BASE_URL = "https://jaeseung-lee-engineer-github-io.onrender.com";
 const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
 const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
 const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
+const VIEWER_ZOOM_PER_SCROLL = 1.1;
 
 let caseData = {};
 let caseSummaries = [];
@@ -1196,7 +1197,10 @@ function handleRoiOverlayWheel(event) {
     event.clientY - rect.top
   );
   const refPoint = viewer.viewport.pointFromPixel(pixel, true);
-  const zoomFactor = event.deltaY < 0 ? 1.2 : (1 / 1.2);
+  // Scale zoom smoothly from wheel delta so ROI-hover zoom feels closer
+  // to OpenSeadragon's native scroll behavior.
+  const normalizedDelta = Math.max(-100, Math.min(100, event.deltaY));
+  const zoomFactor = Math.pow(VIEWER_ZOOM_PER_SCROLL, -normalizedDelta / 100);
 
   viewer.viewport.zoomBy(zoomFactor, refPoint, true);
   viewer.viewport.applyConstraints();
@@ -1456,6 +1460,7 @@ function initViewer(dziPath) {
     animationTime: 0.35,
     blendTime: 0,
     constrainDuringPan: true,
+    zoomPerScroll: VIEWER_ZOOM_PER_SCROLL,
     maxZoomPixelRatio: 2,
     minZoomLevel: 0.5,
     visibilityRatio: 1.0
