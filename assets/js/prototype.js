@@ -3,6 +3,7 @@ const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-te
 const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
 const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
 const VIEWER_ZOOM_PER_SCROLL = 1.1;
+const ROI_EXAMPLE_USER_NAME = "User name";
 
 let caseData = {};
 let caseSummaries = [];
@@ -1300,6 +1301,13 @@ function renderRoiList() {
       note.textContent = roi.note;
       card.appendChild(note);
     }
+
+    const meta = document.createElement("div");
+    meta.className = "roi-card-meta";
+    meta.textContent = roi.savedAt
+      ? `${ROI_EXAMPLE_USER_NAME} · ${roi.savedAt}`
+      : ROI_EXAMPLE_USER_NAME;
+    card.appendChild(meta);
 
     return card;
   }));
