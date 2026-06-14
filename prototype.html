@@ -115,6 +115,7 @@
             <div class="panel viewer-panel">
               <div class="viewer">
                 <div id="slidePreview"></div>
+                <div class="analysis-overlay-layer" id="analysisOverlayLayer" aria-hidden="true"></div>
                 <div class="roi-display-layer" id="roiDisplayLayer" aria-hidden="true"></div>
                 <div class="roi-edit-layer hidden" id="roiEditLayer" aria-hidden="true">
                   <div class="roi-edit-box hidden" id="roiEditBox">
@@ -134,6 +135,7 @@
                   </div>
                 </div>
               </div>
+              <div class="viewer-status" id="viewerStatus" aria-live="polite">Select a case and slide to begin.</div>
             </div>
 
             <div class="panel roi-panel">
@@ -151,8 +153,15 @@
                   <input class="roi-input" id="roiNoteInput" type="text" placeholder="Description" />
                   <div class="roi-form-actions">
                     <button class="btn danger is-hidden" type="button" id="deleteRoiBtn" aria-hidden="true">Delete ROI</button>
+                    <button class="btn" type="button" id="runCellCountingBtn">Run Cell Counting</button>
                     <button class="btn" type="button" id="addRoiSecondaryBtn">Create ROI</button>
                   </div>
+                </div>
+              </div>
+              <div class="analysis-summary" id="analysisSummary">
+                <div class="analysis-summary-title">Cell Counting</div>
+                <div class="analysis-summary-body" id="analysisSummaryBody">
+                  Select a saved ROI, then run cell counting to view count and overlay results.
                 </div>
               </div>
               <div id="roiList" class="roi-list">

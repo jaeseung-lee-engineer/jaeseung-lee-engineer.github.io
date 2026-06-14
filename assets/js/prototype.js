@@ -4,6 +4,7 @@ const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/publi
 const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
 const VIEWER_ZOOM_PER_SCROLL = 1.1;
 const ROI_EXAMPLE_USER_NAME = "User name";
+const MAX_ROI_ANALYSIS_DIMENSION = 2048;
 
 let caseData = {};
 let caseSummaries = [];
@@ -21,6 +22,8 @@ let suppressRoiEditReset = false;
 let roiOverlayDragState = null;
 let roiOverlayRenderFrame = 0;
 let roiOverlaySyncFrame = 0;
+const roiAnalysisResults = {};
+let roiAnalysisInFlight = false;
 function loadSavedRois() {
   try {
     // Security: Check localStorage availability
@@ -268,6 +271,65 @@ function getRoiStorageKey() {
 
 function getCurrentRois() {
   return savedRois[getRoiStorageKey()] || [];
+}
+
+function getCurrentSlideAnalysisResults() {
+  return roiAnalysisResults[getRoiStorageKey()] || {};
+}
+
+function getAnalysisResultForRoi(roiId) {
+  if (!roiId) return null;
+  return getCurrentSlideAnalysisResults()[roiId] || null;
+}
+
+function setAnalysisResultForRoi(roiId, result) {
+  if (!roiId) return;
+  const storageKey = getRoiStorageKey();
+  if (!roiAnalysisResults[storageKey]) {
+    roiAnalysisResults[storageKey] = {};
+  }
+  roiAnalysisResults[storageKey][roiId] = result;
+}
+
+function clearAnalysisResultForRoi(roiId) {
+  if (!roiId) return;
+  const slideResults = roiAnalysisResults[getRoiStorageKey()];
+  if (!slideResults) return;
+  delete slideResults[roiId];
+}
+
+function setAnalysisSummary(message, options = {}) {
+  const { isLoading = false, isError = false } = options;
+  const summary = document.getElementById("analysisSummary");
+  const body = document.getElementById("analysisSummaryBody");
+  if (!summary || !body) return;
+
+  summary.classList.toggle("is-loading", isLoading);
+  summary.classList.toggle("is-error", isError);
+  body.textContent = message;
+}
+
+function updateAnalysisSummaryForActiveRoi() {
+  const roi = getActiveRoi();
+  if (!roi) {
+    setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
+    return;
+  }
+
+  if ((roi.shape || "rectangle") !== "rectangle") {
+    setAnalysisSummary("Cell counting currently supports rectangle ROIs only.", { isError: true });
+    return;
+  }
+
+  const result = getAnalysisResultForRoi(roi.id);
+  if (!result) {
+    setAnalysisSummary(`Ready to analyze ${roi.name}. ROI must be <= ${MAX_ROI_ANALYSIS_DIMENSION} x ${MAX_ROI_ANALYSIS_DIMENSION}px.`);
+    return;
+  }
+
+  setAnalysisSummary(
+    `${roi.name}: ${result.cellCount} cells detected in ${result.timingMs} ms using ${result.model?.name || "Cellpose"}.`
+  );
 }
 
 function getFilteredCaseIds(query) {
@@ -728,6 +790,97 @@ async function downloadQuPathPackage() {
   }
 }
 
+async function runCellCountingForActiveRoi() {
+  const slide = getCurrentSlide();
+  const roi = getActiveRoi();
+
+  if (!slide) {
+    setViewerStatus("Select a slide before running cell counting.");
+    return;
+  }
+
+  if (!roi) {
+    setViewerStatus("Select a saved ROI before running cell counting.");
+    setAnalysisSummary("Select a saved ROI before running cell counting.", { isError: true });
+    return;
+  }
+
+  if ((roi.shape || "rectangle") !== "rectangle") {
+    const message = "Cell counting currently supports rectangle ROIs only.";
+    setViewerStatus(message);
+    setAnalysisSummary(message, { isError: true });
+    return;
+  }
+
+  const width = Math.round(roi.imageRect.width);
+  const height = Math.round(roi.imageRect.height);
+  if (width > MAX_ROI_ANALYSIS_DIMENSION || height > MAX_ROI_ANALYSIS_DIMENSION) {
+    const message = `ROI must be <= ${MAX_ROI_ANALYSIS_DIMENSION} x ${MAX_ROI_ANALYSIS_DIMENSION}px before analysis.`;
+    setViewerStatus(message);
+    setAnalysisSummary(message, { isError: true });
+    return;
+  }
+
+  const apiUrl = getApiUrl(`/slides/${encodeURIComponent(slide.slideId)}/cell-count`);
+  if (!apiUrl) {
+    setViewerStatus("API base URL is not configured.");
+    setAnalysisSummary("API base URL is not configured.", { isError: true });
+    return;
+  }
+
+  roiAnalysisInFlight = true;
+  updateRoiFormUi();
+  setViewerStatus(`Running cell counting for ${roi.name}...`);
+  setAnalysisSummary(`Running Cellpose on ${roi.name}...`, { isLoading: true });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-store",
+      credentials: "omit",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        roi: {
+          x: Math.max(0, Math.round(roi.imageRect.x)),
+          y: Math.max(0, Math.round(roi.imageRect.y)),
+          width,
+          height
+        }
+      })
+    });
+
+    if (!response.ok) {
+      let detail = "Cell counting failed.";
+      try {
+        const errorPayload = await response.json();
+        if (errorPayload?.detail) {
+          detail = errorPayload.detail;
+        }
+      } catch (error) {
+        detail = "Cell counting failed.";
+      }
+      throw new Error(detail);
+    }
+
+    const result = await response.json();
+    setAnalysisResultForRoi(roi.id, result);
+    renderRoiList();
+    renderAnalysisOverlayNow();
+    updateAnalysisSummaryForActiveRoi();
+    setViewerStatus(`Detected ${result.cellCount} cells in ${roi.name}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Cell counting failed.";
+    setViewerStatus(message);
+    setAnalysisSummary(message, { isError: true });
+  } finally {
+    roiAnalysisInFlight = false;
+    updateRoiFormUi();
+  }
+}
+
 // Security: Input validation utilities
 function validateRoiInput(name, note, shape) {
   const MAX_NAME_LENGTH = 255;
@@ -782,20 +935,29 @@ function clearRoiDraftValues() {
   updateRoiFormUi();
   hideEditableRoiOverlay();
   renderPersistentRoiOverlays();
+  updateAnalysisSummaryForActiveRoi();
 }
 
 function updateRoiFormUi() {
   const saveButton = document.getElementById("addRoiSecondaryBtn");
   const deleteButton = document.getElementById("deleteRoiBtn");
+  const runButton = document.getElementById("runCellCountingBtn");
   const actionContainer = saveButton?.closest(".roi-form-actions");
 
-  if (!saveButton || !deleteButton || !actionContainer) return;
+  if (!saveButton || !deleteButton || !runButton || !actionContainer) return;
 
   const isEditing = Boolean(activeRoiEditId);
+  const activeRoi = getActiveRoi();
+  const canAnalyze = isEditing
+    && Boolean(getCurrentSlide())
+    && !roiAnalysisInFlight
+    && (activeRoi?.shape || "rectangle") === "rectangle";
   saveButton.textContent = isEditing ? "Update ROI" : "Create ROI";
   actionContainer.classList.toggle("is-editing", isEditing);
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
+  runButton.disabled = !canAnalyze;
+  runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run Cell Counting";
 }
 
 function getActiveRoi() {
@@ -949,6 +1111,37 @@ function setEditableRoiOverlayRect(rect) {
   box.style.height = `${clamped.height}px`;
 }
 
+function renderAnalysisOverlayNow() {
+  const layer = document.getElementById("analysisOverlayLayer");
+  if (!layer || !viewer || !viewer.viewport || !viewer.world.getItemAt(0)) {
+    if (layer) {
+      layer.replaceChildren();
+    }
+    return;
+  }
+
+  const imageItem = viewer.world.getItemAt(0);
+  const slideResults = Object.values(getCurrentSlideAnalysisResults());
+  if (!slideResults.length) {
+    layer.replaceChildren();
+    return;
+  }
+
+  const points = slideResults.flatMap((result) => (
+    Array.isArray(result.cells) ? result.cells.map((cell) => {
+      const viewportPoint = imageItem.imageToViewportCoordinates(cell.x, cell.y);
+      const pixelPoint = viewer.viewport.pixelFromPoint(viewportPoint, true);
+      const point = document.createElement("div");
+      point.className = "analysis-point";
+      point.style.transform = `translate3d(${pixelPoint.x}px, ${pixelPoint.y}px, 0)`;
+      point.title = `Detected cell (${Math.round(cell.localX)}, ${Math.round(cell.localY)})`;
+      return point;
+    }) : []
+  ));
+
+  layer.replaceChildren(...points);
+}
+
 function renderPersistentRoiOverlaysNow() {
   const { displayLayer } = getRoiEditElements();
   if (!displayLayer || !viewer || !viewer.viewport) return;
@@ -1008,6 +1201,7 @@ function renderPersistentRoiOverlays() {
   roiOverlayRenderFrame = requestAnimationFrame(() => {
     roiOverlayRenderFrame = 0;
     renderPersistentRoiOverlaysNow();
+    renderAnalysisOverlayNow();
   });
 }
 
@@ -1019,6 +1213,7 @@ function scheduleRoiOverlaySync(options = {}) {
   roiOverlaySyncFrame = requestAnimationFrame(() => {
     roiOverlaySyncFrame = 0;
     showEditableRoiOverlayForActiveRoi();
+    renderAnalysisOverlayNow();
     if (resetEditState) {
       resetRoiEditIfViewportChanged();
     }
@@ -1127,8 +1322,10 @@ function applyOverlayRectToActiveRoi() {
   };
 
   savedRois[storageKey] = rois;
+  clearAnalysisResultForRoi(activeRoiEditId);
   persistSavedRois();
   renderRoiList();
+  renderAnalysisOverlayNow();
   setViewerStatus(`Updated ${rois[roiIndex].name} ROI bounds`);
 }
 
@@ -1280,6 +1477,7 @@ function renderRoiList() {
     roiList.replaceChildren(
       createEmptyText("No saved views yet. Create a region to export or analyze in QuPath.")
     );
+    updateAnalysisSummaryForActiveRoi();
     return;
   }
 
@@ -1304,13 +1502,19 @@ function renderRoiList() {
 
     const meta = document.createElement("div");
     meta.className = "roi-card-meta";
-    meta.textContent = roi.savedAt
+    const analysisResult = getAnalysisResultForRoi(roi.id);
+    const baseMeta = roi.savedAt
       ? `${ROI_EXAMPLE_USER_NAME} · ${roi.savedAt}`
       : ROI_EXAMPLE_USER_NAME;
+    meta.textContent = analysisResult
+      ? `${baseMeta} · ${analysisResult.cellCount} cells`
+      : baseMeta;
     card.appendChild(meta);
 
     return card;
   }));
+
+  updateAnalysisSummaryForActiveRoi();
 }
 
 function prefillRoiDraft(roiId) {
@@ -1324,6 +1528,7 @@ function prefillRoiDraft(roiId) {
   updateRoiFormUi();
   renderRoiList();
   showEditableRoiOverlayForActiveRoi();
+  updateAnalysisSummaryForActiveRoi();
   setViewerStatus(`Editing ${roi.name}. Update ROI will save these changes.`);
 }
 
@@ -1383,6 +1588,7 @@ function saveCurrentViewAsRoi() {
 
   if (existingIndex >= 0) {
     rois[existingIndex] = roiPayload;
+    clearAnalysisResultForRoi(roiPayload.id);
   } else {
     rois.push(roiPayload);
   }
@@ -1416,9 +1622,11 @@ function deleteRoi(roiId) {
     clearRoiDraftValues();
   }
 
+  clearAnalysisResultForRoi(roiId);
   savedRois[storageKey] = nextRois;
   persistSavedRois();
   renderRoiList();
+  renderAnalysisOverlayNow();
   setViewerStatus("Deleted the selected ROI");
 }
 
@@ -1568,9 +1776,13 @@ async function renderSlideDetails() {
   }));
 
   renderRoiList();
+  renderAnalysisOverlayNow();
+  updateRoiFormUi();
 }
 
 function clearSlideSelectionUi() {
+  activeRoiEditId = null;
+  roiAnalysisInFlight = false;
   document.getElementById("slideMetaLabel").textContent = "-";
   document.getElementById("slideMetaSubmitter").textContent = "-";
   document.getElementById("slideMetaId").textContent = "-";
@@ -1583,6 +1795,10 @@ function clearSlideSelectionUi() {
     createEmptyText("Select a slide to load review notes.")
   );
   hideEditableRoiOverlay();
+  const analysisOverlayLayer = document.getElementById("analysisOverlayLayer");
+  if (analysisOverlayLayer) {
+    analysisOverlayLayer.replaceChildren();
+  }
   const roiDisplayLayer = document.getElementById("roiDisplayLayer");
   if (roiDisplayLayer) {
     roiDisplayLayer.replaceChildren();
@@ -1601,6 +1817,8 @@ function clearSlideSelectionUi() {
       ? "Choose a linked slide to load whole-slide viewing, ROI tools, and slide-level details."
       : "Choose a case from the left panel to load metadata, linked slides, and whole-slide review."
   );
+  setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
+  updateRoiFormUi();
   renderRoiList();
 }
 
@@ -1812,6 +2030,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("heatmapBtn").addEventListener("click", toggleHeatmap);
   document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
   document.getElementById("deleteRoiBtn").addEventListener("click", deleteActiveRoi);
+  document.getElementById("runCellCountingBtn").addEventListener("click", runCellCountingForActiveRoi);
   document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
   document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
   document.getElementById("imsBtn").addEventListener("click", openIMS);
@@ -1856,6 +2075,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tab-button").forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
+
+  updateRoiFormUi();
+  setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
 
   loadCaseList()
     .then(() => {
