@@ -43,6 +43,8 @@ ANALYSIS_BLUR_RADIUS = int(os.getenv("CLASSICAL_ANALYSIS_BLUR_RADIUS", "2"))
 ANALYSIS_PEAK_PERCENTILE = float(os.getenv("CLASSICAL_ANALYSIS_PEAK_PERCENTILE", "92"))
 ANALYSIS_MIN_DISTANCE = int(os.getenv("CLASSICAL_ANALYSIS_MIN_DISTANCE", "8"))
 ANALYSIS_MAX_CELLS = int(os.getenv("CLASSICAL_ANALYSIS_MAX_CELLS", "4000"))
+ANALYSIS_TILE_SIZE = int(os.getenv("CLASSICAL_ANALYSIS_TILE_SIZE", "512"))
+ANALYSIS_TILE_OVERLAP = int(os.getenv("CLASSICAL_ANALYSIS_TILE_OVERLAP", "32"))
 _case_data_cache = {
     "loaded_at": 0.0,
     "payload": None,
@@ -209,6 +211,12 @@ def normalize_roi_bounds(roi: RoiRectRequest, dimensions: tuple[int, int]):
     return x, y, width, height
 
 
+def clamp_tile_config():
+    tile_size = max(128, min(ANALYSIS_TILE_SIZE, MAX_ROI_DIMENSION))
+    overlap = max(0, min(ANALYSIS_TILE_OVERLAP, tile_size // 2))
+    return tile_size, overlap
+
+
 def downsample_image(image_rgb: np.ndarray):
     height, width = image_rgb.shape[:2]
     longest_side = max(height, width)
@@ -336,6 +344,89 @@ def run_classical_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, 
     }
 
 
+def deduplicate_cells(cells: list[dict], min_distance: float):
+    if not cells:
+        return []
+
+    ordered = sorted(cells, key=lambda cell: cell.get("score", 0.0), reverse=True)
+    deduped = []
+    min_distance_sq = float(min_distance * min_distance)
+
+    for cell in ordered:
+        duplicate_found = False
+        for kept in deduped:
+            dx = cell["x"] - kept["x"]
+            dy = cell["y"] - kept["y"]
+            if (dx * dx) + (dy * dy) <= min_distance_sq:
+                duplicate_found = True
+                break
+        if duplicate_found:
+            continue
+        deduped.append(cell)
+        if len(deduped) >= ANALYSIS_MAX_CELLS:
+            break
+
+    for index, cell in enumerate(deduped, start=1):
+        cell["id"] = index
+
+    return deduped
+
+
+def iter_roi_tiles(x: int, y: int, width: int, height: int):
+    tile_size, overlap = clamp_tile_config()
+    step = max(1, tile_size - overlap)
+    max_x = x + width
+    max_y = y + height
+
+    tile_y = y
+    while tile_y < max_y:
+        tile_x = x
+        next_y = min(tile_y + tile_size, max_y)
+        while tile_x < max_x:
+            next_x = min(tile_x + tile_size, max_x)
+            yield tile_x, tile_y, next_x - tile_x, next_y - tile_y
+            if next_x >= max_x:
+                break
+            tile_x += step
+        if next_y >= max_y:
+            break
+        tile_y += step
+
+
+def run_tiled_count(slide_reader: openslide.OpenSlide, roi_bounds: tuple[int, int, int, int]):
+    x, y, width, height = roi_bounds
+    all_cells = []
+    tile_count = 0
+    threshold_values = []
+    max_mask_width = 0
+    max_mask_height = 0
+
+    for tile_x, tile_y, tile_width, tile_height in iter_roi_tiles(x, y, width, height):
+        tile_count += 1
+        region = slide_reader.read_region((tile_x, tile_y), 0, (tile_width, tile_height)).convert("RGB")
+        analysis = run_classical_count_on_region(np.asarray(region), (tile_x, tile_y))
+        all_cells.extend(analysis["cells"])
+        if analysis["threshold"] is not None:
+            threshold_values.append(analysis["threshold"])
+        max_mask_width = max(max_mask_width, int(analysis["maskShape"][0]))
+        max_mask_height = max(max_mask_height, int(analysis["maskShape"][1]))
+
+        if len(all_cells) >= ANALYSIS_MAX_CELLS * 3:
+            break
+
+    deduped_cells = deduplicate_cells(all_cells, ANALYSIS_MIN_DISTANCE)
+    tile_size, overlap = clamp_tile_config()
+    return {
+        "cellCount": len(deduped_cells),
+        "cells": deduped_cells,
+        "maskShape": [max_mask_width, max_mask_height],
+        "tileCount": tile_count,
+        "tileSize": tile_size,
+        "tileOverlap": overlap,
+        "threshold": round(float(np.mean(threshold_values)), 4) if threshold_values else None,
+    }
+
+
 @app.get("/cases")
 def get_cases():
     case_data = load_case_data()
@@ -390,14 +481,12 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
     try:
         with openslide.OpenSlide(str(cached_svs_path)) as slide_reader:
             x, y, width, height = normalize_roi_bounds(payload.roi, slide_reader.dimensions)
-            region = slide_reader.read_region((x, y), 0, (width, height)).convert("RGB")
+            analysis = run_tiled_count(slide_reader, (x, y, width, height))
     except openslide.OpenSlideError as error:
         raise HTTPException(
             status_code=502,
             detail="Unable to open the cached SVS with OpenSlide.",
         ) from error
-
-    analysis = run_classical_count_on_region(np.asarray(region), (x, y))
     elapsed_ms = round((time.perf_counter() - started_at) * 1000, 2)
 
     return {
@@ -420,8 +509,10 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
             "blurRadius": ANALYSIS_BLUR_RADIUS,
             "peakPercentile": ANALYSIS_PEAK_PERCENTILE,
             "minDistance": ANALYSIS_MIN_DISTANCE,
-            "scale": analysis["scale"],
             "threshold": analysis["threshold"],
+            "tileSize": analysis["tileSize"],
+            "tileOverlap": analysis["tileOverlap"],
+            "tileCount": analysis["tileCount"],
         },
         "source": {
             "svsUrl": svs_url,
