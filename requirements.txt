@@ -2,8 +2,5 @@ fastapi
 uvicorn[standard]
 openslide-bin
 openslide-python
-cellpose
 numpy
-pillow
 requests
-packaging

@@ -328,7 +328,7 @@ function updateAnalysisSummaryForActiveRoi() {
   }
 
   setAnalysisSummary(
-    `${roi.name}: ${result.cellCount} cells detected in ${result.timingMs} ms using ${result.model?.name || "Cellpose"}.`
+    `${roi.name}: ${result.cellCount} cells detected in ${result.timingMs} ms using ${result.model?.name || "image analysis"}.`
   );
 }
 
@@ -831,7 +831,7 @@ async function runCellCountingForActiveRoi() {
   roiAnalysisInFlight = true;
   updateRoiFormUi();
   setViewerStatus(`Running cell counting for ${roi.name}...`);
-  setAnalysisSummary(`Running Cellpose on ${roi.name}...`, { isLoading: true });
+  setAnalysisSummary(`Running image analysis on ${roi.name}...`, { isLoading: true });
 
   try {
     const response = await fetch(apiUrl, {
