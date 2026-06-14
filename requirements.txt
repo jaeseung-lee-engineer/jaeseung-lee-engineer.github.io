@@ -6,3 +6,4 @@ cellpose
 numpy
 pillow
 requests
+packaging
