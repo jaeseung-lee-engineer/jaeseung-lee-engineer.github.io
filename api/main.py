@@ -123,3 +123,8 @@ def get_case(case_id: str):
         "caseId": case_id,
         **case,
     }
+
+import openslide
+
+print("OpenSlide import OK")
+print(openslide.__file__)
