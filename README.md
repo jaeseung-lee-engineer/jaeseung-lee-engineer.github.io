@@ -31,6 +31,10 @@ POST /annotations
 - Slide Details — Quantitative metrics & notes  
 - Import Annotation — Import annotations from QuPath
 
+## ROI-based cell counting 
+- Implemented an OpenCV-based prototype that estimates cell counts within user-defined ROIs and displays contour overlays directly in the web portal.
+<img src="cell-counting.png" width="1000">
+
 ## QuPath Workflow Continuity
 
 To support downstream pathology review beyond the browser-based viewer, the portal includes export features designed to preserve workflow continuity into QuPath.
