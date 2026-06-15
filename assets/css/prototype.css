@@ -1186,7 +1186,7 @@ body.demo-fullscreen {
 .analysis-summary-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
   width: 100%;
   flex-wrap: wrap;
@@ -1213,8 +1213,8 @@ body.demo-fullscreen {
   flex: 0 0 auto;
 }
 
-.analysis-toggle-btn {
-  margin-left: auto;
+.analysis-summary-controls .is-hidden {
+  display: none;
 }
 
 .analysis-summary-body {
