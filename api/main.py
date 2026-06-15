@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
+import cv2
 import numpy as np
 import openslide
 import requests
@@ -39,12 +40,15 @@ SVS_CACHE_DIR = Path(
     )
 )
 ANALYSIS_MAX_DIMENSION = int(os.getenv("CLASSICAL_ANALYSIS_MAX_DIMENSION", "1024"))
-ANALYSIS_BLUR_RADIUS = int(os.getenv("CLASSICAL_ANALYSIS_BLUR_RADIUS", "2"))
-ANALYSIS_PEAK_PERCENTILE = float(os.getenv("CLASSICAL_ANALYSIS_PEAK_PERCENTILE", "92"))
 ANALYSIS_MIN_DISTANCE = int(os.getenv("CLASSICAL_ANALYSIS_MIN_DISTANCE", "8"))
 ANALYSIS_MAX_CELLS = int(os.getenv("CLASSICAL_ANALYSIS_MAX_CELLS", "4000"))
 ANALYSIS_TILE_SIZE = int(os.getenv("CLASSICAL_ANALYSIS_TILE_SIZE", "512"))
 ANALYSIS_TILE_OVERLAP = int(os.getenv("CLASSICAL_ANALYSIS_TILE_OVERLAP", "32"))
+ANALYSIS_GAUSSIAN_KERNEL = int(os.getenv("OPENCV_GAUSSIAN_KERNEL", "5"))
+ANALYSIS_DISTANCE_RATIO = float(os.getenv("OPENCV_DISTANCE_RATIO", "0.28"))
+ANALYSIS_MIN_AREA = int(os.getenv("OPENCV_MIN_AREA", "24"))
+ANALYSIS_MAX_AREA = int(os.getenv("OPENCV_MAX_AREA", "5000"))
+ANALYSIS_MORPH_KERNEL = int(os.getenv("OPENCV_MORPH_KERNEL", "3"))
 _case_data_cache = {
     "loaded_at": 0.0,
     "payload": None,
@@ -92,7 +96,7 @@ def health():
         "status": "ok",
         "caseDataConfigured": bool(CASE_DATA_URL),
         "maxRoiDimension": MAX_ROI_DIMENSION,
-        "analysisMode": "classical-peaks",
+        "analysisMode": "opencv-watershed-centroids",
     }
 
 
@@ -217,112 +221,60 @@ def clamp_tile_config():
     return tile_size, overlap
 
 
+def normalize_kernel_size(value: int):
+    size = max(1, int(value))
+    return size if size % 2 == 1 else size + 1
+
+
 def downsample_image(image_rgb: np.ndarray):
     height, width = image_rgb.shape[:2]
     longest_side = max(height, width)
     if longest_side <= ANALYSIS_MAX_DIMENSION:
-        return image_rgb.astype(np.float32, copy=False) / 255.0, 1
+        return image_rgb.copy(), 1
 
     scale = int(np.ceil(longest_side / ANALYSIS_MAX_DIMENSION))
-    reduced = image_rgb[::scale, ::scale].astype(np.float32, copy=False) / 255.0
+    reduced = cv2.resize(
+        image_rgb,
+        (max(1, width // scale), max(1, height // scale)),
+        interpolation=cv2.INTER_AREA,
+    )
     return reduced, scale
 
 
-def box_blur(image: np.ndarray, radius: int):
-    if radius <= 0:
-        return image
-
-    padded = np.pad(image, radius, mode="reflect")
-    integral = np.pad(padded, ((1, 0), (1, 0)), mode="constant").cumsum(axis=0).cumsum(axis=1)
-    size = (radius * 2) + 1
-    blurred = (
-        integral[size:, size:]
-        - integral[:-size, size:]
-        - integral[size:, :-size]
-        + integral[:-size, :-size]
-    ) / float(size * size)
-    return blurred
-
-
-def compute_nucleus_score(image_rgb: np.ndarray):
-    red = image_rgb[..., 0]
-    green = image_rgb[..., 1]
-    blue = image_rgb[..., 2]
+def build_nucleus_score_image(image_rgb: np.ndarray):
+    image_float = image_rgb.astype(np.float32, copy=False) / 255.0
+    red = image_float[..., 0]
+    green = image_float[..., 1]
+    blue = image_float[..., 2]
     intensity = (red + green + blue) / 3.0
     purple_bias = ((red + blue) * 0.5) - green
     darkness = 1.0 - intensity
-    score = (purple_bias * 0.65) + (darkness * 0.85)
-    return np.clip(score, 0.0, 1.0)
+    score = np.clip((purple_bias * 0.7) + (darkness * 0.8), 0.0, 1.0)
+    return np.clip(score * 255.0, 0, 255).astype(np.uint8)
 
 
-def find_local_maxima(score_map: np.ndarray, threshold: float):
-    if score_map.shape[0] < 3 or score_map.shape[1] < 3:
-        return np.zeros_like(score_map, dtype=bool)
-
-    center = score_map[1:-1, 1:-1]
-    maxima = center >= threshold
-    for dy in (-1, 0, 1):
-        for dx in (-1, 0, 1):
-            if dy == 0 and dx == 0:
-                continue
-            neighbor = score_map[1 + dy:score_map.shape[0] - 1 + dy, 1 + dx:score_map.shape[1] - 1 + dx]
-            maxima &= center >= neighbor
-
-    output = np.zeros_like(score_map, dtype=bool)
-    output[1:-1, 1:-1] = maxima
-    return output
-
-
-def filter_peaks(score_map: np.ndarray, peak_mask: np.ndarray, scale: int, roi_origin: tuple[int, int]):
-    peak_rows, peak_cols = np.nonzero(peak_mask)
-    if peak_rows.size == 0:
-        return []
-
-    peak_scores = score_map[peak_rows, peak_cols]
-    order = np.argsort(peak_scores)[::-1]
-    occupancy = np.zeros_like(peak_mask, dtype=bool)
-    min_distance = max(2, int(np.ceil(ANALYSIS_MIN_DISTANCE / scale)))
-    cells = []
-    offset_x, offset_y = roi_origin
-
-    for index in order:
-        row = int(peak_rows[index])
-        col = int(peak_cols[index])
-        top = max(0, row - min_distance)
-        bottom = min(occupancy.shape[0], row + min_distance + 1)
-        left = max(0, col - min_distance)
-        right = min(occupancy.shape[1], col + min_distance + 1)
-
-        if occupancy[top:bottom, left:right].any():
-            continue
-
-        occupancy[top:bottom, left:right] = True
-        local_x = (col + 0.5) * scale
-        local_y = (row + 0.5) * scale
-        cells.append(
-            {
-                "id": len(cells) + 1,
-                "x": round(offset_x + local_x, 3),
-                "y": round(offset_y + local_y, 3),
-                "localX": round(local_x, 3),
-                "localY": round(local_y, 3),
-                "score": round(float(peak_scores[index]), 4),
-            }
-        )
-        if len(cells) >= ANALYSIS_MAX_CELLS:
-            break
-
-    return cells
-
-
-def run_classical_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, int]):
+def run_opencv_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, int]):
     reduced_image, scale = downsample_image(image_rgb)
-    score_map = compute_nucleus_score(reduced_image)
-    blurred_score = box_blur(score_map, ANALYSIS_BLUR_RADIUS)
-    intensity = reduced_image.mean(axis=2)
-    tissue_mask = intensity < 0.9
+    score_image = build_nucleus_score_image(reduced_image)
+    blur_kernel = normalize_kernel_size(ANALYSIS_GAUSSIAN_KERNEL)
+    morph_kernel_size = max(1, ANALYSIS_MORPH_KERNEL)
 
-    if not np.any(tissue_mask):
+    blurred = cv2.GaussianBlur(score_image, (blur_kernel, blur_kernel), 0)
+    _threshold, binary = cv2.threshold(
+        blurred,
+        0,
+        255,
+        cv2.THRESH_BINARY + cv2.THRESH_OTSU,
+    )
+
+    morph_kernel = cv2.getStructuringElement(
+        cv2.MORPH_ELLIPSE,
+        (morph_kernel_size, morph_kernel_size),
+    )
+    opened = cv2.morphologyEx(binary, cv2.MORPH_OPEN, morph_kernel, iterations=1)
+    closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, morph_kernel, iterations=1)
+
+    if cv2.countNonZero(closed) == 0:
         return {
             "cellCount": 0,
             "cells": [],
@@ -331,16 +283,69 @@ def run_classical_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, 
             "threshold": None,
         }
 
-    tissue_scores = blurred_score[tissue_mask]
-    threshold = float(np.percentile(tissue_scores, ANALYSIS_PEAK_PERCENTILE))
-    peak_mask = find_local_maxima(blurred_score, threshold) & tissue_mask
-    cells = filter_peaks(blurred_score, peak_mask, scale, roi_origin)
+    distance = cv2.distanceTransform(closed, cv2.DIST_L2, 5)
+    max_distance = float(distance.max())
+    if max_distance <= 0:
+        return {
+            "cellCount": 0,
+            "cells": [],
+            "maskShape": [int(reduced_image.shape[1]), int(reduced_image.shape[0])],
+            "scale": scale,
+            "threshold": None,
+        }
+
+    _, sure_fg = cv2.threshold(
+        distance,
+        ANALYSIS_DISTANCE_RATIO * max_distance,
+        255,
+        cv2.THRESH_BINARY,
+    )
+    sure_fg = sure_fg.astype(np.uint8)
+    unknown = cv2.subtract(closed, sure_fg)
+
+    component_count, markers = cv2.connectedComponents(sure_fg)
+    markers = markers + 1
+    markers[unknown == 255] = 0
+
+    watershed_input = cv2.cvtColor(reduced_image, cv2.COLOR_RGB2BGR)
+    watershed_markers = cv2.watershed(watershed_input, markers)
+
+    offset_x, offset_y = roi_origin
+    cells = []
+
+    for label_id in range(2, component_count + 1):
+        component_mask = watershed_markers == label_id
+        area = int(np.count_nonzero(component_mask))
+        if area < ANALYSIS_MIN_AREA or area > ANALYSIS_MAX_AREA:
+            continue
+
+        ys, xs = np.nonzero(component_mask)
+        if xs.size == 0:
+            continue
+
+        local_x = float(xs.mean()) * scale
+        local_y = float(ys.mean()) * scale
+        cells.append(
+            {
+                "id": len(cells) + 1,
+                "x": round(offset_x + local_x, 3),
+                "y": round(offset_y + local_y, 3),
+                "localX": round(local_x, 3),
+                "localY": round(local_y, 3),
+                "score": area,
+                "area": area,
+            }
+        )
+
+        if len(cells) >= ANALYSIS_MAX_CELLS:
+            break
+
     return {
         "cellCount": len(cells),
         "cells": cells,
         "maskShape": [int(reduced_image.shape[1]), int(reduced_image.shape[0])],
         "scale": scale,
-        "threshold": round(threshold, 4),
+        "threshold": None,
     }
 
 
@@ -397,17 +402,16 @@ def run_tiled_count(slide_reader: openslide.OpenSlide, roi_bounds: tuple[int, in
     x, y, width, height = roi_bounds
     all_cells = []
     tile_count = 0
-    threshold_values = []
+    scales = []
     max_mask_width = 0
     max_mask_height = 0
 
     for tile_x, tile_y, tile_width, tile_height in iter_roi_tiles(x, y, width, height):
         tile_count += 1
         region = slide_reader.read_region((tile_x, tile_y), 0, (tile_width, tile_height)).convert("RGB")
-        analysis = run_classical_count_on_region(np.asarray(region), (tile_x, tile_y))
+        analysis = run_opencv_count_on_region(np.asarray(region), (tile_x, tile_y))
         all_cells.extend(analysis["cells"])
-        if analysis["threshold"] is not None:
-            threshold_values.append(analysis["threshold"])
+        scales.append(analysis["scale"])
         max_mask_width = max(max_mask_width, int(analysis["maskShape"][0]))
         max_mask_height = max(max_mask_height, int(analysis["maskShape"][1]))
 
@@ -423,7 +427,7 @@ def run_tiled_count(slide_reader: openslide.OpenSlide, roi_bounds: tuple[int, in
         "tileCount": tile_count,
         "tileSize": tile_size,
         "tileOverlap": overlap,
-        "threshold": round(float(np.mean(threshold_values)), 4) if threshold_values else None,
+        "scale": int(round(float(np.mean(scales)))) if scales else 1,
     }
 
 
@@ -506,14 +510,17 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
         "overlayType": "points",
         "maskShape": analysis["maskShape"],
         "model": {
-            "name": "classical-peaks",
-            "blurRadius": ANALYSIS_BLUR_RADIUS,
-            "peakPercentile": ANALYSIS_PEAK_PERCENTILE,
+            "name": "opencv-watershed-centroids",
+            "gaussianKernel": normalize_kernel_size(ANALYSIS_GAUSSIAN_KERNEL),
+            "distanceRatio": ANALYSIS_DISTANCE_RATIO,
             "minDistance": ANALYSIS_MIN_DISTANCE,
-            "threshold": analysis["threshold"],
+            "minArea": ANALYSIS_MIN_AREA,
+            "maxArea": ANALYSIS_MAX_AREA,
+            "morphKernel": ANALYSIS_MORPH_KERNEL,
             "tileSize": analysis["tileSize"],
             "tileOverlap": analysis["tileOverlap"],
             "tileCount": analysis["tileCount"],
+            "scale": analysis["scale"],
         },
         "source": {
             "svsUrl": svs_url,

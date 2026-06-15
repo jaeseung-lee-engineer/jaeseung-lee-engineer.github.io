@@ -4,3 +4,4 @@ openslide-bin
 openslide-python
 numpy
 requests
+opencv-python-headless
