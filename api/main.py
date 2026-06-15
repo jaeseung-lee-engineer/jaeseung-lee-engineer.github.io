@@ -56,7 +56,7 @@ STARDIST_API_URL = os.getenv(
 )
 STARDIST_NGC_API_URL = os.getenv(
     "STARDIST_NGC_API_URL",
-    "https://jaeseung-lee-engineer--digital-pathology-stardist-ngc-fastapi-app.modal.run/stardist",
+    "https://jaeseung-lee-engineer--digital-pathology-stardist-ngc-fa-54aa4b.modal.run/stardist",
 )
 STARDIST_REQUEST_TIMEOUT_SECONDS = int(os.getenv("STARDIST_REQUEST_TIMEOUT_SECONDS", "900"))
 _case_data_cache = {
