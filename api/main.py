@@ -50,6 +50,11 @@ ANALYSIS_MIN_AREA = int(os.getenv("OPENCV_MIN_AREA", "24"))
 ANALYSIS_MAX_AREA = int(os.getenv("OPENCV_MAX_AREA", "5000"))
 ANALYSIS_MORPH_KERNEL = int(os.getenv("OPENCV_MORPH_KERNEL", "3"))
 ANALYSIS_CONTOUR_EPSILON = float(os.getenv("OPENCV_CONTOUR_EPSILON", "1.2"))
+STARDIST_API_URL = os.getenv(
+    "STARDIST_API_URL",
+    "https://jaeseung-lee-engineer--digital-pathology-stardist-fastapi-app.modal.run/stardist",
+)
+STARDIST_REQUEST_TIMEOUT_SECONDS = int(os.getenv("STARDIST_REQUEST_TIMEOUT_SECONDS", "900"))
 _case_data_cache = {
     "loaded_at": 0.0,
     "payload": None,
@@ -553,3 +558,66 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
         },
         "timingMs": elapsed_ms,
     }
+
+
+@app.post("/slides/{slide_id}/cell-count/stardist")
+def count_cells_in_roi_stardist(slide_id: str, payload: CellCountRequest):
+    case_data = load_case_data()
+    case_id, case, slide = find_slide_by_id(case_data, slide_id)
+
+    if not slide:
+        raise HTTPException(status_code=404, detail=f"Slide '{slide_id}' not found")
+
+    svs_url = slide.get("svsUrl")
+    if not svs_url:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Slide '{slide_id}' does not include an SVS source URL.",
+        )
+
+    stardist_payload = {
+        "svsUrl": svs_url,
+        "roi": {
+            "x": payload.roi.x,
+            "y": payload.roi.y,
+            "width": payload.roi.width,
+            "height": payload.roi.height,
+        },
+    }
+
+    try:
+        response = requests.post(
+            STARDIST_API_URL,
+            json=stardist_payload,
+            timeout=STARDIST_REQUEST_TIMEOUT_SECONDS,
+        )
+    except requests.RequestException as error:
+        raise HTTPException(
+            status_code=502,
+            detail="Unable to reach the StarDist analysis service.",
+        ) from error
+
+    if not response.ok:
+        detail = "StarDist analysis failed."
+        try:
+            error_payload = response.json()
+            if isinstance(error_payload, dict) and error_payload.get("detail"):
+                detail = str(error_payload["detail"])
+        except ValueError:
+            detail = response.text or detail
+
+        raise HTTPException(status_code=502, detail=detail)
+
+    try:
+        result = response.json()
+    except ValueError as error:
+        raise HTTPException(
+            status_code=502,
+            detail="StarDist service returned an invalid JSON response.",
+        ) from error
+
+    result["caseId"] = case_id
+    result["caseDiagnosis"] = case.get("diagnosis")
+    result["slideId"] = slide_id
+    result["slideLabel"] = slide.get("label")
+    return result

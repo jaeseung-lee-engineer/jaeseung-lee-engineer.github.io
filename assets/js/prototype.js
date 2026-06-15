@@ -1,5 +1,4 @@
 const API_BASE_URL = "https://jaeseung-lee-engineer-github-io.onrender.com";
-const STARDIST_API_URL = "https://jaeseung-lee-engineer--digital-pathology-stardist-fastapi-app.modal.run/stardist";
 const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
 const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
 const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
@@ -942,13 +941,15 @@ async function runCellCountingForActiveRoi() {
 }
 
 async function runStarDistForActiveRoi() {
+  const analysisContext = validateActiveRoiForAnalysis();
+  if (!analysisContext) return;
+
   await runAnalysisForActiveRoi({
     source: "stardist",
-    apiUrl: STARDIST_API_URL,
+    apiUrl: getApiUrl(`/slides/${encodeURIComponent(analysisContext.slide.slideId)}/cell-count/stardist`),
     summaryLabel: "StarDist analysis",
     viewerLabel: "StarDist",
-    buildPayload: ({ slide, roi, width, height }) => ({
-      svsUrl: slide.svsUrl,
+    buildPayload: ({ roi, width, height }) => ({
       roi: {
         x: Math.max(0, Math.round(roi.imageRect.x)),
         y: Math.max(0, Math.round(roi.imageRect.y)),
@@ -1036,7 +1037,7 @@ function updateRoiFormUi() {
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
   runButton.disabled = !canAnalyze;
-  stardistButton.disabled = !canAnalyze || !STARDIST_API_URL;
+  stardistButton.disabled = !canAnalyze;
   runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run";
   stardistButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist";
 }

@@ -18,6 +18,13 @@ SVS_DOWNLOAD_TIMEOUT_SECONDS = int(os.getenv("SVS_DOWNLOAD_TIMEOUT_SECONDS", "30
 DEFAULT_PERCENTILE_LOW = float(os.getenv("STARDIST_PERCENTILE_LOW", "0.2"))
 DEFAULT_PERCENTILE_HIGH = float(os.getenv("STARDIST_PERCENTILE_HIGH", "99.8"))
 DEFAULT_MAX_DIMENSION = int(os.getenv("STARDIST_MAX_DIMENSION", "4096"))
+DEFAULT_ALLOWED_ORIGINS = [
+    "https://jaeseung-lee-engineer.github.io",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 app = modal.App(APP_NAME)
 
@@ -61,11 +68,44 @@ def fastapi_app():
     import requests
     from csbdeep.utils import normalize
     from fastapi import FastAPI, HTTPException
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.responses import Response
     from pydantic import BaseModel, Field
     from stardist.models import StarDist2D
 
     web_app = FastAPI(title="StarDist Modal API")
     _model = None
+    allowed_origins = []
+
+    def parse_allowed_origins():
+        raw_origins = os.getenv("ALLOWED_ORIGINS")
+        if not raw_origins:
+            return DEFAULT_ALLOWED_ORIGINS
+
+        origins = [origin.strip() for origin in raw_origins.split(",")]
+        return [origin for origin in origins if origin]
+
+    allowed_origins = parse_allowed_origins()
+
+    web_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    def build_cors_response():
+        origin = allowed_origins[0] if allowed_origins else "*"
+        return Response(
+            status_code=204,
+            headers={
+                "Access-Control-Allow-Origin": origin,
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Max-Age": "86400",
+            },
+        )
 
     class RoiRectRequest(BaseModel):
         x: float = Field(ge=0)
@@ -217,6 +257,14 @@ def fastapi_app():
             "maxRoiDimension": MAX_ROI_DIMENSION,
             "gpuType": GPU_TYPE,
         }
+
+    @web_app.options("/health")
+    async def health_options():
+        return build_cors_response()
+
+    @web_app.options("/stardist")
+    async def stardist_options():
+        return build_cors_response()
 
     @web_app.post("/stardist")
     async def stardist_detect(payload: StarDistRequest):
