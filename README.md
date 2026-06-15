@@ -32,7 +32,7 @@ POST /annotations
 - Import Annotation — Import annotations from QuPath
 
 ## ROI-based cell counting 
-- Implemented an OpenCV-based prototype that estimates cell counts within user-defined ROIs and displays contour overlays directly in the web portal.
+- Built a deep learning-based ROI cell counting workflow using StarDist, including nuclei segmentation, automated count estimation, and overlay visualization within the digital pathology web portal.
 <img src="cell-counting.png" width="1000">
 
 ## QuPath Workflow Continuity
