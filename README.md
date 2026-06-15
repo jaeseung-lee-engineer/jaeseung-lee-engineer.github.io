@@ -31,8 +31,8 @@ POST /annotations
 - Slide Details — Quantitative metrics & notes  
 - Import Annotation — Import annotations from QuPath
 
-## ROI-based cell counting 
-- Built a deep learning-based ROI cell counting workflow using StarDist, including nuclei segmentation, automated count estimation, and overlay visualization within the digital pathology web portal.
+## Deep learning-based cell counting 
+- A StarDist-based nuclei segmentation workflow to estimate cell counts within user-defined ROIs and display segmentation overlays for visual quality control. StarDist is widely used in bioimage analysis workflows, including tools such as QuPath and ImageJ/Fiji..
 <img src="cell-counting.png" width="1000">
 
 ## QuPath Workflow Continuity
