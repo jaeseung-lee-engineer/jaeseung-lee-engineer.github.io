@@ -5,6 +5,22 @@ const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
 const VIEWER_ZOOM_PER_SCROLL = 1.1;
 const ROI_EXAMPLE_USER_NAME = "User name";
 const MAX_ROI_ANALYSIS_DIMENSION = 2048;
+const ANALYSIS_METHODS = {
+  classical: {
+    endpoint: "",
+    buttonLabel: "Run Cell Counting",
+    runningLabel: "Counting...",
+    statusLabel: "classical counting",
+    summaryLabel: "classical image analysis"
+  },
+  cellpose: {
+    endpoint: "/cellpose",
+    buttonLabel: "Run Cellpose (Experimental)",
+    runningLabel: "Running...",
+    statusLabel: "Cellpose experimental",
+    summaryLabel: "Cellpose experimental"
+  }
+};
 
 let caseData = {};
 let caseSummaries = [];
@@ -24,6 +40,7 @@ let roiOverlayRenderFrame = 0;
 let roiOverlaySyncFrame = 0;
 const roiAnalysisResults = {};
 let roiAnalysisInFlight = false;
+let roiAnalysisMethodInFlight = "classical";
 function loadSavedRois() {
   try {
     // Security: Check localStorage availability
@@ -277,18 +294,36 @@ function getCurrentSlideAnalysisResults() {
   return roiAnalysisResults[getRoiStorageKey()] || {};
 }
 
-function getAnalysisResultForRoi(roiId) {
+function getStoredAnalysisEntryForRoi(roiId) {
   if (!roiId) return null;
   return getCurrentSlideAnalysisResults()[roiId] || null;
 }
 
-function setAnalysisResultForRoi(roiId, result) {
+function getActiveAnalysisMethodForRoi(roiId) {
+  return getStoredAnalysisEntryForRoi(roiId)?.activeMethod || "classical";
+}
+
+function getAnalysisResultForRoi(roiId, method = null) {
+  const entry = getStoredAnalysisEntryForRoi(roiId);
+  if (!entry) return null;
+  const targetMethod = method || entry.activeMethod || "classical";
+  return entry.results?.[targetMethod] || null;
+}
+
+function setAnalysisResultForRoi(roiId, method, result) {
   if (!roiId) return;
   const storageKey = getRoiStorageKey();
   if (!roiAnalysisResults[storageKey]) {
     roiAnalysisResults[storageKey] = {};
   }
-  roiAnalysisResults[storageKey][roiId] = result;
+  const existing = roiAnalysisResults[storageKey][roiId] || { results: {}, activeMethod: method };
+  roiAnalysisResults[storageKey][roiId] = {
+    activeMethod: method,
+    results: {
+      ...existing.results,
+      [method]: result
+    }
+  };
 }
 
 function clearAnalysisResultForRoi(roiId) {
@@ -312,7 +347,7 @@ function setAnalysisSummary(message, options = {}) {
 function updateAnalysisSummaryForActiveRoi() {
   const roi = getActiveRoi();
   if (!roi) {
-    setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
+    setAnalysisSummary("Select a saved ROI, then run classical counting or Cellpose experimental mode to compare results.");
     return;
   }
 
@@ -321,14 +356,28 @@ function updateAnalysisSummaryForActiveRoi() {
     return;
   }
 
-  const result = getAnalysisResultForRoi(roi.id);
-  if (!result) {
+  const entry = getStoredAnalysisEntryForRoi(roi.id);
+  if (!entry?.results || !Object.keys(entry.results).length) {
     setAnalysisSummary(`Ready to analyze ${roi.name}. ROI must be <= ${MAX_ROI_ANALYSIS_DIMENSION} x ${MAX_ROI_ANALYSIS_DIMENSION}px.`);
     return;
   }
 
+  const activeMethod = entry.activeMethod || "classical";
+  const activeResult = entry.results[activeMethod];
+  const classicalResult = entry.results.classical;
+  const cellposeResult = entry.results.cellpose;
+  const parts = [];
+
+  if (classicalResult) {
+    parts.push(`Classical: ${classicalResult.cellCount}`);
+  }
+  if (cellposeResult) {
+    parts.push(`Cellpose: ${cellposeResult.cellCount}`);
+  }
+
+  const activeLabel = activeMethod === "cellpose" ? "Cellpose experimental" : "classical image analysis";
   setAnalysisSummary(
-    `${roi.name}: ${result.cellCount} cells detected in ${result.timingMs} ms using ${result.model?.name || "image analysis"}.`
+    `${roi.name}: ${parts.join(" · ")}. Overlay showing ${activeLabel} (${activeResult?.timingMs ?? "-"} ms).`
   );
 }
 
@@ -790,9 +839,10 @@ async function downloadQuPathPackage() {
   }
 }
 
-async function runCellCountingForActiveRoi() {
+async function runAnalysisForActiveRoi(method = "classical") {
   const slide = getCurrentSlide();
   const roi = getActiveRoi();
+  const methodConfig = ANALYSIS_METHODS[method] || ANALYSIS_METHODS.classical;
 
   if (!slide) {
     setViewerStatus("Select a slide before running cell counting.");
@@ -821,7 +871,7 @@ async function runCellCountingForActiveRoi() {
     return;
   }
 
-  const apiUrl = getApiUrl(`/slides/${encodeURIComponent(slide.slideId)}/cell-count`);
+  const apiUrl = getApiUrl(`/slides/${encodeURIComponent(slide.slideId)}/cell-count${methodConfig.endpoint}`);
   if (!apiUrl) {
     setViewerStatus("API base URL is not configured.");
     setAnalysisSummary("API base URL is not configured.", { isError: true });
@@ -829,9 +879,10 @@ async function runCellCountingForActiveRoi() {
   }
 
   roiAnalysisInFlight = true;
+  roiAnalysisMethodInFlight = method;
   updateRoiFormUi();
-  setViewerStatus(`Running cell counting for ${roi.name}...`);
-  setAnalysisSummary(`Running image analysis on ${roi.name}...`, { isLoading: true });
+  setViewerStatus(`Running ${methodConfig.statusLabel} for ${roi.name}...`);
+  setAnalysisSummary(`Running ${methodConfig.summaryLabel} on ${roi.name}...`, { isLoading: true });
 
   try {
     const response = await fetch(apiUrl, {
@@ -866,19 +917,28 @@ async function runCellCountingForActiveRoi() {
     }
 
     const result = await response.json();
-    setAnalysisResultForRoi(roi.id, result);
+    setAnalysisResultForRoi(roi.id, method, result);
     renderRoiList();
     renderAnalysisOverlayNow();
     updateAnalysisSummaryForActiveRoi();
-    setViewerStatus(`Detected ${result.cellCount} cells in ${roi.name}`);
+    setViewerStatus(`Detected ${result.cellCount} cells in ${roi.name} with ${methodConfig.summaryLabel}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Cell counting failed.";
     setViewerStatus(message);
     setAnalysisSummary(message, { isError: true });
   } finally {
     roiAnalysisInFlight = false;
+    roiAnalysisMethodInFlight = "classical";
     updateRoiFormUi();
   }
+}
+
+async function runCellCountingForActiveRoi() {
+  await runAnalysisForActiveRoi("classical");
+}
+
+async function runCellposeForActiveRoi() {
+  await runAnalysisForActiveRoi("cellpose");
 }
 
 // Security: Input validation utilities
@@ -942,9 +1002,10 @@ function updateRoiFormUi() {
   const saveButton = document.getElementById("addRoiSecondaryBtn");
   const deleteButton = document.getElementById("deleteRoiBtn");
   const runButton = document.getElementById("runCellCountingBtn");
+  const runCellposeButton = document.getElementById("runCellposeBtn");
   const actionContainer = saveButton?.closest(".roi-form-actions");
 
-  if (!saveButton || !deleteButton || !runButton || !actionContainer) return;
+  if (!saveButton || !deleteButton || !runButton || !runCellposeButton || !actionContainer) return;
 
   const isEditing = Boolean(activeRoiEditId);
   const activeRoi = getActiveRoi();
@@ -957,7 +1018,13 @@ function updateRoiFormUi() {
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
   runButton.disabled = !canAnalyze;
-  runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run Cell Counting";
+  runCellposeButton.disabled = !canAnalyze;
+  runButton.textContent = roiAnalysisInFlight && roiAnalysisMethodInFlight === "classical"
+    ? ANALYSIS_METHODS.classical.runningLabel
+    : ANALYSIS_METHODS.classical.buttonLabel;
+  runCellposeButton.textContent = roiAnalysisInFlight && roiAnalysisMethodInFlight === "cellpose"
+    ? ANALYSIS_METHODS.cellpose.runningLabel
+    : ANALYSIS_METHODS.cellpose.buttonLabel;
 }
 
 function getActiveRoi() {
@@ -1121,14 +1188,15 @@ function renderAnalysisOverlayNow() {
   }
 
   const imageItem = viewer.world.getItemAt(0);
-  const slideResults = Object.values(getCurrentSlideAnalysisResults());
-  if (!slideResults.length) {
+  const slideResultEntries = Object.values(getCurrentSlideAnalysisResults());
+  if (!slideResultEntries.length) {
     layer.replaceChildren();
     return;
   }
 
-  const points = slideResults.flatMap((result) => (
-    Array.isArray(result.cells) ? result.cells.map((cell) => {
+  const points = slideResultEntries.flatMap((entry) => {
+    const result = entry?.results?.[entry.activeMethod || "classical"];
+    return Array.isArray(result?.cells) ? result.cells.map((cell) => {
       const viewportPoint = imageItem.imageToViewportCoordinates(cell.x, cell.y);
       const pixelPoint = viewer.viewport.pixelFromPoint(viewportPoint, true);
       const point = document.createElement("div");
@@ -1136,8 +1204,8 @@ function renderAnalysisOverlayNow() {
       point.style.transform = `translate3d(${pixelPoint.x}px, ${pixelPoint.y}px, 0)`;
       point.title = `Detected cell (${Math.round(cell.localX)}, ${Math.round(cell.localY)})`;
       return point;
-    }) : []
-  ));
+    }) : [];
+  });
 
   layer.replaceChildren(...points);
 }
@@ -1502,12 +1570,17 @@ function renderRoiList() {
 
     const meta = document.createElement("div");
     meta.className = "roi-card-meta";
-    const analysisResult = getAnalysisResultForRoi(roi.id);
     const baseMeta = roi.savedAt
       ? `${ROI_EXAMPLE_USER_NAME} · ${roi.savedAt}`
       : ROI_EXAMPLE_USER_NAME;
-    meta.textContent = analysisResult
-      ? `${baseMeta} · ${analysisResult.cellCount} cells`
+    const classicalResult = getAnalysisResultForRoi(roi.id, "classical");
+    const cellposeResult = getAnalysisResultForRoi(roi.id, "cellpose");
+    const metrics = [
+      classicalResult ? `Classical ${classicalResult.cellCount}` : "",
+      cellposeResult ? `Cellpose ${cellposeResult.cellCount}` : ""
+    ].filter(Boolean);
+    meta.textContent = metrics.length
+      ? `${baseMeta} · ${metrics.join(" / ")}`
       : baseMeta;
     card.appendChild(meta);
 
@@ -1783,6 +1856,7 @@ async function renderSlideDetails() {
 function clearSlideSelectionUi() {
   activeRoiEditId = null;
   roiAnalysisInFlight = false;
+  roiAnalysisMethodInFlight = "classical";
   document.getElementById("slideMetaLabel").textContent = "-";
   document.getElementById("slideMetaSubmitter").textContent = "-";
   document.getElementById("slideMetaId").textContent = "-";
@@ -1817,7 +1891,7 @@ function clearSlideSelectionUi() {
       ? "Choose a linked slide to load whole-slide viewing, ROI tools, and slide-level details."
       : "Choose a case from the left panel to load metadata, linked slides, and whole-slide review."
   );
-  setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
+  setAnalysisSummary("Select a saved ROI, then run classical counting or Cellpose experimental mode to compare results.");
   updateRoiFormUi();
   renderRoiList();
 }
@@ -2031,6 +2105,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
   document.getElementById("deleteRoiBtn").addEventListener("click", deleteActiveRoi);
   document.getElementById("runCellCountingBtn").addEventListener("click", runCellCountingForActiveRoi);
+  document.getElementById("runCellposeBtn").addEventListener("click", runCellposeForActiveRoi);
   document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
   document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
   document.getElementById("imsBtn").addEventListener("click", openIMS);
@@ -2077,7 +2152,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   updateRoiFormUi();
-  setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
+  setAnalysisSummary("Select a saved ROI, then run classical counting or Cellpose experimental mode to compare results.");
 
   loadCaseList()
     .then(() => {
