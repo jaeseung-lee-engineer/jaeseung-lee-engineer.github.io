@@ -768,9 +768,9 @@ body.demo-fullscreen {
 
 .roi-size-badge {
   position: absolute;
-  left: 0;
-  top: -30px;
-  max-width: calc(100% + 16px);
+  left: 8px;
+  top: 8px;
+  max-width: calc(100% - 16px);
   padding: 4px 8px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.88);
@@ -781,6 +781,14 @@ body.demo-fullscreen {
   white-space: nowrap;
   box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease;
+}
+
+.roi-size-badge.is-visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 .roi-edit-box.hidden,

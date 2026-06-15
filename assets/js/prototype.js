@@ -1016,6 +1016,7 @@ function hideEditableRoiOverlay() {
   box.classList.remove("circle");
   if (sizeBadge) {
     sizeBadge.textContent = "";
+    sizeBadge.classList.remove("is-visible");
   }
 }
 
@@ -1152,10 +1153,17 @@ function updateEditableRoiSizeBadge(rect) {
   const imageRect = getImageRectFromOverlayPixels(rect);
   if (!imageRect) {
     sizeBadge.textContent = "";
+    sizeBadge.classList.remove("is-visible");
     return;
   }
 
   sizeBadge.textContent = `${Math.max(0, Math.round(imageRect.width))} x ${Math.max(0, Math.round(imageRect.height))} px`;
+}
+
+function setEditableRoiSizeBadgeVisible(isVisible) {
+  const { sizeBadge } = getRoiEditElements();
+  if (!sizeBadge) return;
+  sizeBadge.classList.toggle("is-visible", isVisible);
 }
 
 function renderAnalysisOverlayNow() {
@@ -1437,6 +1445,7 @@ function buildOverlayRectFromDrag(state, clientX, clientY) {
 function stopRoiOverlayDrag() {
   if (!roiOverlayDragState) return;
   roiOverlayDragState = null;
+  setEditableRoiSizeBadgeVisible(false);
   applyOverlayRectToActiveRoi();
   showEditableRoiOverlayForActiveRoi();
 }
@@ -1494,6 +1503,7 @@ function startRoiOverlayDrag(event, mode) {
       height: Number.parseFloat(box.style.height || "0")
     }
   };
+  setEditableRoiSizeBadgeVisible(true);
 }
 
 function buildSeedViewportRect(bounds, shape) {
