@@ -1061,7 +1061,7 @@ function updateRoiFormUi() {
   stardistCpuButton.disabled = !canAnalyze;
   stardistNgcButton.disabled = !canAnalyze;
   runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run";
-  stardistCpuButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist CPU";
+  stardistCpuButton.textContent = roiAnalysisInFlight ? "Working..." : "Run";
   stardistNgcButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist NGC";
 }
 

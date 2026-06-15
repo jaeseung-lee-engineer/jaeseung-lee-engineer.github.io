@@ -38,12 +38,11 @@ image = (
     modal.Image.from_registry(
         NGC_IMAGE_TAG,
         secret=ngc_secret,
-        add_python="3.11",
     )
     .apt_install("libgl1", "libglib2.0-0")
     .pip_install(
         "fastapi[standard]",
-        "numpy",
+        "numpy==1.26.4",
         "opencv-python-headless",
         "openslide-bin",
         "openslide-python",
