@@ -6,8 +6,10 @@ from pathlib import Path
 import modal
 
 
-APP_NAME = os.getenv("MODAL_APP_NAME", "digital-pathology-stardist")
+APP_NAME = os.getenv("MODAL_APP_NAME", "digital-pathology-stardist-ngc")
 MODEL_NAME = os.getenv("STARDIST_MODEL_NAME", "2D_versatile_he")
+NGC_IMAGE_TAG = os.getenv("NGC_TENSORFLOW_IMAGE", "nvcr.io/nvidia/tensorflow:25.02-tf2-py3")
+NGC_SECRET_NAME = os.getenv("NGC_SECRET_NAME", "ngc-registry")
 MODEL_VOLUME_NAME = os.getenv("MODAL_MODEL_VOLUME", "stardist-models")
 SVS_VOLUME_NAME = os.getenv("MODAL_SVS_VOLUME", "stardist-svs-cache")
 MODEL_DIR = "/models"
@@ -27,8 +29,17 @@ DEFAULT_ALLOWED_ORIGINS = [
 
 app = modal.App(APP_NAME)
 
+ngc_secret = modal.Secret.from_name(
+    NGC_SECRET_NAME,
+    required_keys=["REGISTRY_USERNAME", "REGISTRY_PASSWORD"],
+)
+
 image = (
-    modal.Image.debian_slim(python_version="3.11")
+    modal.Image.from_registry(
+        NGC_IMAGE_TAG,
+        secret=ngc_secret,
+        add_python="3.11",
+    )
     .apt_install("libgl1", "libglib2.0-0")
     .pip_install(
         "fastapi[standard]",
@@ -37,7 +48,6 @@ image = (
         "openslide-bin",
         "openslide-python",
         "requests",
-        "tensorflow",
         "stardist",
         "csbdeep",
         "pillow",
@@ -51,6 +61,7 @@ svs_volume = modal.Volume.from_name(SVS_VOLUME_NAME, create_if_missing=True)
 
 @app.function(
     image=image,
+    gpu="L4",
     timeout=900,
     scaledown_window=300,
     volumes={
@@ -71,9 +82,8 @@ def fastapi_app():
     from pydantic import BaseModel, Field
     from stardist.models import StarDist2D
 
-    web_app = FastAPI(title="StarDist Modal API")
+    web_app = FastAPI(title="StarDist Modal NGC API")
     _model = None
-    allowed_origins = []
 
     def parse_allowed_origins():
         raw_origins = os.getenv("ALLOWED_ORIGINS")
@@ -254,10 +264,11 @@ def fastapi_app():
             "status": "ok",
             "modelName": MODEL_NAME,
             "maxRoiDimension": MAX_ROI_DIMENSION,
-            "runtime": "cpu",
+            "runtime": "ngc-gpu",
             "tensorflowGpus": [
                 device.name for device in tf.config.list_physical_devices("GPU")
             ],
+            "ngcImage": NGC_IMAGE_TAG,
         }
 
     @web_app.options("/health")
@@ -325,6 +336,7 @@ def fastapi_app():
                 "percentileHigh": payload.percentileHigh,
                 "maxDimension": payload.maxDimension,
                 "scale": scale,
+                "container": "ngc-tensorflow",
             },
             "source": {
                 "svsUrl": payload.svsUrl,

@@ -285,7 +285,7 @@ function getAnalysisResultForRoi(roiId) {
   if (!entry) return null;
 
   const activeSource = entry.activeSource || DEFAULT_ANALYSIS_SOURCE;
-  return entry[activeSource] || entry.opencv || entry.stardist || null;
+  return entry[activeSource] || entry.opencv || entry.stardist_cpu || entry.stardist_ngc || entry.stardist || null;
 }
 
 function setAnalysisResultForRoi(roiId, source, result) {
@@ -945,10 +945,30 @@ async function runStarDistForActiveRoi() {
   if (!analysisContext) return;
 
   await runAnalysisForActiveRoi({
-    source: "stardist",
+    source: "stardist_cpu",
     apiUrl: getApiUrl(`/slides/${encodeURIComponent(analysisContext.slide.slideId)}/cell-count/stardist`),
-    summaryLabel: "StarDist analysis",
-    viewerLabel: "StarDist",
+    summaryLabel: "StarDist CPU analysis",
+    viewerLabel: "StarDist CPU",
+    buildPayload: ({ roi, width, height }) => ({
+      roi: {
+        x: Math.max(0, Math.round(roi.imageRect.x)),
+        y: Math.max(0, Math.round(roi.imageRect.y)),
+        width,
+        height
+      }
+    })
+  });
+}
+
+async function runStarDistNgcForActiveRoi() {
+  const analysisContext = validateActiveRoiForAnalysis();
+  if (!analysisContext) return;
+
+  await runAnalysisForActiveRoi({
+    source: "stardist_ngc",
+    apiUrl: getApiUrl(`/slides/${encodeURIComponent(analysisContext.slide.slideId)}/cell-count/stardist-ngc`),
+    summaryLabel: "StarDist NGC analysis",
+    viewerLabel: "StarDist NGC",
     buildPayload: ({ roi, width, height }) => ({
       roi: {
         x: Math.max(0, Math.round(roi.imageRect.x)),
@@ -1021,10 +1041,11 @@ function updateRoiFormUi() {
   const saveButton = document.getElementById("addRoiSecondaryBtn");
   const deleteButton = document.getElementById("deleteRoiBtn");
   const runButton = document.getElementById("runCellCountingBtn");
-  const stardistButton = document.getElementById("runStarDistBtn");
+  const stardistCpuButton = document.getElementById("runStarDistCpuBtn");
+  const stardistNgcButton = document.getElementById("runStarDistNgcBtn");
   const actionContainer = saveButton?.closest(".roi-form-actions");
 
-  if (!saveButton || !deleteButton || !runButton || !stardistButton || !actionContainer) return;
+  if (!saveButton || !deleteButton || !runButton || !stardistCpuButton || !stardistNgcButton || !actionContainer) return;
 
   const isEditing = Boolean(activeRoiEditId);
   const activeRoi = getActiveRoi();
@@ -1037,9 +1058,11 @@ function updateRoiFormUi() {
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
   runButton.disabled = !canAnalyze;
-  stardistButton.disabled = !canAnalyze;
+  stardistCpuButton.disabled = !canAnalyze;
+  stardistNgcButton.disabled = !canAnalyze;
   runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run";
-  stardistButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist";
+  stardistCpuButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist CPU";
+  stardistNgcButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist NGC";
 }
 
 function getActiveRoi() {
@@ -1272,7 +1295,7 @@ function renderAnalysisOverlayNow() {
   const fallbackPoints = [];
 
   slideResults.forEach((entry) => {
-    const result = entry?.[entry.activeSource || DEFAULT_ANALYSIS_SOURCE] || entry?.opencv || entry?.stardist || entry;
+    const result = entry?.[entry.activeSource || DEFAULT_ANALYSIS_SOURCE] || entry?.opencv || entry?.stardist_cpu || entry?.stardist_ngc || entry?.stardist || entry;
     if (!Array.isArray(result.cells)) return;
 
     result.cells.forEach((cell) => {
@@ -2193,7 +2216,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
   document.getElementById("deleteRoiBtn").addEventListener("click", deleteActiveRoi);
   document.getElementById("runCellCountingBtn").addEventListener("click", runCellCountingForActiveRoi);
-  document.getElementById("runStarDistBtn").addEventListener("click", runStarDistForActiveRoi);
+  document.getElementById("runStarDistCpuBtn").addEventListener("click", runStarDistForActiveRoi);
+  document.getElementById("runStarDistNgcBtn").addEventListener("click", runStarDistNgcForActiveRoi);
   document.getElementById("toggleContourOverlayBtn").addEventListener("click", toggleAnalysisContours);
   document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
   document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);

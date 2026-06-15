@@ -54,6 +54,10 @@ STARDIST_API_URL = os.getenv(
     "STARDIST_API_URL",
     "https://jaeseung-lee-engineer--digital-pathology-stardist-fastapi-app.modal.run/stardist",
 )
+STARDIST_NGC_API_URL = os.getenv(
+    "STARDIST_NGC_API_URL",
+    "https://jaeseung-lee-engineer--digital-pathology-stardist-ngc-fastapi-app.modal.run/stardist",
+)
 STARDIST_REQUEST_TIMEOUT_SECONDS = int(os.getenv("STARDIST_REQUEST_TIMEOUT_SECONDS", "900"))
 _case_data_cache = {
     "loaded_at": 0.0,
@@ -560,8 +564,7 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
     }
 
 
-@app.post("/slides/{slide_id}/cell-count/stardist")
-def count_cells_in_roi_stardist(slide_id: str, payload: CellCountRequest):
+def forward_stardist_request(slide_id: str, payload: CellCountRequest, target_url: str):
     case_data = load_case_data()
     case_id, case, slide = find_slide_by_id(case_data, slide_id)
 
@@ -587,7 +590,7 @@ def count_cells_in_roi_stardist(slide_id: str, payload: CellCountRequest):
 
     try:
         response = requests.post(
-            STARDIST_API_URL,
+            target_url,
             json=stardist_payload,
             timeout=STARDIST_REQUEST_TIMEOUT_SECONDS,
         )
@@ -621,3 +624,13 @@ def count_cells_in_roi_stardist(slide_id: str, payload: CellCountRequest):
     result["slideId"] = slide_id
     result["slideLabel"] = slide.get("label")
     return result
+
+
+@app.post("/slides/{slide_id}/cell-count/stardist")
+def count_cells_in_roi_stardist(slide_id: str, payload: CellCountRequest):
+    return forward_stardist_request(slide_id, payload, STARDIST_API_URL)
+
+
+@app.post("/slides/{slide_id}/cell-count/stardist-ngc")
+def count_cells_in_roi_stardist_ngc(slide_id: str, payload: CellCountRequest):
+    return forward_stardist_request(slide_id, payload, STARDIST_NGC_API_URL)
