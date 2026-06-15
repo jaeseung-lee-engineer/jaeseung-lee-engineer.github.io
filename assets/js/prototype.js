@@ -1,4 +1,5 @@
 const API_BASE_URL = "https://jaeseung-lee-engineer-github-io.onrender.com";
+const STARDIST_API_URL = "https://jaeseung-lee-engineer--digital-pathology-stardist-fastapi-app.modal.run/stardist";
 const CASE_DATA_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/case-data.json";
 const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/public-test/";
 const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
@@ -25,6 +26,7 @@ let roiOverlaySyncFrame = 0;
 const roiAnalysisResults = {};
 let roiAnalysisInFlight = false;
 let analysisContoursVisible = true;
+const DEFAULT_ANALYSIS_SOURCE = "opencv";
 function loadSavedRois() {
   try {
     // Security: Check localStorage availability
@@ -280,16 +282,34 @@ function getCurrentSlideAnalysisResults() {
 
 function getAnalysisResultForRoi(roiId) {
   if (!roiId) return null;
-  return getCurrentSlideAnalysisResults()[roiId] || null;
+  const entry = getCurrentSlideAnalysisResults()[roiId];
+  if (!entry) return null;
+
+  const activeSource = entry.activeSource || DEFAULT_ANALYSIS_SOURCE;
+  return entry[activeSource] || entry.opencv || entry.stardist || null;
 }
 
-function setAnalysisResultForRoi(roiId, result) {
+function setAnalysisResultForRoi(roiId, source, result) {
   if (!roiId) return;
   const storageKey = getRoiStorageKey();
   if (!roiAnalysisResults[storageKey]) {
     roiAnalysisResults[storageKey] = {};
   }
-  roiAnalysisResults[storageKey][roiId] = result;
+  if (!roiAnalysisResults[storageKey][roiId]) {
+    roiAnalysisResults[storageKey][roiId] = {
+      activeSource: DEFAULT_ANALYSIS_SOURCE
+    };
+  }
+
+  roiAnalysisResults[storageKey][roiId][source] = result;
+  roiAnalysisResults[storageKey][roiId].activeSource = source;
+}
+
+function setActiveAnalysisSourceForRoi(roiId, source) {
+  if (!roiId) return;
+  const entry = getCurrentSlideAnalysisResults()[roiId];
+  if (!entry || !entry[source]) return;
+  entry.activeSource = source;
 }
 
 function clearAnalysisResultForRoi(roiId) {
@@ -805,26 +825,26 @@ async function downloadQuPathPackage() {
   }
 }
 
-async function runCellCountingForActiveRoi() {
+function validateActiveRoiForAnalysis() {
   const slide = getCurrentSlide();
   const roi = getActiveRoi();
 
   if (!slide) {
     setViewerStatus("Select a slide before running cell counting.");
-    return;
+    return null;
   }
 
   if (!roi) {
     setViewerStatus("Select a saved ROI before running cell counting.");
     setAnalysisSummary("Select a saved ROI before running cell counting.", { isError: true });
-    return;
+    return null;
   }
 
   if ((roi.shape || "rectangle") !== "rectangle") {
     const message = "Cell counting currently supports rectangle ROIs only.";
     setViewerStatus(message);
     setAnalysisSummary(message, { isError: true });
-    return;
+    return null;
   }
 
   const width = Math.round(roi.imageRect.width);
@@ -833,10 +853,21 @@ async function runCellCountingForActiveRoi() {
     const message = `ROI must be <= ${MAX_ROI_ANALYSIS_DIMENSION} x ${MAX_ROI_ANALYSIS_DIMENSION}px before analysis.`;
     setViewerStatus(message);
     setAnalysisSummary(message, { isError: true });
+    return null;
+  }
+
+  return { slide, roi, width, height };
+}
+
+async function runAnalysisForActiveRoi(options) {
+  const { source, apiUrl, summaryLabel, viewerLabel, buildPayload } = options;
+  const analysisContext = validateActiveRoiForAnalysis();
+  if (!analysisContext) {
     return;
   }
 
-  const apiUrl = getApiUrl(`/slides/${encodeURIComponent(slide.slideId)}/cell-count`);
+  const { slide, roi, width, height } = analysisContext;
+
   if (!apiUrl) {
     setViewerStatus("API base URL is not configured.");
     setAnalysisSummary("API base URL is not configured.", { isError: true });
@@ -845,8 +876,8 @@ async function runCellCountingForActiveRoi() {
 
   roiAnalysisInFlight = true;
   updateRoiFormUi();
-  setViewerStatus(`Running cell counting for ${roi.name}...`);
-  setAnalysisSummary(`Running image analysis on ${roi.name}...`, { isLoading: true });
+  setViewerStatus(`Running ${viewerLabel} for ${roi.name}...`);
+  setAnalysisSummary(`Running ${summaryLabel} on ${roi.name}...`, { isLoading: true });
 
   try {
     const response = await fetch(apiUrl, {
@@ -857,14 +888,7 @@ async function runCellCountingForActiveRoi() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        roi: {
-          x: Math.max(0, Math.round(roi.imageRect.x)),
-          y: Math.max(0, Math.round(roi.imageRect.y)),
-          width,
-          height
-        }
-      })
+      body: JSON.stringify(buildPayload({ slide, roi, width, height }))
     });
 
     if (!response.ok) {
@@ -881,11 +905,11 @@ async function runCellCountingForActiveRoi() {
     }
 
     const result = await response.json();
-    setAnalysisResultForRoi(roi.id, result);
+    setAnalysisResultForRoi(roi.id, source, result);
     renderRoiList();
     renderAnalysisOverlayNow();
     updateAnalysisSummaryForActiveRoi();
-    setViewerStatus(`Detected ${result.cellCount} cells in ${roi.name}`);
+    setViewerStatus(`Detected ${result.cellCount} cells in ${roi.name} using ${viewerLabel}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Cell counting failed.";
     setViewerStatus(message);
@@ -894,6 +918,45 @@ async function runCellCountingForActiveRoi() {
     roiAnalysisInFlight = false;
     updateRoiFormUi();
   }
+}
+
+async function runCellCountingForActiveRoi() {
+  const analysisContext = validateActiveRoiForAnalysis();
+  if (!analysisContext) return;
+
+  const apiUrl = getApiUrl(`/slides/${encodeURIComponent(analysisContext.slide.slideId)}/cell-count`);
+  await runAnalysisForActiveRoi({
+    source: "opencv",
+    apiUrl,
+    summaryLabel: "image analysis",
+    viewerLabel: "cell counting",
+    buildPayload: ({ roi, width, height }) => ({
+      roi: {
+        x: Math.max(0, Math.round(roi.imageRect.x)),
+        y: Math.max(0, Math.round(roi.imageRect.y)),
+        width,
+        height
+      }
+    })
+  });
+}
+
+async function runStarDistForActiveRoi() {
+  await runAnalysisForActiveRoi({
+    source: "stardist",
+    apiUrl: STARDIST_API_URL,
+    summaryLabel: "StarDist analysis",
+    viewerLabel: "StarDist",
+    buildPayload: ({ slide, roi, width, height }) => ({
+      svsUrl: slide.svsUrl,
+      roi: {
+        x: Math.max(0, Math.round(roi.imageRect.x)),
+        y: Math.max(0, Math.round(roi.imageRect.y)),
+        width,
+        height
+      }
+    })
+  });
 }
 
 // Security: Input validation utilities
@@ -957,9 +1020,10 @@ function updateRoiFormUi() {
   const saveButton = document.getElementById("addRoiSecondaryBtn");
   const deleteButton = document.getElementById("deleteRoiBtn");
   const runButton = document.getElementById("runCellCountingBtn");
+  const stardistButton = document.getElementById("runStarDistBtn");
   const actionContainer = saveButton?.closest(".roi-form-actions");
 
-  if (!saveButton || !deleteButton || !runButton || !actionContainer) return;
+  if (!saveButton || !deleteButton || !runButton || !stardistButton || !actionContainer) return;
 
   const isEditing = Boolean(activeRoiEditId);
   const activeRoi = getActiveRoi();
@@ -972,7 +1036,9 @@ function updateRoiFormUi() {
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
   runButton.disabled = !canAnalyze;
+  stardistButton.disabled = !canAnalyze || !STARDIST_API_URL;
   runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run";
+  stardistButton.textContent = roiAnalysisInFlight ? "Working..." : "StarDist";
 }
 
 function getActiveRoi() {
@@ -1204,7 +1270,8 @@ function renderAnalysisOverlayNow() {
 
   const fallbackPoints = [];
 
-  slideResults.forEach((result) => {
+  slideResults.forEach((entry) => {
+    const result = entry?.[entry.activeSource || DEFAULT_ANALYSIS_SOURCE] || entry?.opencv || entry?.stardist || entry;
     if (!Array.isArray(result.cells)) return;
 
     result.cells.forEach((cell) => {
@@ -2125,6 +2192,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
   document.getElementById("deleteRoiBtn").addEventListener("click", deleteActiveRoi);
   document.getElementById("runCellCountingBtn").addEventListener("click", runCellCountingForActiveRoi);
+  document.getElementById("runStarDistBtn").addEventListener("click", runStarDistForActiveRoi);
   document.getElementById("toggleContourOverlayBtn").addEventListener("click", toggleAnalysisContours);
   document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
   document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);

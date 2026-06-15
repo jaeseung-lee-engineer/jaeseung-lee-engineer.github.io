@@ -1189,6 +1189,7 @@ body.demo-fullscreen {
   justify-content: space-between;
   gap: 10px;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .analysis-summary-title {
@@ -1206,6 +1207,14 @@ body.demo-fullscreen {
   height: 28px;
   padding: 0 10px;
   font-size: 11px;
+}
+
+.analysis-run-btn {
+  flex: 0 0 auto;
+}
+
+.analysis-toggle-btn {
+  margin-left: auto;
 }
 
 .analysis-summary-body {
