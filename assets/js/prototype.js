@@ -1174,19 +1174,42 @@ function renderAnalysisOverlayNow() {
     return;
   }
 
-  const points = slideResults.flatMap((result) => (
-    Array.isArray(result.cells) ? result.cells.map((cell) => {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "analysis-overlay-svg");
+  svg.setAttribute("viewBox", `0 0 ${layer.clientWidth || 1} ${layer.clientHeight || 1}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+
+  const fallbackPoints = [];
+
+  slideResults.forEach((result) => {
+    if (!Array.isArray(result.cells)) return;
+
+    result.cells.forEach((cell) => {
+      if (Array.isArray(cell.contour) && cell.contour.length >= 3) {
+        const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        const pointsAttr = cell.contour.map((pair) => {
+          const viewportPoint = imageItem.imageToViewportCoordinates(pair[0], pair[1]);
+          const pixelPoint = viewer.viewport.pixelFromPoint(viewportPoint, true);
+          return `${pixelPoint.x},${pixelPoint.y}`;
+        }).join(" ");
+        polygon.setAttribute("class", "analysis-contour");
+        polygon.setAttribute("points", pointsAttr);
+        polygon.setAttribute("aria-hidden", "true");
+        svg.appendChild(polygon);
+        return;
+      }
+
       const viewportPoint = imageItem.imageToViewportCoordinates(cell.x, cell.y);
       const pixelPoint = viewer.viewport.pixelFromPoint(viewportPoint, true);
       const point = document.createElement("div");
       point.className = "analysis-point";
       point.style.transform = `translate3d(${pixelPoint.x}px, ${pixelPoint.y}px, 0)`;
       point.title = `Detected cell (${Math.round(cell.localX)}, ${Math.round(cell.localY)})`;
-      return point;
-    }) : []
-  ));
+      fallbackPoints.push(point);
+    });
+  });
 
-  layer.replaceChildren(...points);
+  layer.replaceChildren(svg, ...fallbackPoints);
 }
 
 function renderPersistentRoiOverlaysNow() {

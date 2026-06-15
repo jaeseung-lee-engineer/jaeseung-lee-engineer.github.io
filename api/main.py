@@ -49,6 +49,7 @@ ANALYSIS_DISTANCE_RATIO = float(os.getenv("OPENCV_DISTANCE_RATIO", "0.28"))
 ANALYSIS_MIN_AREA = int(os.getenv("OPENCV_MIN_AREA", "24"))
 ANALYSIS_MAX_AREA = int(os.getenv("OPENCV_MAX_AREA", "5000"))
 ANALYSIS_MORPH_KERNEL = int(os.getenv("OPENCV_MORPH_KERNEL", "3"))
+ANALYSIS_CONTOUR_EPSILON = float(os.getenv("OPENCV_CONTOUR_EPSILON", "1.2"))
 _case_data_cache = {
     "loaded_at": 0.0,
     "payload": None,
@@ -323,6 +324,28 @@ def run_opencv_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, int
         if xs.size == 0:
             continue
 
+        contour_mask = component_mask.astype(np.uint8) * 255
+        contours, _hierarchy = cv2.findContours(
+            contour_mask,
+            cv2.RETR_EXTERNAL,
+            cv2.CHAIN_APPROX_SIMPLE,
+        )
+        if not contours:
+            continue
+
+        contour = max(contours, key=cv2.contourArea)
+        epsilon = max(0.5, ANALYSIS_CONTOUR_EPSILON)
+        approx_contour = cv2.approxPolyDP(contour, epsilon, True)
+        contour_points = [
+            [
+                round(offset_x + (float(point[0][0]) * scale), 3),
+                round(offset_y + (float(point[0][1]) * scale), 3),
+            ]
+            for point in approx_contour
+        ]
+        if len(contour_points) < 3:
+            continue
+
         local_x = float(xs.mean()) * scale
         local_y = float(ys.mean()) * scale
         cells.append(
@@ -334,6 +357,7 @@ def run_opencv_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, int
                 "localY": round(local_y, 3),
                 "score": area,
                 "area": area,
+                "contour": contour_points,
             }
         )
 
@@ -507,7 +531,7 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
         },
         "cellCount": analysis["cellCount"],
         "cells": analysis["cells"],
-        "overlayType": "points",
+        "overlayType": "contours",
         "maskShape": analysis["maskShape"],
         "model": {
             "name": "opencv-watershed-centroids",
@@ -517,6 +541,7 @@ def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
             "minArea": ANALYSIS_MIN_AREA,
             "maxArea": ANALYSIS_MAX_AREA,
             "morphKernel": ANALYSIS_MORPH_KERNEL,
+            "contourEpsilon": ANALYSIS_CONTOUR_EPSILON,
             "tileSize": analysis["tileSize"],
             "tileOverlap": analysis["tileOverlap"],
             "tileCount": analysis["tileCount"],
