@@ -119,6 +119,7 @@
                 <div class="roi-display-layer" id="roiDisplayLayer" aria-hidden="true"></div>
                 <div class="roi-edit-layer hidden" id="roiEditLayer" aria-hidden="true">
                   <div class="roi-edit-box hidden" id="roiEditBox">
+                    <div class="roi-size-badge" id="roiSizeBadge" aria-live="polite"></div>
                     <div class="roi-edit-handle nw" data-handle="nw"></div>
                     <div class="roi-edit-handle ne" data-handle="ne"></div>
                     <div class="roi-edit-handle sw" data-handle="sw"></div>
@@ -154,7 +155,6 @@
                   <div class="roi-form-actions">
                     <button class="btn danger is-hidden" type="button" id="deleteRoiBtn" aria-hidden="true">Delete ROI</button>
                     <button class="btn" type="button" id="runCellCountingBtn">Run Cell Counting</button>
-                    <button class="btn" type="button" id="runCellposeBtn">Run Cellpose (Experimental)</button>
                     <button class="btn" type="button" id="addRoiSecondaryBtn">Create ROI</button>
                   </div>
                 </div>
@@ -162,7 +162,7 @@
               <div class="analysis-summary" id="analysisSummary">
                 <div class="analysis-summary-title">Cell Counting</div>
                 <div class="analysis-summary-body" id="analysisSummaryBody">
-                  Select a saved ROI, then run classical counting or Cellpose experimental mode to compare results.
+                  Select a saved ROI, then run cell counting to view count and overlay results.
                 </div>
               </div>
               <div id="roiList" class="roi-list">

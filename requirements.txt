@@ -4,6 +4,3 @@ openslide-bin
 openslide-python
 numpy
 requests
-packaging
-torch
-cellpose

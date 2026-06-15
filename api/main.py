@@ -45,17 +45,11 @@ ANALYSIS_MIN_DISTANCE = int(os.getenv("CLASSICAL_ANALYSIS_MIN_DISTANCE", "8"))
 ANALYSIS_MAX_CELLS = int(os.getenv("CLASSICAL_ANALYSIS_MAX_CELLS", "4000"))
 ANALYSIS_TILE_SIZE = int(os.getenv("CLASSICAL_ANALYSIS_TILE_SIZE", "512"))
 ANALYSIS_TILE_OVERLAP = int(os.getenv("CLASSICAL_ANALYSIS_TILE_OVERLAP", "32"))
-CELLPOSE_MODEL_NAME = os.getenv("CELLPOSE_PRETRAINED_MODEL", "cpsam_v2")
-CELLPOSE_DIAMETER = float(os.getenv("CELLPOSE_DIAMETER", "30"))
-CELLPOSE_BATCH_SIZE = int(os.getenv("CELLPOSE_BATCH_SIZE", "8"))
-CELLPOSE_MIN_SIZE = int(os.getenv("CELLPOSE_MIN_SIZE", "15"))
 _case_data_cache = {
     "loaded_at": 0.0,
     "payload": None,
 }
 _svs_cache_lock = Lock()
-_cellpose_model_lock = Lock()
-_cellpose_model = None
 
 
 class RoiRectRequest(BaseModel):
@@ -98,7 +92,7 @@ def health():
         "status": "ok",
         "caseDataConfigured": bool(CASE_DATA_URL),
         "maxRoiDimension": MAX_ROI_DIMENSION,
-        "analysisModes": ["classical", "cellpose-experimental"],
+        "analysisMode": "classical-peaks",
     }
 
 
@@ -221,35 +215,6 @@ def clamp_tile_config():
     tile_size = max(128, min(ANALYSIS_TILE_SIZE, MAX_ROI_DIMENSION))
     overlap = max(0, min(ANALYSIS_TILE_OVERLAP, tile_size // 2))
     return tile_size, overlap
-
-
-def get_cellpose_model():
-    global _cellpose_model
-
-    if _cellpose_model is not None:
-        return _cellpose_model
-
-    with _cellpose_model_lock:
-        if _cellpose_model is not None:
-            return _cellpose_model
-
-        try:
-            from cellpose import models
-        except ModuleNotFoundError as error:
-            raise HTTPException(
-                status_code=503,
-                detail=(
-                    "Cellpose is not installed on this deployment. "
-                    "Add cellpose, torch, and packaging to requirements to enable the experimental mode."
-                ),
-            ) from error
-
-        _cellpose_model = models.CellposeModel(
-            gpu=False,
-            pretrained_model=CELLPOSE_MODEL_NAME,
-        )
-
-    return _cellpose_model
 
 
 def downsample_image(image_rgb: np.ndarray):
@@ -379,76 +344,6 @@ def run_classical_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, 
     }
 
 
-def run_cellpose_count_on_region(image_rgb: np.ndarray, roi_origin: tuple[int, int]):
-    model = get_cellpose_model()
-    masks, _flows, _styles = model.eval(
-        image_rgb,
-        batch_size=CELLPOSE_BATCH_SIZE,
-        diameter=CELLPOSE_DIAMETER,
-        channels=None,
-        flow_threshold=0.4,
-        cellprob_threshold=0.0,
-        min_size=CELLPOSE_MIN_SIZE,
-        tile_overlap=0.1,
-    )
-    labels = np.asarray(masks, dtype=np.int32)
-    if labels.size == 0:
-        return {
-            "cellCount": 0,
-            "cells": [],
-            "maskShape": [0, 0],
-            "scale": 1,
-            "threshold": None,
-        }
-
-    positive = labels > 0
-    if not np.any(positive):
-        return {
-            "cellCount": 0,
-            "cells": [],
-            "maskShape": [int(labels.shape[1]), int(labels.shape[0])],
-            "scale": 1,
-            "threshold": None,
-        }
-
-    flat_labels = labels.ravel()
-    ys, xs = np.indices(labels.shape)
-    xs = xs.ravel()[positive.ravel()].astype(np.float64, copy=False)
-    ys = ys.ravel()[positive.ravel()].astype(np.float64, copy=False)
-    label_ids = flat_labels[positive.ravel()]
-    counts = np.bincount(label_ids)
-    sum_x = np.bincount(label_ids, weights=xs)
-    sum_y = np.bincount(label_ids, weights=ys)
-    offset_x, offset_y = roi_origin
-    cells = []
-
-    for label_id in range(1, len(counts)):
-        if counts[label_id] == 0:
-            continue
-        local_x = sum_x[label_id] / counts[label_id]
-        local_y = sum_y[label_id] / counts[label_id]
-        cells.append(
-            {
-                "id": len(cells) + 1,
-                "x": round(offset_x + local_x, 3),
-                "y": round(offset_y + local_y, 3),
-                "localX": round(local_x, 3),
-                "localY": round(local_y, 3),
-                "score": float(counts[label_id]),
-            }
-        )
-        if len(cells) >= ANALYSIS_MAX_CELLS:
-            break
-
-    return {
-        "cellCount": len(cells),
-        "cells": cells,
-        "maskShape": [int(labels.shape[1]), int(labels.shape[0])],
-        "scale": 1,
-        "threshold": None,
-    }
-
-
 def deduplicate_cells(cells: list[dict], min_distance: float):
     if not cells:
         return []
@@ -532,37 +427,6 @@ def run_tiled_count(slide_reader: openslide.OpenSlide, roi_bounds: tuple[int, in
     }
 
 
-def run_tiled_cellpose_count(slide_reader: openslide.OpenSlide, roi_bounds: tuple[int, int, int, int]):
-    x, y, width, height = roi_bounds
-    all_cells = []
-    tile_count = 0
-    max_mask_width = 0
-    max_mask_height = 0
-
-    for tile_x, tile_y, tile_width, tile_height in iter_roi_tiles(x, y, width, height):
-        tile_count += 1
-        region = slide_reader.read_region((tile_x, tile_y), 0, (tile_width, tile_height)).convert("RGB")
-        analysis = run_cellpose_count_on_region(np.asarray(region), (tile_x, tile_y))
-        all_cells.extend(analysis["cells"])
-        max_mask_width = max(max_mask_width, int(analysis["maskShape"][0]))
-        max_mask_height = max(max_mask_height, int(analysis["maskShape"][1]))
-
-        if len(all_cells) >= ANALYSIS_MAX_CELLS * 3:
-            break
-
-    deduped_cells = deduplicate_cells(all_cells, ANALYSIS_MIN_DISTANCE)
-    tile_size, overlap = clamp_tile_config()
-    return {
-        "cellCount": len(deduped_cells),
-        "cells": deduped_cells,
-        "maskShape": [max_mask_width, max_mask_height],
-        "tileCount": tile_count,
-        "tileSize": tile_size,
-        "tileOverlap": overlap,
-        "threshold": None,
-    }
-
-
 @app.get("/cases")
 def get_cases():
     case_data = load_case_data()
@@ -596,28 +460,35 @@ def get_case(case_id: str):
     }
 
 
-def build_analysis_response(case_id: str, case: dict, slide_id: str, slide: dict, roi_bounds: tuple[int, int, int, int], analysis: dict, method: str, svs_url: str, cached_svs_path: Path, timing_ms: float):
-    x, y, width, height = roi_bounds
-    model_payload = {
-        "name": "classical-peaks",
-        "blurRadius": ANALYSIS_BLUR_RADIUS,
-        "peakPercentile": ANALYSIS_PEAK_PERCENTILE,
-        "minDistance": ANALYSIS_MIN_DISTANCE,
-        "threshold": analysis["threshold"],
-        "tileSize": analysis["tileSize"],
-        "tileOverlap": analysis["tileOverlap"],
-        "tileCount": analysis["tileCount"],
-    }
-    if method == "cellpose":
-        model_payload = {
-            "name": "cellpose-experimental",
-            "diameter": CELLPOSE_DIAMETER,
-            "minSize": CELLPOSE_MIN_SIZE,
-            "batchSize": CELLPOSE_BATCH_SIZE,
-            "tileSize": analysis["tileSize"],
-            "tileOverlap": analysis["tileOverlap"],
-            "tileCount": analysis["tileCount"],
-        }
+@app.post("/slides/{slide_id}/cell-count")
+def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
+    case_data = load_case_data()
+    case_id, case, slide = find_slide_by_id(case_data, slide_id)
+
+    if not slide:
+        raise HTTPException(status_code=404, detail=f"Slide '{slide_id}' not found")
+
+    svs_url = slide.get("svsUrl")
+    if not svs_url:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Slide '{slide_id}' does not include an SVS source URL.",
+        )
+
+    started_at = time.perf_counter()
+    cached_svs_path = ensure_svs_cached(svs_url)
+
+    try:
+        with openslide.OpenSlide(str(cached_svs_path)) as slide_reader:
+            x, y, width, height = normalize_roi_bounds(payload.roi, slide_reader.dimensions)
+            analysis = run_tiled_count(slide_reader, (x, y, width, height))
+    except openslide.OpenSlideError as error:
+        raise HTTPException(
+            status_code=502,
+            detail="Unable to open the cached SVS with OpenSlide.",
+        ) from error
+
+    elapsed_ms = round((time.perf_counter() - started_at) * 1000, 2)
 
     return {
         "caseId": case_id,
@@ -634,56 +505,19 @@ def build_analysis_response(case_id: str, case: dict, slide_id: str, slide: dict
         "cells": analysis["cells"],
         "overlayType": "points",
         "maskShape": analysis["maskShape"],
-        "method": method,
-        "model": model_payload,
+        "model": {
+            "name": "classical-peaks",
+            "blurRadius": ANALYSIS_BLUR_RADIUS,
+            "peakPercentile": ANALYSIS_PEAK_PERCENTILE,
+            "minDistance": ANALYSIS_MIN_DISTANCE,
+            "threshold": analysis["threshold"],
+            "tileSize": analysis["tileSize"],
+            "tileOverlap": analysis["tileOverlap"],
+            "tileCount": analysis["tileCount"],
+        },
         "source": {
             "svsUrl": svs_url,
             "cachedFilename": cached_svs_path.name,
         },
-        "timingMs": timing_ms,
+        "timingMs": elapsed_ms,
     }
-
-
-def count_cells_in_roi_with_method(slide_id: str, payload: CellCountRequest, method: str):
-    case_data = load_case_data()
-    case_id, case, slide = find_slide_by_id(case_data, slide_id)
-
-    if not slide:
-        raise HTTPException(status_code=404, detail=f"Slide '{slide_id}' not found")
-
-    svs_url = slide.get("svsUrl")
-    if not svs_url:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Slide '{slide_id}' does not include an SVS source URL.",
-        )
-
-    started_at = time.perf_counter()
-    cached_svs_path = ensure_svs_cached(svs_url)
-    roi_bounds = None
-
-    try:
-        with openslide.OpenSlide(str(cached_svs_path)) as slide_reader:
-            roi_bounds = normalize_roi_bounds(payload.roi, slide_reader.dimensions)
-            if method == "cellpose":
-                analysis = run_tiled_cellpose_count(slide_reader, roi_bounds)
-            else:
-                analysis = run_tiled_count(slide_reader, roi_bounds)
-    except openslide.OpenSlideError as error:
-        raise HTTPException(
-            status_code=502,
-            detail="Unable to open the cached SVS with OpenSlide.",
-        ) from error
-    elapsed_ms = round((time.perf_counter() - started_at) * 1000, 2)
-
-    return build_analysis_response(case_id, case, slide_id, slide, roi_bounds, analysis, method, svs_url, cached_svs_path, elapsed_ms)
-
-
-@app.post("/slides/{slide_id}/cell-count")
-def count_cells_in_roi(slide_id: str, payload: CellCountRequest):
-    return count_cells_in_roi_with_method(slide_id, payload, "classical")
-
-
-@app.post("/slides/{slide_id}/cell-count/cellpose")
-def count_cells_in_roi_cellpose(slide_id: str, payload: CellCountRequest):
-    return count_cells_in_roi_with_method(slide_id, payload, "cellpose")
