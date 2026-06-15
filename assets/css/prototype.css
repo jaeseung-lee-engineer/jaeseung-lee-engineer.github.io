@@ -1177,13 +1177,35 @@ body.demo-fullscreen {
   background: var(--surface-subtle);
 }
 
-.analysis-summary-title {
+.analysis-summary-header {
+  display: grid;
+  gap: 8px;
   margin-bottom: 4px;
+}
+
+.analysis-summary-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.analysis-summary-title {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
+}
+
+.analysis-run-btn,
+.analysis-toggle-btn {
+  min-width: 72px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
 }
 
 .analysis-summary-body {

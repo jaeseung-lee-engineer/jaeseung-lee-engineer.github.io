@@ -4,7 +4,7 @@ const S3_ASSET_BASE_URL = "https://jaeseung-lee.s3.us-east-2.amazonaws.com/publi
 const S3_ASSET_ORIGIN = new URL(S3_ASSET_BASE_URL).origin;
 const VIEWER_ZOOM_PER_SCROLL = 1.1;
 const ROI_EXAMPLE_USER_NAME = "User name";
-const MAX_ROI_ANALYSIS_DIMENSION = 2048;
+const MAX_ROI_ANALYSIS_DIMENSION = 3000;
 
 let caseData = {};
 let caseSummaries = [];
@@ -24,6 +24,7 @@ let roiOverlayRenderFrame = 0;
 let roiOverlaySyncFrame = 0;
 const roiAnalysisResults = {};
 let roiAnalysisInFlight = false;
+let analysisContoursVisible = true;
 function loadSavedRois() {
   try {
     // Security: Check localStorage availability
@@ -307,6 +308,20 @@ function setAnalysisSummary(message, options = {}) {
   summary.classList.toggle("is-loading", isLoading);
   summary.classList.toggle("is-error", isError);
   body.textContent = message;
+}
+
+function updateAnalysisOverlayToggleUi() {
+  const toggleButton = document.getElementById("toggleContourOverlayBtn");
+  if (!toggleButton) return;
+
+  toggleButton.textContent = analysisContoursVisible ? "Contour Off" : "Contour On";
+  toggleButton.setAttribute("aria-pressed", String(analysisContoursVisible));
+}
+
+function toggleAnalysisContours() {
+  analysisContoursVisible = !analysisContoursVisible;
+  updateAnalysisOverlayToggleUi();
+  renderAnalysisOverlayNow();
 }
 
 function updateAnalysisSummaryForActiveRoi() {
@@ -957,7 +972,7 @@ function updateRoiFormUi() {
   deleteButton.classList.toggle("is-hidden", !isEditing);
   deleteButton.setAttribute("aria-hidden", String(!isEditing));
   runButton.disabled = !canAnalyze;
-  runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run Cell Counting";
+  runButton.textContent = roiAnalysisInFlight ? "Counting..." : "Run";
 }
 
 function getActiveRoi() {
@@ -1177,7 +1192,7 @@ function renderAnalysisOverlayNow() {
 
   const imageItem = viewer.world.getItemAt(0);
   const slideResults = Object.values(getCurrentSlideAnalysisResults());
-  if (!slideResults.length) {
+  if (!slideResults.length || !analysisContoursVisible) {
     layer.replaceChildren();
     return;
   }
@@ -2110,6 +2125,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("addRoiSecondaryBtn").addEventListener("click", saveCurrentViewAsRoi);
   document.getElementById("deleteRoiBtn").addEventListener("click", deleteActiveRoi);
   document.getElementById("runCellCountingBtn").addEventListener("click", runCellCountingForActiveRoi);
+  document.getElementById("toggleContourOverlayBtn").addEventListener("click", toggleAnalysisContours);
   document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
   document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
   document.getElementById("imsBtn").addEventListener("click", openIMS);
@@ -2154,6 +2170,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tab-button").forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
+  updateAnalysisOverlayToggleUi();
 
   updateRoiFormUi();
   setAnalysisSummary("Select a saved ROI, then run cell counting to view count and overlay results.");
