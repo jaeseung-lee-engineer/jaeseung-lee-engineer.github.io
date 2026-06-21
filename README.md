@@ -55,8 +55,6 @@ AWS S3 currently serves as the backing data layer for the portal, including:
 - DZI tile JPEGs
 - source SVS files
 
-This means the frontend is already connected to cloud-hosted review data rather than showing a purely conceptual IMS placeholder.
-
 ## Tech Stack
 
 - HTML/CSS/JavaScript
