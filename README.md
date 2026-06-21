@@ -1,14 +1,14 @@
 # Digital Pathology Portal Demo
 
 This demo explores how case-level clinical meta-data and slide-level information can be unified within a single pathology review interface.
-The current implementation combines a static frontend, FastAPI backend, AWS S3 asset storage, and OpenSeadragon-based whole-slide image viewing.
+The current implementation combines a static frontend, FastAPI backend, AWS S3-backed case and slide data delivery, and OpenSeadragon-based whole-slide image viewing.
 <a href="https://jaeseung-lee-engineer.github.io/prototype.html" target="_blank">
 Open the Digital Pathology Portal Demo
 </a>
 
 <img src="digital_pathology_demo_architecture.png" width="1000">
 
-This demo now includes a lightweight FastAPI backend deployed separately from the static frontend. The current implementation uses an API-first metadata flow, falls back to AWS S3 if the API is unavailable, and streams slide assets directly from S3.
+This demo now includes a lightweight FastAPI backend deployed separately from the static frontend. The current implementation uses an API-first metadata flow, falls back to AWS S3 if the API is unavailable, and reads both case metadata and slide assets from the same cloud-backed source.
 
 Current API endpoints:
 
@@ -45,20 +45,17 @@ To support downstream pathology review beyond the browser-based viewer, the port
 - Review Context Preservation — carries slide identifiers, case summary metadata, and source SVS link forward into the downstream analysis step
 - Current implementation stores ROI client-side in localStorage for lightweight review continuity.
 
-## AWS S3
-- case-data.json
+## Cloud-Backed Review Data
+
+AWS S3 currently serves as the backing data layer for the portal, including:
+
+- `case-data.json` case and slide metadata
 - thumbnail images
-- DZI files
+- DZI manifests
 - DZI tile JPEGs
 - source SVS files
-  
-## IMS Integration
 
-Designed to conceptually support retrieval of:
-- Whole-slide images (WSI)
-- Case metadata
-- Slide details
-- Annotation layers
+This means the frontend is already connected to cloud-hosted review data rather than showing a purely conceptual IMS placeholder.
 
 ## Tech Stack
 

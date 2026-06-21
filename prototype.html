@@ -24,7 +24,7 @@
       <a class="back-link" href="index.html">← Back to home</a>
       <h1>Digital Pathology Review Portal</h1>
       <p class="subtitle">
-        Prototype interface for case-level review built with TCGA open-access data, integrating whole-slide viewing, metadata context, and conceptual IMS connectivity. Implementation details and system design available on <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank">GitHub Repository</a>
+        Prototype interface for case-level review built with TCGA open-access data, integrating whole-slide viewing, metadata context, and AWS S3-backed case and slide delivery. Implementation details and system design available on <a href="https://github.com/jaeseung-lee-engineer/jaeseung-lee-engineer.github.io" target="_blank">GitHub Repository</a>
       </p>
     </header>
 
@@ -35,7 +35,7 @@
           <span class="prototype-badge">Prototype</span>
         </div>
         <div class="topbar-meta">
-          IMS Integration Concept: <strong style="color: var(--text); font-weight: 600;">Proscia Concentriq LS</strong>
+          Cloud-Backed Review Data: <strong style="color: var(--text); font-weight: 600;">AWS S3</strong>
         </div>
       </div>
 
@@ -103,8 +103,6 @@
               <button class="btn action-link" type="button" id="packageBtn">□ Export to QuPath</button>
               <span class="action-separator" aria-hidden="true">|</span>
               <button class="btn action-link" type="button" id="heatmapBtn">◉ Import Annotation</button>
-              <span class="action-separator" aria-hidden="true">|</span>
-              <button class="btn action-link" type="button" id="imsBtn">↗ Concentriq LS</button>
               <span class="action-separator compact-only-action" aria-hidden="true">|</span>
               <button class="btn action-link compact-only-action" type="button" id="toggleRoiPanelBtn">▣ Regions of Interest</button>
               <span class="action-separator compact-only-action" aria-hidden="true">|</span>

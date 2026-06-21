@@ -2049,10 +2049,6 @@ function toggleHeatmap() {
   document.getElementById("heatmapOverlay").classList.toggle("visible", heatmapOn);
 }
 
-function openIMS() {
-  alert("Prototype action: this would open the selected slide in Proscia Concentriq LS using an API deep-link.");
-}
-
 function isCompactPanelMode() {
   return window.matchMedia("(max-width: 2000px)").matches;
 }
@@ -2221,7 +2217,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("toggleContourOverlayBtn").addEventListener("click", toggleAnalysisContours);
   document.getElementById("downloadSvsBtn").addEventListener("click", downloadCurrentSvs);
   document.getElementById("packageBtn").addEventListener("click", downloadQuPathPackage);
-  document.getElementById("imsBtn").addEventListener("click", openIMS);
   document.getElementById("toggleRoiPanelBtn").addEventListener("click", () => toggleCompactPanel("roi"));
   document.getElementById("toggleDetailsPanelBtn").addEventListener("click", () => toggleCompactPanel("side"));
   document.getElementById("fullscreenToggleBtn").addEventListener("click", toggleDemoFullscreen);
